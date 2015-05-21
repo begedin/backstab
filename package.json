@@ -1,0 +1,26 @@
+{
+  "name": "backstab",
+  "version": "0.0.0",
+  "description": "Stealth puzzler in Phaser",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/begedin/backstab.git"
+  },
+  "keywords": [
+    "game",
+    "phaser",
+    "stealth",
+    "puzzle",
+    "rogue"
+  ],
+  "author": "Nikola Begedin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/begedin/backstab/issues"
+  },
+  "homepage": "https://github.com/begedin/backstab"
+}
