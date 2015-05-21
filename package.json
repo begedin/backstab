@@ -22,5 +22,11 @@
   "bugs": {
     "url": "https://github.com/begedin/backstab/issues"
   },
-  "homepage": "https://github.com/begedin/backstab"
+  "homepage": "https://github.com/begedin/backstab",
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-babel": "^5.1.0",
+    "gulp-sourcemaps": "^1.5.2",
+    "require-dir": "^0.3.0"
+  }
 }
