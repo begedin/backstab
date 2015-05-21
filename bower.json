@@ -1,31 +1,12 @@
 {
   "name": "backstab",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "description": "A stealth puzzler",
   "authors": [
-    "Nikola Begedin"
-  ],
-  "description": "A stealth puzzler in Phaser",
-  "main": "index.js",
-  "moduleType": [
-    "es6"
-  ],
-  "keywords": [
-    "rogue",
-    "game",
-    "phaser",
-    "stealth",
-    "puzzle"
-  ],
-  "license": "MIT",
-  "private": true,
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
+    ""
   ],
   "dependencies": {
-    "phaser": "~2.3.0"
+    "phaser-official": "latest",
+    "traceur-runtime": "latest"
   }
 }
