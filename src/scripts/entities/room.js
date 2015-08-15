@@ -25,6 +25,13 @@ class Room {
   get bottom() {
     return this.y + this.height;
   }
+
+  overlaps(entity) {
+    return this.left <= entity.right &&
+      entity.left <= this.right &&
+      this.top <= entity.bottom &&
+      entity.top <= this.bottom;
+  }
 }
 
 export default Room;

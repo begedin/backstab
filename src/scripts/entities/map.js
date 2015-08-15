@@ -2,7 +2,7 @@ import Room from 'entities/room';
 
 var MAP_ROWS = 25;
 var MAP_COLUMNS = 80;
-var MIN_ROOM_SIZE = 3;
+var MIN_ROOM_SIZE = 4;
 var MAX_ROOM_SIZE = 8;
 
 var ROOM_COUNT = 10;
@@ -31,8 +31,8 @@ class Map {
   }
 
   addRooms(count) {
-    while (this.unlinkedRooms.length < count) {
-        this.tryPlaceARoom();
+    while (this.rooms.length < count) {
+      this.tryPlaceARoom();
     }
   }
 
@@ -44,17 +44,27 @@ class Map {
     if (maxWidth < MIN_ROOM_SIZE) {
         return;
     }
-    var width = this.game.rnd.integerInRange(3, maxWidth);
+    var width = this.game.rnd.integerInRange(MIN_ROOM_SIZE, maxWidth);
 
     var maxHeight = Math.min(MAP_COLUMNS - y, MAX_ROOM_SIZE);
     if (maxHeight < MIN_ROOM_SIZE) {
         return;
     }
-    var height = this.game.rnd.integerInRange(3, maxHeight);
+    var height = this.game.rnd.integerInRange(MIN_ROOM_SIZE, maxHeight);
 
-    console.log("TODO: Check if room overlaps");
+    var newRoom = new Room(this.game, x, y, width, height);
+    if (!this.roomHasOverlap(newRoom)) {
+      this.rooms.push(newRoom);
+    }
 
-    this.rooms.push(new Room(this.game, x, y, width, height));
+  }
+
+  roomHasOverlap(room) {
+    for (var otherRoom of this.rooms) {
+      if (room.overlaps(otherRoom)) {
+        return true;
+      }
+    }
   }
 
   linkRooms() {
@@ -63,12 +73,12 @@ class Map {
 
   debugDraw() {
     var map = [];
-    for (var row = 0; row < MAP_ROWS; row++) {
-      var map_row = [];
-      for (var column = 0; column < MAP_COLUMNS; column++) {
-        map_row.push('.');
+    for (var rowNum = 0; rowNum < MAP_ROWS; rowNum++) {
+      var mapRow = [];
+      for (var colNum = 0; colNum < MAP_COLUMNS; colNum++) {
+        mapRow.push('.');
       }
-      map.push(map_row);
+      map.push(mapRow);
     }
 
     for (var room of this.rooms) {
