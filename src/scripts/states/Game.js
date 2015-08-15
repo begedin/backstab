@@ -1,7 +1,9 @@
+import Map from 'entities/map';
+
 class Game {
 
     create() {
-        console.log('Hello Game!');
+        this.map = new Map(this);
     }
 
 }
