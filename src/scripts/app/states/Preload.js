@@ -12,8 +12,6 @@ import assets from '../data/assets';
 
 // To make matters easier, I prepared a SplashScreen class, responsible for
 // displaying the decorated splash screen graphic, and the progress bar.
-import SplashScreen from '../objects/SplashScreen';
-
 
 export default class Preload extends Phaser.State {
 
@@ -23,8 +21,6 @@ export default class Preload extends Phaser.State {
   }
 
   preload () {
-    this.showSplashScreen();
-
     this.loadGraphics();
     this.loadAudio();
   }

@@ -12,6 +12,17 @@
  *
  */
 
+import { Terrains } from 'app/enums/terrain';
+
+var game = [];
+
+for (var terrain in Terrains) {
+  game.push({
+    key: terrain.graphic,
+    type: 'image',
+    url: terrain.graphic + '.png'
+  });
+}
 
 export default {
 
@@ -31,13 +42,7 @@ export default {
   ],
 
   // - Game assets ------------------------------------------------------------
-  game: [
-    {
-      key: 'phaser',
-      type: 'image',
-      url: 'phaser.png'
-    }
-  ],
+  game: game,
 
   // - Music and Sound effects ------------------------------------------------
   audio: [
