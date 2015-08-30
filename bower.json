@@ -1,0 +1,13 @@
+{
+  "name": "backstab",
+  "dependencies": {
+    "phaser": "~2.4.2",
+    "almond": "~0.3.0"
+  },
+  "overrides": {
+    "phaser": {
+      "main": "build/custom/phaser-no-physics.js"
+    }
+  },
+  "private": true
+}
