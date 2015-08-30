@@ -1,23 +1,24 @@
 {
-  "esnext": true,
+  "bitwise": true,
+  "laxcomma": true,
   "camelcase": true,
   "curly": true,
   "eqeqeq": true,
-  "indent": 4,
+  "forin": true,
+  "immed": true,
+  "latedef": true,
+  "newcap": true,
   "noarg": true,
-  "nonew": true,
+  "nonew": false,
+  "quotmark": "single",
   "undef": true,
   "unused": true,
-  "trailing": true,
-  "sub": true,
-  "white": true,
   "devel": true,
-  "debug": true,
+  "trailing": true,
   "browser": true,
+  "sub": true,
+  "debug": true,
   "globals": {
-    "require": true,
-    "module": true,
-    "Phaser": true,
-    "PIXI": true
+    "Phaser": false
   }
 }

@@ -1,7 +1,14 @@
-.DS_Store
+.*
+*.log
+Thumbs.db
 
-.tmp
 dist
-
+build
 node_modules
 bower_components
+
+!.git*
+!.babelrc
+!.bowerrc
+!.eslintrc
+!.editorconfig

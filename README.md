@@ -1,39 +1,30 @@
-# backstab
+Backstab
+===============================================================================
 
-A stealth puzzler
+>   
 
-## Pre-requesits
 
-You will need to have [node][node] and [gulp][gulp] setup on your machine.
+Development Instructions 
+-------------------------------------------------------------------------------
 
-## Getting started
-
-To package all source files and run on a local server simply run the following command:
+The following `npm` scripts are available to you, performing the tasks as
+described below.
 
 ```sh
-$ gulp
+npm start     # Launch a development server. Same as `gulp dev`.
+npm run dist  # Prepare the game release for distribution. Also `gulp dist`.
+npm run clean # Delete temporary and distribution build files.
 ```
 
-This should open a browser window with the game running locally. You can copy the address and paste it into any browser on your local network (including mobiles and tablets).
+<small>Also, you may want to install Gulp and Bower globally, but you are not
+required to do so.</small>
 
-## Scaffold
-* design (game design document goes here)
-* media (folder for your assets source...)
-* gulp (gulp tasks folder)
-* project (contains scripts, stylesheets and index.html)
-* static/assets (image and sound files, use 'assets/file_name' in source code)
-    - graphic
-    - music
-    - sound
+Should you consider distributing your game as an open source project, please
+[include a LICENSE file][lcnc] in your project root.
 
-## Editing
+Congrats and happy coding!
 
-When editing, make sure you update the files within the `project` directory. These files will then be compressed and added to the `dist` directory ready for publishing.
 
-ECMAScript 6 features are supported with help of [Traceur][Traceur]. This means you can write code with syntax which is going to be supported officially by Phaser 3.
+<!-- ---------------------------------------------------------------------- -->
 
-Happy building games!
-
-[node]:       http://nodejs.org/
-[gulp]:       http://gulpjs.com/
-[Traceur]:    https://github.com/google/traceur-compiler
+[lcnc]: http://choosealicense.com
