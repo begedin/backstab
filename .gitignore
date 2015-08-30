@@ -1,7 +1,5 @@
 .DS_Store
-
-.tmp
-dist
-
-node_modules
-bower_components
+*.db
+node_modules/
+bower_components/
+.tmp/
