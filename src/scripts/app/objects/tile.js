@@ -1,10 +1,8 @@
-import { Terrains } from 'app/enums/terrain';
-
-var TILE_SIZE = 32;
+var TILE_SIZE = 16;
 
 class Tile extends Phaser.Sprite {
   constructor (game, terrainType, gridX, gridY) {
-    super(game, gridX * 32, gridY * 32, terrainType.graphic);
+    super(game, gridX * TILE_SIZE, gridY * TILE_SIZE, terrainType.graphic);
   }
 }
 
