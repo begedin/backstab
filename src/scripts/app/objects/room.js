@@ -1,5 +1,5 @@
 function pointDistance(x1, y1, x2, y2) {
-  return Math.sqrt((x2-x1)(x2-x1) + (y2-y1)(y2-y1));
+  return Math.sqrt( (x2-x1) * (x2-x1) + (y2-y1) * (y2-y1));
 }
 
 class Room {
@@ -18,7 +18,7 @@ class Room {
     var left = otherRoom.right < this.left;
     var right = this.right < otherRoom.left;
     var bottom = otherRoom.bottom < this.top;
-    var top = this.bottom < otherRoom.top; 
+    var top = this.bottom < otherRoom.top;
 
     if (top && left) {
       return pointDistance(this.left, this.bottom, otherRoom.right, otherRoom.top);

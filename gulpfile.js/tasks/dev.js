@@ -56,7 +56,7 @@ module.exports = function (gulp, $, config) {
   });
 
   // Compile script files as AMD, bundle them as a single file.
-  gulp.task('dev:build:scripts', [ 'dev:lint' ], function () {
+  gulp.task('dev:build:scripts', function () {
     return gulp.src(globs.scripts)
       .pipe($.cached('scripts'))
       .pipe($.sourcemaps.init())

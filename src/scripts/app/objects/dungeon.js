@@ -1,31 +1,33 @@
 import Terrains from 'app/enums/terrain';
-import Room from 'app/objects/rooom';
+import Tile from 'app/objects/tile';
+import Room from 'app/objects/room';
 
-HEIGHT: 40;
-WIDTH: 80;
+var HEIGHT = 40;
+var WIDTH = 80;
+
+var NUM_ROOM_TRIES = 15;
+
+var ROOM_EXTRA_SIZE = 0;
 
 class Dungeon {
-	constructor(game) {
+
+  constructor (game) {
 		this.game = game;
+
+    this.rooms = [];
+    this.tiles = [];
+
 		this.init();
-		this.fill(Terrains.ROCK);	
+		this.fill(Terrains.ROCK);
 		this.addRooms();
 		this.addTiles();
 	}
 
-	var numRoomTries;
-
-	// increase this to make bigger rooms
-	var roomExtraSize = 0;
-
-	var _tiles = [];
-	var _rooms = [];
-
 	setTile (x, y, terrainType) {
-		_tiles[x][y] = terrainType;
+		this.tiles[x][y] = terrainType;
 	}
 
-	function _carve(room, terrainType) {
+	carve (room, terrainType) {
 		if (!terrainType) {
 			terrainType = Terrains.FLOOR;
 		}
@@ -36,11 +38,11 @@ class Dungeon {
     }
 	}
 
-	init() {
+	init () {
 		for (var x = 0; x < WIDTH; x++) {
-			_tiles.push([]);
+			this.tiles.push([]);
 			for (var y = 0; y < HEIGHT; y++) {
-				_tiles[x].push(null);
+				this.tiles[x].push(null);
 			}
 		}
 	}
@@ -48,7 +50,7 @@ class Dungeon {
 	fill (terrainType) {
 		for (var y = 0; y < HEIGHT; y++) {
 			for (var x = 0; x < WIDTH; x++) {
-				setTile(x, y, terrainType);
+				this.setTile(x, y, terrainType);
 			}
 		}
 	}
@@ -56,10 +58,10 @@ class Dungeon {
 	addRooms () {
 		var rng = this.game.rnd;
 
-		for (var i = 0; i < numRoomTries; i++) {
+		for (var i = 0; i < NUM_ROOM_TRIES; i++) {
 			// * 2 + 1 makes sure rooms are odd-sized. they end up beeing between 3 and 6 tiles big
-			// by default, with roomExtraSize increasing this number
-			var size = rng.integerInRange(1, 3 + roomExtraSize) * 2 + 1;
+			// by default, with ROOM_EXTRA_SIZE increasing this number
+			var size = rng.integerInRange(1, 3 + ROOM_EXTRA_SIZE) * 2 + 1;
 
 			// amount to add to either width or height to make the rooms less rectangular
 			var rectangularity = this.game.rnd.integerInRange(0, 1 + Math.floor(size / 2)) * 2;
@@ -67,7 +69,7 @@ class Dungeon {
 			var width = size;
 			var height = size;
 
-			if (rng.pick([0, 1]) === 1) {
+			if (rng.pick([ 0, 1 ]) === 1) {
 				width += rectangularity;
 			} else {
 				height += rectangularity;
@@ -79,7 +81,7 @@ class Dungeon {
 			var room = new Room(x, y, width, height);
 
 			var overlaps = false;
-			for (var other of _rooms) {
+			for (var other of this.rooms) {
 				if (room.distanceTo(other) <= 0) {
 					overlaps = true;
 					break;
@@ -90,18 +92,20 @@ class Dungeon {
 				continue;
 			}
 
-			_rooms.push(room);
-			_carve(room);
+			this.rooms.push(room);
+			this.carve(room);
 		}
 	}
 
 	addTiles () {
 		for (var x = 0; x < WIDTH; x++) {
 			for (var y = 0; y < HEIGHT; y++) {
-				var terrainType = _tiles[x][y];
+				var terrainType = this.tiles[x][y];
 				this.add(new Tile(this.game, terrainType, x, y));
 			}
 		}
 	}
 
 }
+
+export default Dungeon;
