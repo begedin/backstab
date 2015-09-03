@@ -1,6 +1,10 @@
 export const Terrains = {
-  ROCK_FLOOR: {
-    graphic: 'rock-floor',
+	ROCK: {
+		graphic: 'rock',
+		index: 0
+	},
+  FLOOR: {
+    graphic: 'floor',
     index: 1
   }
 };
