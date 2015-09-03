@@ -1,17 +1,19 @@
-import Terrains from 'app/enums/terrain';
+import { Terrains } from 'app/enums/terrain';
 import Tile from 'app/objects/tile';
 import Room from 'app/objects/room';
 
-var HEIGHT = 40;
+var HEIGHT = 60;
 var WIDTH = 80;
 
-var NUM_ROOM_TRIES = 15;
+var NUM_ROOM_TRIES = 60;
 
 var ROOM_EXTRA_SIZE = 0;
 
-class Dungeon {
+class Dungeon extends Phaser.Group {
 
   constructor (game) {
+    super(game);
+
 		this.game = game;
 
     this.rooms = [];

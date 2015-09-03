@@ -16,7 +16,8 @@ import { Terrains } from 'app/enums/terrain';
 
 var game = [];
 
-for (var terrain in Terrains) {
+for (var key in Terrains) {
+  var terrain = Terrains[key];
   game.push({
     key: terrain.graphic,
     type: 'image',
