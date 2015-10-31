@@ -2,8 +2,8 @@ import { Terrains } from 'app/enums/terrain';
 import Tile from 'app/objects/tile';
 import Room from 'app/objects/room';
 
-var HEIGHT = 29;
-var WIDTH = 39;
+var HEIGHT = 159;
+var WIDTH = 119;
 
 var BOUND_Y = HEIGHT + 1;
 var BOUND_X = WIDTH + 1;
@@ -12,7 +12,7 @@ var NUM_ROOM_TRIES = 60;
 
 var ROOM_EXTRA_SIZE = 0;
 
-var WINDING_PERCENT = 0;
+var WINDING_PERCENT = 20;
 
 function initialize2DArray(width, height, defaultValue) {
   if (!defaultValue) {
@@ -189,14 +189,17 @@ class Dungeon extends Phaser.Group {
     var rng = this.game.rnd;
 
     var cells = [];
-    var lastDir;
+    var initialCell = { x: x, y: y };
 
     this.startRegion();
-    this.carve(x, y);
+    this.carve(initialCell.x, initialCell.y);
 
-    cells.push({x: x, y: y});
+    cells.push(initialCell);
+
+    var lastDir = null;
 
     while (cells.length > 0) {
+
       var cell = lastElementInArray(cells);
 
       // See which adjacent cells are open.
@@ -207,6 +210,8 @@ class Dungeon extends Phaser.Group {
           unmadeCells.push(dir);
         }
       }
+
+      console.log(unmadeCells.join(','));
 
       if (unmadeCells.length > 0) {
         // Based on how "windy" passages are, try to prefer carving in the
@@ -219,17 +224,19 @@ class Dungeon extends Phaser.Group {
         var xMod = this.xModifierForDirection(dirToCarveIn);
         var yMod = this.yModifierForDirection(dirToCarveIn);
 
-        this.carve(cell.x + xMod, cell.y + yMod);
-        this.carve(cell.x + xMod * 2, cell.y + yMod * 2);
+        var adjacentCell = { x: cell.x + xMod, y: cell.y + yMod};
+        this.carve(adjacentCell.x, adjacentCell.y);
 
-        cells.push({x: x + xMod * 2, y: y + yMod * 2});
+        var endCell = {x: cell.x + xMod * 2, y: cell.y + yMod * 2};
+        this.carve(endCell.x, endCell.y);
+
+        cells.push(endCell);
+
         lastDir = dirToCarveIn;
       } else {
         // No adjacent uncarved cells.
-        removeLastElementFromArray(cells);
-
-        // This path has ended.
         lastDir = null;
+        removeLastElementFromArray(cells);
       }
     }
   }

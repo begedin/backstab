@@ -1,4 +1,4 @@
-var TILE_SIZE = 20;
+var TILE_SIZE = 5;
 
 class Tile extends Phaser.Sprite {
   constructor (game, terrainType, gridX, gridY) {
