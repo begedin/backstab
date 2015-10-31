@@ -1,3 +1,5 @@
+'use strict';
+
 var TILE_SIZE = 16;
 
 class Tile extends Phaser.Sprite {

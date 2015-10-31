@@ -1,3 +1,5 @@
+'use strict';
+
 import { Terrains } from 'app/enums/terrain';
 import Tile from 'app/objects/tile';
 import Room from 'app/objects/room';

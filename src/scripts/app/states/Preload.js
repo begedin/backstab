@@ -8,6 +8,8 @@
  * during the asset load.
  */
 
+'use strict';
+
 import assets from '../data/assets';
 
 // To make matters easier, I prepared a SplashScreen class, responsible for
