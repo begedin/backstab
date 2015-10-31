@@ -5,8 +5,6 @@
  * The module providing the main routine of the game application launch.
  */
 
-'use strict';
-
 // Import all declared states as an object.
 import * as states from './app/states';
 
