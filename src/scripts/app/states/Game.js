@@ -4,6 +4,9 @@
  *
  * A sample Game state, displaying the Phaser logo.
  */
+
+'use strict';
+
 import assets from '../data/assets';
 
 import Dungeon from 'app/objects/dungeon';
