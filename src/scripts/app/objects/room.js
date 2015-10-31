@@ -12,8 +12,8 @@ class Room {
   setBoundaries (left, top, width, height) {
     this.left = left;
     this.top = top;
-    this.right = left + width - 1;
-    this.bottom = top + height - 1;
+    this.right = left + width;
+    this.bottom = top + height;
   }
 
   distanceTo(otherRoom) {
