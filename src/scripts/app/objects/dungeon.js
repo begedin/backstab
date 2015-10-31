@@ -11,6 +11,33 @@ var NUM_ROOM_TRIES = 60;
 
 var ROOM_EXTRA_SIZE = 0;
 
+var WINDING_PERCENT = 0;
+
+function initialize2DArray(WIDTH, HEIGHT, defaultValue) {
+  if (!defaultValue) {
+    defaultValue = 0;
+  }
+
+  var matrix = [];
+  for (var i = 0; i < WIDTH; i++) {
+    var row = [];
+    for (var j = 0; j < HEIGHT; j++) {
+      row.push(defaultValue)
+    }
+    matrix.push(row);
+  }
+
+  return matrix;
+}
+
+function lastElementInArray(array) {
+  return array[array.length - 1];
+}
+
+function removeLastElementFromArray(array) {
+  array.pop(lastElementInArray(array));
+}
+
 class Dungeon extends Phaser.Group {
 
   constructor (game) {
@@ -20,27 +47,40 @@ class Dungeon extends Phaser.Group {
 
     this.rooms = [];
     this.tiles = [];
+    this.regions = initialize2DArray(WIDTH, HEIGHT, 0);
+
+    this.currentRegion = -1;
 
 		this.init();
 		this.fill(Terrains.ROCK);
 		this.addRooms();
+    this.fillRemainderWithMazes();
 		this.addTiles();
 	}
+
+  getTile(x, y) {
+    return this.tiles[x][y];
+  }
 
 	setTile (x, y, terrainType) {
 		this.tiles[x][y] = terrainType;
 	}
 
-	carve (room, terrainType) {
-		if (!terrainType) {
-			terrainType = Terrains.FLOOR;
-		}
+	carveRoom (room, terrainType) {
     for (var x = room.left; x <= room.right; x++) {
     	for (var y = room.top; y <= room.bottom; y++) {
-    		this.setTile(x, y, terrainType);
+    		this.carve(x,y, terrainType);
     	}
     }
 	}
+
+  carve(x, y, terrainType) {
+    if (!terrainType) {
+      terrainType = Terrains.FLOOR;
+      this.setTile(x, y, terrainType);
+      this.regions[x][y] = this.currentRegion;
+    }
+  }
 
 	init () {
 		for (var x = 0; x < WIDTH; x++) {
@@ -79,8 +119,8 @@ class Dungeon extends Phaser.Group {
 				height += rectangularity;
 			}
 
-			var x = rng.integerInRange(0, Math.floor((WIDTH - width) / 2) * 2 + 1);
-			var y = rng.integerInRange(0, Math.floor((HEIGHT - height) / 2) * 2 + 1);
+			var x = rng.integerInRange(0, Math.floor((WIDTH - width) / 2)) * 2 + 1;
+			var y = rng.integerInRange(0, Math.floor((HEIGHT - height) / 2)) * 2 + 1;
 
 			var room = new Room(x, y, width, height);
 
@@ -96,10 +136,72 @@ class Dungeon extends Phaser.Group {
 				continue;
 			}
 
+      this.startRegion();
 			this.rooms.push(room);
-			this.carve(room);
+			this.carveRoom(room);
 		}
 	}
+
+  fillRemainderWithMazes() {
+    // Fill in all of the empty space with mazes.
+    for (var y = 1; y < HEIGHT; y += 2) {
+      for (var x = 1; x < WIDTH; x += 2) {
+        if (this.getTile(x,y).terrain !== Terrains.ROCK) {
+          this.growMaze(x,y);
+        }
+      }
+    }
+  }
+
+  growMaze(x, y) {
+    var rng = this.game.rnd;
+    var arrayUtils = this.game.arrayUtils;
+
+    var cells = [];
+    var lastDir;
+
+    this.startRegion();
+    this.carve(x, y);
+
+    cells.push({x: x, y: y});
+
+    while (cells.isNotEmpty) {
+      var cell = lastElementInArray(cells);
+
+      // See which adjacent cells are open.
+      var unmadeCells = [];
+
+      for (var dir in ['up', 'down', 'left', 'right']) {
+        if (this.canCarve(cell, dir)) unmadeCells.add(dir);
+      }
+
+      if (unmadeCells.length > 0) {
+        // Based on how "windy" passages are, try to prefer carving in the
+        // same direction.
+        var dir;
+        if (unmadeCells.contains(lastDir) && rng.integerInRange(0, 100) > WINDING_PERCENT) {
+          dir = lastDir;
+        } else {
+          dir = arrayUtilsy.getRandomItem(unmadeCells);
+        }
+
+        var addedCells = this.carveInDirectionFromCell(cell, dir, amount);
+
+        cells.concat(addedCells);
+        lastDir = dir;
+      } else {
+        // No adjacent uncarved cells.
+        cells.removeLast();
+
+        // This path has ended.
+        lastDir = null;
+      }
+    }
+  }
+
+  startRegion() {
+    this.currentRegion++;
+  }
 
 	addTiles () {
 		for (var x = 0; x < WIDTH; x++) {
@@ -109,6 +211,9 @@ class Dungeon extends Phaser.Group {
 			}
 		}
 	}
+
+
+
 
 }
 
