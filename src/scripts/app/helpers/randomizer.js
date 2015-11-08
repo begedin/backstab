@@ -1,6 +1,6 @@
 class Randomizer {
   constructor (seed) {
-    this.rng = new Phaser.RandomDataGenerator(seed || [Date.now().toString()]);
+    this.rng = new Phaser.RandomDataGenerator([seed || Date.now().toString()]);
   }
 
   integerInRange (min, max) {
