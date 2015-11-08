@@ -1,10 +1,9 @@
 import { Terrains } from 'app/enums/terrain';
 import Room from 'app/objects/room';
+import Randomizer from 'app/helpers/randomizer';
 
 var NUM_ROOM_TRIES = 60;
-
 var ROOM_EXTRA_SIZE = 0;
-
 var WINDING_PERCENT = 20;
 
 function initialize2DArray(width, height, defaultValue) {
@@ -34,10 +33,12 @@ function removeLastElementFromArray(array) {
 
 class Dungeon {
 
-  constructor (game, width, height) {
-		this.game = game;
+  constructor (width, height) {
+    this.rng = new Randomizer();
+
     this.width = width;
     this.height = height;
+
     this.boundX = width + 1;
     this.boundY = height + 1;
 
@@ -126,27 +127,25 @@ class Dungeon {
 	}
 
 	addRooms () {
-		var rng = this.game.rnd;
-
 		for (var i = 0; i < NUM_ROOM_TRIES; i++) {
 			// * 2 + 1 makes sure rooms are odd-sized. they end up beeing between 3 and 6 tiles big
 			// by default, with ROOM_EXTRA_SIZE increasing this number
-			var size = rng.integerInRange(1, 3 + ROOM_EXTRA_SIZE) * 2 + 1;
+			var size = this.rng.integerInRange(1, 3 + ROOM_EXTRA_SIZE) * 2 + 1;
 
 			// amount to add to either width or height to make the rooms less rectangular
-			var rectangularity = this.game.rnd.integerInRange(0, 1 + Math.floor(size / 2)) * 2;
+			var rectangularity = this.rng.integerInRange(0, 1 + Math.floor(size / 2)) * 2;
 
 			var width = size;
 			var height = size;
 
-			if (rng.pick([ 0, 1 ]) === 1) {
+			if (this.rng.pick([ 0, 1 ]) === 1) {
 				width += rectangularity;
 			} else {
 				height += rectangularity;
 			}
 
-			var x = rng.integerInRange(0, Math.floor((this.boundX - 1 - width) / 2)) * 2 + 1;
-			var y = rng.integerInRange(0, Math.floor((this.boundY - 1 - height) / 2)) * 2 + 1;
+			var x = this.rng.integerInRange(0, Math.floor((this.boundX - 1 - width) / 2)) * 2 + 1;
+			var y = this.rng.integerInRange(0, Math.floor((this.boundY - 1 - height) / 2)) * 2 + 1;
 
 			var room = new Room(x, y, width, height);
 
@@ -179,8 +178,6 @@ class Dungeon {
   }
 
   growMaze(x, y) {
-    var rng = this.game.rnd;
-
     var cells = [];
     var initialCell = { x: x, y: y };
 
@@ -208,8 +205,8 @@ class Dungeon {
         // Based on how "windy" passages are, try to prefer carving in the
         // same direction.
         var dirToCarveIn = lastDir;
-        if (unmadeCells.indexOf(lastDir) === -1 || rng.integerInRange(0, 100) < WINDING_PERCENT) {
-          dirToCarveIn = rng.pick(unmadeCells);
+        if (unmadeCells.indexOf(lastDir) === -1 || this.rng.integerInRange(0, 100) < WINDING_PERCENT) {
+          dirToCarveIn = this.rng.pick(unmadeCells);
         }
 
         var xMod = this.xModifierForDirection(dirToCarveIn);
