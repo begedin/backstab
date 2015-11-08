@@ -1,35 +1,11 @@
 import { Terrains } from 'app/enums/terrain';
 import Room from 'app/objects/room';
 import Randomizer from 'app/helpers/randomizer';
+import { initialize2DArray, removeLastElementFromArray, lastElementInArray } from 'app/helpers/array';
 
 var NUM_ROOM_TRIES = 60;
 var ROOM_EXTRA_SIZE = 0;
 var WINDING_PERCENT = 20;
-
-function initialize2DArray(width, height, defaultValue) {
-  if (!defaultValue) {
-    defaultValue = 0;
-  }
-
-  var matrix = [];
-  for (var i = 0; i < width; i++) {
-    var row = [];
-    for (var j = 0; j < height; j++) {
-      row.push(defaultValue);
-    }
-    matrix.push(row);
-  }
-
-  return matrix;
-}
-
-function lastElementInArray(array) {
-  return array[array.length - 1];
-}
-
-function removeLastElementFromArray(array) {
-  array.pop(lastElementInArray(array));
-}
 
 class Dungeon {
 
