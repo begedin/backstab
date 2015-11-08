@@ -21,7 +21,7 @@ for (var key in Terrains) {
   game.push({
     key: terrain.graphic,
     type: 'image',
-    url: terrain.graphic + '.png'
+    url: terrain.graphic + '_debug.png'
   });
 }
 
