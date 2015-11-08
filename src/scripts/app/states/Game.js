@@ -24,7 +24,7 @@ export default class Game extends Phaser.State {
   }
 
   create () {
-    var dungeon = new Dungeon(29, 29);
+    var dungeon = new Dungeon(19, 19);
     this.loadDungeon(dungeon);
   }
 
@@ -40,5 +40,4 @@ export default class Game extends Phaser.State {
 
   update () {
   }
-
 }
