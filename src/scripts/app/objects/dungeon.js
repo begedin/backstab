@@ -1,12 +1,5 @@
 import { Terrains } from 'app/enums/terrain';
-import Tile from 'app/objects/tile';
 import Room from 'app/objects/room';
-
-var HEIGHT = 159;
-var WIDTH = 119;
-
-var BOUND_Y = HEIGHT + 1;
-var BOUND_X = WIDTH + 1;
 
 var NUM_ROOM_TRIES = 60;
 
@@ -39,16 +32,18 @@ function removeLastElementFromArray(array) {
   array.pop(lastElementInArray(array));
 }
 
-class Dungeon extends Phaser.Group {
+class Dungeon {
 
-  constructor (game) {
-    super(game);
-
+  constructor (game, width, height) {
 		this.game = game;
+    this.width = width;
+    this.height = height;
+    this.boundX = width + 1;
+    this.boundY = height + 1;
 
     this.rooms = [];
     this.tiles = [];
-    this.regions = initialize2DArray(BOUND_X, BOUND_Y, 0);
+    this.regions = initialize2DArray(this.boundX, this.boundY, 0);
 
     this.currentRegion = -1;
 
@@ -58,8 +53,6 @@ class Dungeon extends Phaser.Group {
     this.addRooms();
 
     this.fillRemainderWithMazes();
-
-		this.addTiles();
 	}
 
   getTile(x, y) {
@@ -101,7 +94,7 @@ class Dungeon extends Phaser.Group {
   }
 
   isWithinBounds(x, y) {
-    return x > 0 && x < BOUND_X && y > 0 && y < BOUND_Y;
+    return x > 0 && x < this.boundX && y > 0 && y < this.boundY;
   }
 
   isUncarved(x, y) {
@@ -116,17 +109,17 @@ class Dungeon extends Phaser.Group {
   }
 
 	init () {
-		for (var x = 0; x < BOUND_X; x++) {
+		for (var x = 0; x < this.boundX; x++) {
 			this.tiles.push([]);
-			for (var y = 0; y < BOUND_Y; y++) {
+			for (var y = 0; y < this.boundY; y++) {
 				this.tiles[x].push(null);
 			}
 		}
 	}
 
 	fill (terrainType) {
-		for (var y = 0; y < BOUND_Y; y++) {
-			for (var x = 0; x < BOUND_X; x++) {
+		for (var y = 0; y < this.boundY; y++) {
+			for (var x = 0; x < this.boundX; x++) {
 				this.setTile(x, y, terrainType);
 			}
 		}
@@ -152,8 +145,8 @@ class Dungeon extends Phaser.Group {
 				height += rectangularity;
 			}
 
-			var x = rng.integerInRange(0, Math.floor((BOUND_X - 1 - width) / 2)) * 2 + 1;
-			var y = rng.integerInRange(0, Math.floor((BOUND_Y - 1 - height) / 2)) * 2 + 1;
+			var x = rng.integerInRange(0, Math.floor((this.boundX - 1 - width) / 2)) * 2 + 1;
+			var y = rng.integerInRange(0, Math.floor((this.boundY - 1 - height) / 2)) * 2 + 1;
 
 			var room = new Room(x, y, width, height);
 
@@ -176,8 +169,8 @@ class Dungeon extends Phaser.Group {
 
   fillRemainderWithMazes() {
     // Fill in all of the empty space with mazes.
-    for (var y = 1; y < BOUND_Y; y += 2) {
-      for (var x = 1; x < BOUND_X; x += 2) {
+    for (var y = 1; y < this.boundY; y += 2) {
+      for (var x = 1; x < this.boundX; x += 2) {
         if (this.getTile(x,y) === Terrains.ROCK) {
           this.growMaze(x,y);
         }
@@ -211,8 +204,6 @@ class Dungeon extends Phaser.Group {
         }
       }
 
-      console.log(unmadeCells.join(','));
-
       if (unmadeCells.length > 0) {
         // Based on how "windy" passages are, try to prefer carving in the
         // same direction.
@@ -244,15 +235,6 @@ class Dungeon extends Phaser.Group {
   startRegion() {
     this.currentRegion++;
   }
-
-	addTiles () {
-		for (var x = 1; x < BOUND_X; x++) {
-			for (var y = 1; y < BOUND_Y; y++) {
-				var terrainType = this.tiles[x][y];
-				this.add(new Tile(this.game, terrainType, x, y));
-			}
-		}
-	}
 }
 
 export default Dungeon;
