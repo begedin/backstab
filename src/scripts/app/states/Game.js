@@ -8,6 +8,7 @@
 import assets from '../data/assets';
 
 import Dungeon from 'app/objects/dungeon';
+import Tile from 'app/objects/tile';
 
 export default class Game extends Phaser.State {
 
@@ -23,10 +24,20 @@ export default class Game extends Phaser.State {
   }
 
   create () {
-    this.dungeon = new Dungeon(this.game);
+    var dungeon = new Dungeon(19, 19);
+    this.loadDungeon(dungeon);
+  }
+
+  loadDungeon (dungeon) {
+    var tiles = new Phaser.Group(this.game);
+    for (var x = 1; x <= dungeon.width; x++) {
+      for (var y = 1; y <= dungeon.height; y++) {
+        var terrainType = dungeon.tiles[x][y];
+        tiles.add(new Tile(this.game, terrainType, x, y));
+      }
+    }
   }
 
   update () {
   }
-
 }
