@@ -38,10 +38,7 @@ class Dungeon {
       
       var room = new Room(roomX, roomY, roomW, roomH);
 
-      if (!room.colidesWithAny(this.rooms)) {
-        room.w--;
-        room.h--;
-
+      if (!room.colidesWithAny(this.rooms)) { 
         this.rooms.push(room);
         roomsPlaced++;
       }
@@ -88,13 +85,16 @@ class Dungeon {
   }
 
   _carveRooms (roomCount) {
-    // carve out each room
     for (var i = 0; i < roomCount; i++) {
-      var room = this.rooms[i];
-      for (var x = room.x; x < room.x + room.w; x++) {
-        for (var y = room.y; y < room.y + room.h; y++) {
-          this.map[x][y] = 1;
-        }
+      this._carveRoom(this.rooms[i]);
+      
+    }
+  }
+
+  _carveRoom (room) {
+    for (var x = room.x; x < room.x + room.w; x++) {
+      for (var y = room.y; y < room.y + room.h; y++) {
+        this.map[x][y] = 1;
       }
     }
   }

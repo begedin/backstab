@@ -35,17 +35,28 @@ class Room {
     var closest = null;
     var closestDistance = 1000;
     for (var i = 0; i < rooms.length; i++) {
-      var check = rooms[i];
-      if (check !== this) {
-        var checkCenter = check.center;
-        var distance = Math.min(Math.abs(this.center.x - checkCenter.x) - (this.w / 2) - (check.w / 2), Math.abs(this.center.y - checkCenter.y) - (this.h / 2) - (check.h / 2));
+      var otherRoom = rooms[i];
+      if (otherRoom !== this) {
+        var distance = this.distanceTo(otherRoom);
         if (distance < closestDistance) {
           closestDistance = distance;
-          closest = check;
+          closest = otherRoom;
         }
       }
     }
     return closest;
+  }
+
+  distanceTo (otherRoom) {
+    return Math.min(this.horizontalDistanceTo(otherRoom), this.verticalDistanceTo(otherRoom));
+  }
+
+  horizontalDistanceTo (otherRoom) {
+    return Math.abs(this.center.x - otherRoom.center.x) - (this.w / 2) - (otherRoom.w / 2)
+  }
+
+  verticalDistanceTo (otherRoom) {
+    return Math.abs(this.center.y - otherRoom.center.y) - (this.h / 2) - (otherRoom.h / 2)
   }
 }
 
