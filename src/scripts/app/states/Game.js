@@ -11,13 +11,14 @@ import Dungeon from 'app/objects/dungeon';
 import Tile from 'app/objects/tile';
 import Player from 'app/objects/player';
 
+import config from 'app/config'
+
 export default class Game extends Phaser.State {
 
   init () {
     // Point the Phaser Asset Loader to where all your assets live.
     this.load.baseURL = './assets/';
     this.stage.backgroundColor = '#fffff';
-
   }
 
   preload () {
@@ -25,9 +26,11 @@ export default class Game extends Phaser.State {
   }
 
   create () {
+    this.game.world.setBounds(0, 0, config.WORLD_BOUND_X, config.WORLD_BOUND_Y)
     var dungeon = new Dungeon();
     this.loadDungeon(dungeon);
-    this.createPlayer();
+    var player = this.createPlayer();
+    this.game.camera.follow(player);
   }
 
   loadDungeon (dungeon) {
@@ -44,8 +47,6 @@ export default class Game extends Phaser.State {
     var actors = new Phaser.Group(this.game);
     var player = new Player(this.game, 1, 1);
     actors.add(player);
-  }
-
-  update () {
+    return player;
   }
 }

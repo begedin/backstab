@@ -2,9 +2,12 @@ import { initialize2DArray, printMatrixToConsole } from 'app/helpers/array';
 import Randomizer from 'app/helpers/randomizer';
 import { Terrains } from 'app/enums/terrain';
 
+import config from 'app/config';
+
+
 class Dungeon {
   constructor () {
-    this.mapSize = 64;
+    this.mapSize = config.MAP_SIZE;
     this.width = this.mapSize;
     this.height = this.mapSize;
 
