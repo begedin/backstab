@@ -21,14 +21,14 @@ class Dungeon {
     var minSize = 5;
     var maxSize = 15;
 
-    this.placeRooms(roomCount, minSize, maxSize);
-    this.joinRooms(roomCount);
-    this.carveRooms(roomCount);
+    this._placeRooms(roomCount, minSize, maxSize);
+    this._joinRooms(roomCount);
+    this._carveRooms(roomCount);
 
-    this.generateTiles();
+    this._generateTiles();
   }
 
-  placeRooms (roomCount, minSize, maxSize) {
+  _placeRooms (roomCount, minSize, maxSize) {
     var roomsPlaced = 0;
     while (roomsPlaced <= roomCount) {
       var roomX = this.rng.integerInRange(1, this.mapSize - maxSize - 1);
@@ -48,16 +48,16 @@ class Dungeon {
     }
   }
 
-  joinRooms (roomCount) {
+  _joinRooms (roomCount) {
     for (var i = 0; i < roomCount; i++) {
       var roomA = this.rooms[i];
-      var roomB = this.findClosestRoom(roomA);
+      var roomB = roomA.getClosest(this.rooms);
 
-      this.joinTwoRooms(roomA, roomB);
+      this._joinTwoRooms(roomA, roomB);
     }
   }
 
-  joinTwoRooms (roomA, roomB) {
+  _joinTwoRooms (roomA, roomB) {
     var pointA = {
       x: this.rng.integerInRange(roomA.x, roomA.x + roomA.w),
       y: this.rng.integerInRange(roomA.y, roomA.y + roomA.h)
@@ -87,7 +87,7 @@ class Dungeon {
     }
   }
 
-  carveRooms (roomCount) {
+  _carveRooms (roomCount) {
     // carve out each room
     for (var i = 0; i < roomCount; i++) {
       var room = this.rooms[i];
@@ -99,7 +99,7 @@ class Dungeon {
     }
   }
 
-  generateTiles () {
+  _generateTiles () {
     var tiles = [];
     this.map.forEach(function(mapRow) {
       var tileRow = [];
@@ -116,30 +116,6 @@ class Dungeon {
     });
 
     this.tiles = tiles;
-  }
-
-  findClosestRoom (room) {
-    var mid = {
-      x: room.x + (room.w / 2),
-      y: room.y + (room.h / 2)
-    };
-    var closest = null;
-    var closestDistance = 1000;
-    for (var i = 0; i < this.rooms.length; i++) {
-      var check = this.rooms[i];
-      if (check !== room) {
-        var check_mid = {
-          x: check.x + (check.w / 2),
-          y: check.y + (check.h / 2)
-        };
-        var distance = Math.min(Math.abs(mid.x - check_mid.x) - (room.w / 2) - (check.w / 2), Math.abs(mid.y - check_mid.y) - (room.h / 2) - (check.h / 2));
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closest = check;
-        }
-      }
-    }
-    return closest;
   }
 }
 
