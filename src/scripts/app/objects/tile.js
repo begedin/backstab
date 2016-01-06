@@ -1,9 +1,8 @@
-import config from 'app/config';
+import GridSprite from 'app/objects/grid_sprite';
 
-class Tile extends Phaser.Sprite {
+class Tile extends GridSprite {
   constructor (game, terrainType, gridX, gridY) {
-    super(game, gridX * config.DESIRED_TILE_SIZE, gridY * config.DESIRED_TILE_SIZE, terrainType.graphic);
-    this.scale.setTo(config.SCALE);
+    super(game, gridX, gridY, terrainType.graphic);
   }
 }
 

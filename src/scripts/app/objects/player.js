@@ -1,14 +1,9 @@
 import config from 'app/config';
+import GridSprite from 'app/objects/grid_sprite';
 
-class Player extends Phaser.Sprite {
+class Player extends GridSprite {
 	constructor (game, gridX, gridY) {
-		super(game, gridX * config.DESIRED_TILE_SIZE, gridY * config.DESIRED_TILE_SIZE, 'player');
-    
-    this.gridX = gridX;
-    this.gridY = gridY;
-   
-    this.scale.setTo(config.SCALE);
-
+		super(game, gridX, gridY, 'player');
     this.cursors = game.input.keyboard.createCursorKeys();
 	}
 
@@ -26,24 +21,6 @@ class Player extends Phaser.Sprite {
     } else if (this.cursors.left.isDown && this.gridX > 1) {
       this.moveLeft();
     }
-  }
-
-  get gridX () {
-    return this._gridX;
-  }
-
-  set gridX (value) {
-    this._gridX = value;
-    this.x = this._gridX * config.DESIRED_TILE_SIZE;
-  }
-
-  get gridY () {
-    return this._gridY;
-  }
-
-  set gridY (value) {
-    this._gridY = value;
-    this.y = this._gridY * config.DESIRED_TILE_SIZE;
   }
 
   moveUp() {
