@@ -35,9 +35,16 @@ function _printRow(row) {
   console.log(rowString);
 }
 
+function flatten2DArray(array) {
+  return array.reduce(function(prev, curr) {
+    return prev.concat(curr);
+  }, []);
+}
+
 export default {
   initialize2DArray: initialize2DArray,
   lastElementInArray: lastElementInArray,
   removeLastElementFromArray: removeLastElementFromArray,
-  printMatrixToConsole: printMatrixToConsole
+  printMatrixToConsole: printMatrixToConsole,
+  flatten2DArray: flatten2DArray
 };

@@ -1,13 +1,16 @@
-import { initialize2DArray, printMatrixToConsole } from 'app/helpers/array';
+import { initialize2DArray, flatten2DArray } from 'app/helpers/array';
 import Randomizer from 'app/helpers/randomizer';
 import { Terrains } from 'app/enums/terrain';
 import Room from 'app/objects/room';
+import Tile from 'app/objects/tile';
+
 
 import config from 'app/config';
 
 
 class Dungeon {
-  constructor () {
+  constructor (game) {
+    this.game = game;
     this.mapSize = config.MAP_SIZE;
     this.width = this.mapSize;
     this.height = this.mapSize;
@@ -25,7 +28,17 @@ class Dungeon {
     this._joinRooms(roomCount);
     this._carveRooms(roomCount);
 
-    this._generateTiles();
+    this._generateTileMap();
+  }
+
+  tileAt(x, y) {
+    return this.tiles[x][y];
+  }
+
+  get firstWalkableTile() {
+    return flatten2DArray(this.tiles).find(function(tile) {
+      return tile.isWalkable === true
+    });
   }
 
   _placeRooms (roomCount, minSize, maxSize) {
@@ -99,23 +112,25 @@ class Dungeon {
     }
   }
 
-  _generateTiles () {
-    var tiles = [];
-    this.map.forEach(function(mapRow) {
-      var tileRow = [];
-      mapRow.forEach(function(mapIndex) {
-        var tile;
+  _generateTileMap () {
+    let game = this.game;
 
-        if (mapIndex === 1) {
-          tileRow.push(Terrains.FLOOR);
-        } else {
-          tileRow.push(Terrains.ROCK);
-        }
+    let tiles = this.map.map(function(mapRow, i) {
+      return mapRow.map(function(mapField, j) {
+        let terrain = numberToTerrain(mapField);        
+        return new Tile(game, terrain, i, j)
       });
-      tiles.push(tileRow);
     });
 
     this.tiles = tiles;
+  }
+}
+
+function numberToTerrain(number) {
+  if (number === 1) {
+    return Terrains.FLOOR;
+  } else {
+    return Terrains.ROCK
   }
 }
 
