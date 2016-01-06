@@ -1,212 +1,203 @@
-import { Terrains } from 'app/enums/terrain';
-import Room from 'app/objects/room';
+import { initialize2DArray, printMatrixToConsole } from 'app/helpers/array';
 import Randomizer from 'app/helpers/randomizer';
-import { initialize2DArray, removeLastElementFromArray, lastElementInArray } from 'app/helpers/array';
-
-var NUM_ROOM_TRIES = 60;
-var ROOM_EXTRA_SIZE = 0;
-var WINDING_PERCENT = 20;
+import { Terrains } from 'app/enums/terrain';
 
 class Dungeon {
-
-  constructor (width, height) {
-    this.rng = new Randomizer();
-
-    this.width = width;
-    this.height = height;
-
-    this.boundX = width + 1;
-    this.boundY = height + 1;
+  constructor () {
+    this.mapSize = 64;
+    this.width = this.mapSize;
+    this.height = this.mapSize;
 
     this.rooms = [];
-    this.tiles = [];
-    this.regions = initialize2DArray(this.boundX, this.boundY, 0);
+    this.rng = new Randomizer();
+    
+    // create map of all 0s (rock)
+    this.map = initialize2DArray(this.mapSize, this.mapSize, 0)
 
-    this.currentRegion = -1;
+    // initialize dungeon state
+    var roomCount = this.rng.integerInRange(10, 20);
+    var minSize = 5;
+    var maxSize = 15;
 
-		this.init();
-		this.fill(Terrains.ROCK);
+    this.placeRooms(roomCount, minSize, maxSize);
+    this.squashRooms();
+    this.joinRooms(roomCount);
+    this.carveRooms(roomCount);
 
-    this.addRooms();
+    this.generateTiles();
 
-    this.fillRemainderWithMazes();
-	}
+    //printMatrixToConsole(this.map);
 
-  getTile(x, y) {
-    return this.tiles[x][y];
-  }
-
-	setTile (x, y, terrainType) {
-		this.tiles[x][y] = terrainType;
-	}
-
-	carveRoom (room, terrainType) {
-    for (var x = room.left; x < room.right; x++) {
-    	for (var y = room.top; y < room.bottom; y++) {
-    		this.carve(x,y, terrainType);
-    	}
-    }
-	}
-
-  carve(x, y, terrainType) {
-    if (!terrainType) {
-      terrainType = Terrains.FLOOR;
-      this.setTile(x, y, terrainType);
-      this.regions[x][y] = this.currentRegion;
-    }
-  }
-
-  xModifierForDirection(direction) {
-    if (direction === 'left') { return - 1; }
-    if (direction === 'right') { return 1; }
-
-    return 0;
-  }
-
-  yModifierForDirection(direction) {
-    if (direction === 'up') { return - 1; }
-    if (direction === 'down') { return 1; }
-
-    return 0;
-  }
-
-  isWithinBounds(x, y) {
-    return x > 0 && x < this.boundX && y > 0 && y < this.boundY;
-  }
-
-  isUncarved(x, y) {
-    return this.tiles[x][y] === Terrains.ROCK;
-  }
-
-  canCarve (x, y, direction) {
-    var xMod = this.xModifierForDirection(direction);
-    var yMod = this.yModifierForDirection(direction);
-
-    return this.isWithinBounds(x + xMod * 3, y + yMod * 3) && this.isUncarved(x + xMod * 2, y + yMod * 2);
-  }
-
-	init () {
-		for (var x = 0; x < this.boundX; x++) {
-			this.tiles.push([]);
-			for (var y = 0; y < this.boundY; y++) {
-				this.tiles[x].push(null);
-			}
-		}
-	}
-
-	fill (terrainType) {
-		for (var y = 0; y < this.boundY; y++) {
-			for (var x = 0; x < this.boundX; x++) {
-				this.setTile(x, y, terrainType);
-			}
-		}
-	}
-
-	addRooms () {
-		for (var i = 0; i < NUM_ROOM_TRIES; i++) {
-			// * 2 + 1 makes sure rooms are odd-sized. they end up beeing between 3 and 6 tiles big
-			// by default, with ROOM_EXTRA_SIZE increasing this number
-			var size = this.rng.integerInRange(1, 3 + ROOM_EXTRA_SIZE) * 2 + 1;
-
-			// amount to add to either width or height to make the rooms less rectangular
-			var rectangularity = this.rng.integerInRange(0, 1 + Math.floor(size / 2)) * 2;
-
-			var width = size;
-			var height = size;
-
-			if (this.rng.pick([ 0, 1 ]) === 1) {
-				width += rectangularity;
-			} else {
-				height += rectangularity;
-			}
-
-			var x = this.rng.integerInRange(0, Math.floor((this.boundX - 1 - width) / 2)) * 2 + 1;
-			var y = this.rng.integerInRange(0, Math.floor((this.boundY - 1 - height) / 2)) * 2 + 1;
-
-			var room = new Room(x, y, width, height);
-
-			var overlaps = false;
-			for (var other of this.rooms) {
-				if (room.distanceTo(other) <= 0) {
-					overlaps = true;
-					break;
-				}
-			}
-
-			if (!overlaps) {
-        this.startRegion();
-  			this.rooms.push(room);
-  			this.carveRoom(room);
+    // add room borders
+    /*for (var x = 0; x < this.map_size; x++) {
+      for (var y = 0; y < this.map_size; y++) {
+        if (this.map[x][y] == 1) {
+          for (var xx = x - 1; xx <= x + 1; xx++) {
+            for (var yy = y - 1; yy <= y + 1; yy++) {
+              if (this.map[xx][yy] == 0) this.map[xx][yy] = 2;
+            }
+          }
+        }
       }
+    }*/
+  }
 
-		}
-	}
+  placeRooms (roomCount, minSize, maxSize) {
+    var roomsPlaced = 0;
+    while (roomsPlaced <= roomCount) {
+      var room = {};
+      room.x = this.rng.integerInRange(1, this.mapSize - maxSize - 1);
+      room.y = this.rng.integerInRange(1, this.mapSize - maxSize - 1);
+      room.w = this.rng.integerInRange(minSize, maxSize);
+      room.h = this.rng.integerInRange(minSize, maxSize);
 
-  fillRemainderWithMazes() {
-    // Fill in all of the empty space with mazes.
-    for (var y = 1; y < this.boundY; y += 2) {
-      for (var x = 1; x < this.boundX; x += 2) {
-        if (this.getTile(x,y) === Terrains.ROCK) {
-          this.growMaze(x,y);
+      if (!this.roomColidesWithOtherRooms(room)) {
+        // TODO: Why do we decrement here?
+        room.w--;
+        room.h--;
+
+        this.rooms.push(room);
+        roomsPlaced++;
+      }
+    }
+  }
+
+  squashRooms () {
+    for (var i = 0; i < 10; i++) {
+      for (var j = 0; j < this.rooms.length; j++) {
+        var room = this.rooms[j];
+
+        var done = false;
+        
+        while (!done) {
+          var oldPosition = {
+            x: room.x,
+            y: room.y
+          };
+          
+          if (room.x > 1) {
+            room.x--;
+          }
+          
+          if (room.y > 1) {
+            room.y--;
+          }
+
+          if ((room.x == 1) && (room.y == 1)) {
+            done = true;
+          }
+
+          if (this.roomColidesWithOtherRooms(room, j)) {
+            room.x = oldPosition.x;
+            room.y = oldPosition.y;
+            done = true;
+          }
         }
       }
     }
   }
 
-  growMaze(x, y) {
-    var cells = [];
-    var initialCell = { x: x, y: y };
+  joinRooms (roomCount) {
+    // join each room with their closest room
+    for (var i = 0; i < roomCount; i++) {
+      var roomA = this.rooms[i];
+      var roomB = this.findClosestRoom(roomA);
 
-    this.startRegion();
-    this.carve(initialCell.x, initialCell.y);
+      var pointA = {
+        x: this.rng.integerInRange(roomA.x, roomA.x + roomA.w),
+        y: this.rng.integerInRange(roomA.y, roomA.y + roomA.h)
+      };
 
-    cells.push(initialCell);
+      var pointB = {
+        x: this.rng.integerInRange(roomB.x, roomB.x + roomB.w),
+        y: this.rng.integerInRange(roomB.y, roomB.y + roomB.h)
+      };
 
-    var lastDir = null;
-
-    while (cells.length > 0) {
-
-      var cell = lastElementInArray(cells);
-
-      // See which adjacent cells are open.
-      var unmadeCells = [];
-
-      for (let dir of ['up', 'down', 'left', 'right']) {
-        if (this.canCarve(cell.x, cell.y, dir)) {
-          unmadeCells.push(dir);
+      while ((pointB.x != pointA.x) || (pointB.y != pointA.y)) {
+        if (pointB.x != pointA.x) {
+          if (pointB.x > pointA.x) { 
+            pointB.x--;
+          } else {
+            pointB.x++;
+          }
+        } else if (pointB.y != pointA.y) {
+          if (pointB.y > pointA.y) {
+            pointB.y--;
+          } else {
+            pointB.y++;
+          }
         }
-      }
 
-      if (unmadeCells.length > 0) {
-        // Based on how "windy" passages are, try to prefer carving in the
-        // same direction.
-        var dirToCarveIn = lastDir;
-        if (unmadeCells.indexOf(lastDir) === -1 || this.rng.integerInRange(0, 100) < WINDING_PERCENT) {
-          dirToCarveIn = this.rng.pick(unmadeCells);
-        }
-
-        var xMod = this.xModifierForDirection(dirToCarveIn);
-        var yMod = this.yModifierForDirection(dirToCarveIn);
-
-        var adjacentCell = { x: cell.x + xMod, y: cell.y + yMod};
-        this.carve(adjacentCell.x, adjacentCell.y);
-
-        var endCell = {x: cell.x + xMod * 2, y: cell.y + yMod * 2};
-        this.carve(endCell.x, endCell.y);
-
-        cells.push(endCell);
-
-        lastDir = dirToCarveIn;
-      } else {
-        // No adjacent uncarved cells.
-        lastDir = null;
-        removeLastElementFromArray(cells);
+        this.map[pointB.x][pointB.y] = 1;
       }
     }
   }
 
-  startRegion() {
-    this.currentRegion++;
+  carveRooms (roomCount) {
+    // carve out each room
+    for (var i = 0; i < roomCount; i++) {
+      var room = this.rooms[i];
+      for (var x = room.x; x < room.x + room.w; x++) {
+        for (var y = room.y; y < room.y + room.h; y++) {
+          this.map[x][y] = 1;
+        }
+      }
+    }
+  }
+
+  generateTiles () {
+    var tiles = [];
+    this.map.forEach(function(mapRow) {
+      var tileRow = [];
+      mapRow.forEach(function(mapIndex) {
+        var tile;
+
+        if (mapIndex === 1) {
+          tileRow.push(Terrains.FLOOR);
+        } else {
+          tileRow.push(Terrains.ROCK);
+        }
+      });
+      tiles.push(tileRow);
+    });
+
+    this.tiles = tiles;
+  }
+
+  roomColidesWithOtherRooms (room, roomIndexToIgnore) {
+    for (var i = 0; i < this.rooms.length; i++) {
+      if (i !== roomIndexToIgnore)  {
+        var check = this.rooms[i];
+        if (!((room.x + room.w < check.x) || (room.x > check.x + check.w) || (room.y + room.h < check.y) || (room.y > check.y + check.h))) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  findClosestRoom (room) {
+    var mid = {
+      x: room.x + (room.w / 2),
+      y: room.y + (room.h / 2)
+    };
+    var closest = null;
+    var closestDistance = 1000;
+    for (var i = 0; i < this.rooms.length; i++) {
+      var check = this.rooms[i];
+      if (check !== room) {
+        var check_mid = {
+          x: check.x + (check.w / 2),
+          y: check.y + (check.h / 2)
+        };
+        var distance = Math.min(Math.abs(mid.x - check_mid.x) - (room.w / 2) - (check.w / 2), Math.abs(mid.y - check_mid.y) - (room.h / 2) - (check.h / 2));
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closest = check;
+        }
+      }
+    }
+    return closest;
   }
 }
 
