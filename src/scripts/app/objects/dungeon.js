@@ -2,9 +2,12 @@ import { initialize2DArray, printMatrixToConsole } from 'app/helpers/array';
 import Randomizer from 'app/helpers/randomizer';
 import { Terrains } from 'app/enums/terrain';
 
+import config from 'app/config';
+
+
 class Dungeon {
   constructor () {
-    this.mapSize = 64;
+    this.mapSize = config.MAP_SIZE;
     this.width = this.mapSize;
     this.height = this.mapSize;
 
@@ -103,33 +106,37 @@ class Dungeon {
       var roomA = this.rooms[i];
       var roomB = this.findClosestRoom(roomA);
 
-      var pointA = {
-        x: this.rng.integerInRange(roomA.x, roomA.x + roomA.w),
-        y: this.rng.integerInRange(roomA.y, roomA.y + roomA.h)
-      };
+      this.joinTwoRooms(roomA, roomB);
+    }
+  }
 
-      var pointB = {
-        x: this.rng.integerInRange(roomB.x, roomB.x + roomB.w),
-        y: this.rng.integerInRange(roomB.y, roomB.y + roomB.h)
-      };
+  joinTwoRooms (roomA, roomB) {
+    var pointA = {
+      x: this.rng.integerInRange(roomA.x, roomA.x + roomA.w),
+      y: this.rng.integerInRange(roomA.y, roomA.y + roomA.h)
+    };
 
-      while ((pointB.x != pointA.x) || (pointB.y != pointA.y)) {
-        if (pointB.x != pointA.x) {
-          if (pointB.x > pointA.x) { 
-            pointB.x--;
-          } else {
-            pointB.x++;
-          }
-        } else if (pointB.y != pointA.y) {
-          if (pointB.y > pointA.y) {
-            pointB.y--;
-          } else {
-            pointB.y++;
-          }
+    var pointB = {
+      x: this.rng.integerInRange(roomB.x, roomB.x + roomB.w),
+      y: this.rng.integerInRange(roomB.y, roomB.y + roomB.h)
+    };
+
+    while ((pointB.x != pointA.x) || (pointB.y != pointA.y)) {
+      if (pointB.x != pointA.x) {
+        if (pointB.x > pointA.x) { 
+          pointB.x--;
+        } else {
+          pointB.x++;
         }
-
-        this.map[pointB.x][pointB.y] = 1;
+      } else if (pointB.y != pointA.y) {
+        if (pointB.y > pointA.y) {
+          pointB.y--;
+        } else {
+          pointB.y++;
+        }
       }
+
+      this.map[pointB.x][pointB.y] = 1;
     }
   }
 

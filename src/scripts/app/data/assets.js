@@ -25,6 +25,12 @@ for (var key in Terrains) {
   });
 }
 
+game.push({
+  key: 'player',
+  type: 'image',
+  url: 'player.png'
+})
+
 export default {
 
   // - Boot Assets ------------------------------------------------------------
