@@ -1,5 +1,5 @@
 var config = {
-	DESIRED_TILE_SIZE: 64,
+	DESIRED_TILE_SIZE: 16,
   ACTUAL_TILE_SIZE: 32,
   MAP_SIZE: 64
 }

@@ -10,7 +10,7 @@ import * as states from './app/states';
 
 
 export default function () {
-  let game = new Phaser.Game(800, 600, Phaser.AUTO);
+  let game = new Phaser.Game(900, 900, Phaser.AUTO);
 
   // Dynamically add all required game states.
   Object.keys(states)
