@@ -1,46 +1,27 @@
 'use strict';
 
-function pointDistance(x1, y1, x2, y2) {
-  return Math.sqrt( (x2-x1) * (x2-x1) + (y2-y1) * (y2-y1));
-}
-
 class Room {
-  constructor (left, top, width, height) {
-    this.setBoundaries(left, top, width, height);
+  constructor (x, y, width, height) {
+    this.x = x;
+    this.y = y;
+    this.w = width;
+    this.h = height;
   }
 
-  setBoundaries (left, top, width, height) {
-    this.left = left;
-    this.top = top;
-    this.right = left + width;
-    this.bottom = top + height;
-  }
-
-  distanceTo(otherRoom) {
-    var left = otherRoom.right < this.left;
-    var right = this.right < otherRoom.left;
-    var bottom = otherRoom.bottom < this.top;
-    var top = this.bottom < otherRoom.top;
-
-    if (top && left) {
-      return pointDistance(this.left, this.bottom, otherRoom.right, otherRoom.top);
-    } else if (left && bottom) {
-      return pointDistance(this.left, this.top, otherRoom.right, otherRoom.bottom);
-    } else if (bottom && right) {
-      return pointDistance(this.right, this.top, otherRoom.left, otherRoom.bottom);
-    } else if (right && top) {
-      return pointDistance(this.right, this.bottom, otherRoom.left, otherRoom.top);
-    } else if (left) {
-      return this.left - otherRoom.right;
-    } else if (right) {
-      return otherRoom.left - this.right;
-    } else if (bottom) {
-      return this.top - otherRoom.bottom;
-    } else if (top) {
-      return otherRoom.top - this.bottom;
-    } else {
-      return 0;
+  colidesWithAny (rooms, roomIndexToIgnore) {
+    for (var i = 0; i < rooms.length; i++) {
+      var otherRoom = rooms[i];
+      
+      if (!(otherRoom === this) && !this.collidesWith(otherRoom)) {
+        return true;
+      }
     }
+    
+    return false;
+  }
+
+  collidesWith (otherRoom) {
+    return (this.x + this.w < otherRoom.x) || (this.x > otherRoom.x + otherRoom.w) || (this.y + this.h < otherRoom.y) || (this.y > otherRoom.y + otherRoom.h):
   }
 }
 
