@@ -30,8 +30,8 @@ export default class Game extends Phaser.State {
 
   loadDungeon (dungeon) {
     var tiles = new Phaser.Group(this.game);
-    for (var x = 1; x <= dungeon.width; x++) {
-      for (var y = 1; y <= dungeon.height; y++) {
+    for (var x = 0; x < dungeon.width; x++) {
+      for (var y = 0; y < dungeon.height; y++) {
         var terrainType = dungeon.tiles[x][y];
         tiles.add(new Tile(this.game, terrainType, x, y));
       }
