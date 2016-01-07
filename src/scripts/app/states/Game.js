@@ -56,9 +56,21 @@ export default class Game extends Phaser.State {
     return player;
   }
 
+  update() {
+    this.handlePlusMinus();
+  }
+
   handleMouseWheel() {
     var delta = this.game.input.mouse.wheelDelta;
     var amount = delta * 0.2;
     this.game.camera.scale.add(amount, amount);
+  }
+
+  handlePlusMinus() {
+    if (this.game.input.keyboard.isDown(Phaser.KeyCode.PLUS) || this.game.input.keyboard.isDown(Phaser.KeyCode.NUMPAD_ADD)) {
+      this.game.camera.scale.add(0.02, 0.02);
+    } else if (this.game.input.keyboard.isDown(Phaser.KeyCode.MINUS) || this.game.input.keyboard.isDown(Phaser.KeyCode.NUMPAD_SUBTRACT)) {
+      this.game.camera.scale.subtract(0.02, 0.02);
+    }
   }
 }
