@@ -13,25 +13,32 @@ import config from 'app/config'
 
 export default class Game extends Phaser.State {
 
-  init () {
+  init() {
     // Point the Phaser Asset Loader to where all your assets live.
     this.load.baseURL = './assets/';
     this.stage.backgroundColor = '#fffff';
   }
 
-  preload () {
+  preload() {
     this.load.pack('game', null, assets);
   }
 
-  create () {
+  create() {
     this.game.world.setBounds(0, 0, config.WORLD_BOUND_X, config.WORLD_BOUND_Y)
     var dungeon = new Dungeon(this.game);
     this.loadDungeon(dungeon);
     var player = this.createPlayer(dungeon);
     this.game.camera.follow(player);
+
+    this.setup
+
+    var context = this;
+    this.game.input.mouse.mouseWheelCallback = function(mouseEvent) {
+      context.handleMouseWheel(event)
+    }
   }
 
-  loadDungeon (dungeon) {
+  loadDungeon(dungeon) {
     var tiles = new Phaser.Group(this.game);
     for (var x = 0; x < dungeon.width; x++) {
       for (var y = 0; y < dungeon.height; y++) {
@@ -47,5 +54,11 @@ export default class Game extends Phaser.State {
     var player = new Player(this.game, dungeon, tile.gridX, tile.gridY);
     actors.add(player);
     return player;
+  }
+
+  handleMouseWheel() {
+    var delta = this.game.input.mouse.wheelDelta;
+    var amount = delta * 0.2;
+    this.game.camera.scale.add(amount, amount);
   }
 }
