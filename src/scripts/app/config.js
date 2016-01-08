@@ -2,7 +2,7 @@ var config = {
 	DESIRED_TILE_SIZE: 16,
   ACTUAL_TILE_SIZE: 32,
   MAP_SIZE: 64,
-  BASE_SPEED: 100
+  BASE_SPEED: 200
 }
 
 config.SCALE = config.DESIRED_TILE_SIZE / config.ACTUAL_TILE_SIZE;
