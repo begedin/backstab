@@ -6,7 +6,7 @@ class GridSprite extends Phaser.Sprite {
 
     this.gridX = gridX;
     this.gridY = gridY;
- 
+
     this.scale.setTo(config.SCALE);
   }
 
@@ -26,6 +26,37 @@ class GridSprite extends Phaser.Sprite {
   set gridY (value) {
     this._gridY = value;
     this.y = this._gridY * config.DESIRED_TILE_SIZE;
+  }
+
+  moveUp() {
+    this.moveTo({ gridY: this.gridY - 1});
+  }
+
+  moveDown() {
+    this.moveTo({ gridY: this.gridY + 1});
+  }
+
+  moveLeft() {
+    this.moveTo({ gridX: this.gridX - 1});
+  }
+
+  moveRight() {
+    this.moveTo({ gridX: this.gridX + 1});
+  }
+
+  moveTo (updatedCoordinates) {
+    var tween = this.game.add.tween(this).to(updatedCoordinates, config.BASE_SPEED);
+    this.startMotion();
+    tween.onComplete.add(this.stopMotion, this);
+    tween.start();
+  }
+
+  startMotion () {
+    this.isMoving = true;
+  }
+
+  stopMotion () {
+    this.isMoving = false;
   }
 }
 

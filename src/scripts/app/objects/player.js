@@ -9,7 +9,9 @@ class Player extends GridSprite {
 	}
 
   update () {
-    this.handleMovement();
+    if (!this.isMoving) {
+      this.handleMovement();
+    }
   }
 
   handleMovement() {
@@ -38,22 +40,6 @@ class Player extends GridSprite {
 
   get canMoveLeft() {
     return (this.gridX > 1) && this.dungeon.tileAt(this.gridX - 1, this.gridY).isWalkable;
-  }
-
-  moveUp() {
-    this.gridY--;
-  }
-
-  moveDown() {
-    this.gridY++;
-  }
-
-  moveLeft() {
-    this.gridX--;
-  }
-
-  moveRight() {
-    this.gridX++;
   }
 }
 
