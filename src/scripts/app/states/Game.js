@@ -28,7 +28,7 @@ export default class Game extends Phaser.State {
     var dungeon = new Dungeon(this.game);
     this.loadDungeon(dungeon);
     var player = this.createPlayer(dungeon);
-    this.game.camera.follow(player);
+    this.game.camera.follow(player, Phaser.Camera.FOLLOW_TOPDOWN);
 
     this.setup
 

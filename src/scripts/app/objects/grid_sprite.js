@@ -45,7 +45,7 @@ class GridSprite extends Phaser.Sprite {
   }
 
   moveTo (updatedCoordinates) {
-    var tween = this.game.add.tween(this).to(updatedCoordinates, config.BASE_SPEED, Phaser.Easing.Bounce.Out);
+    var tween = this.game.add.tween(this).to(updatedCoordinates, config.BASE_SPEED, Phaser.Easing.Quadratic.In);
     this.startMotion();
     tween.onComplete.add(this.stopMotion, this);
     tween.start();
