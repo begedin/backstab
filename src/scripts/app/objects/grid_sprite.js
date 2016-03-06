@@ -2,12 +2,10 @@ import config from 'app/config';
 
 class GridSprite extends Phaser.Sprite {
 	constructor(game, gridX, gridY, key, frame) {
-    super(game, gridX * config.DESIRED_TILE_SIZE, gridY * config.DESIRED_TILE_SIZE, key, frame);
+    super(game, gridX * config.TILE_SIZE, gridY * config.TILE_SIZE, key, frame);
 
     this.gridX = gridX;
     this.gridY = gridY;
-
-    this.scale.setTo(config.SCALE);
   }
 
   get gridX () {
@@ -16,7 +14,7 @@ class GridSprite extends Phaser.Sprite {
 
   set gridX (value) {
     this._gridX = value;
-    this.x = this._gridX * config.DESIRED_TILE_SIZE;
+    this.x = this._gridX * config.TILE_SIZE;
   }
 
   get gridY () {
@@ -25,7 +23,7 @@ class GridSprite extends Phaser.Sprite {
 
   set gridY (value) {
     this._gridY = value;
-    this.y = this._gridY * config.DESIRED_TILE_SIZE;
+    this.y = this._gridY * 32;
   }
 
   moveUp() {

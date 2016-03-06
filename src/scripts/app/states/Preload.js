@@ -1,16 +1,5 @@
-/*
- * Preload state
- * ============================================================================
- *
- * This state comprises two purposes: Take care of loading the remaining
- * assets used within your game, including graphics and sound effects, while
- * displaying a busy splash screen, showing how much progress were made
- * during the asset load.
- */
-
-'use strict';
-
 import assets from '../data/assets';
+import SplashScreen from 'app/objects/splash_screen';
 
 // To make matters easier, I prepared a SplashScreen class, responsible for
 // displaying the decorated splash screen graphic, and the progress bar.

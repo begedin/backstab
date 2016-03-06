@@ -12,24 +12,23 @@
  *
  */
 
-import { Terrains } from 'app/enums/terrain';
+import { Terrain } from 'app/enums';
 
 var game = [];
 
-for (var key in Terrains) {
-  var terrain = Terrains[key];
+Object.getOwnPropertyNames(Terrain).forEach((key) => {
   game.push({
-    key: terrain.graphic,
+    key: key.toLowerCase(),
     type: 'image',
-    url: terrain.graphic + '_debug.png'
+    url: key.toLowerCase() + '.png'
   });
-}
+});
 
 game.push({
   key: 'player',
   type: 'image',
   url: 'player.png'
-})
+});
 
 export default {
 
