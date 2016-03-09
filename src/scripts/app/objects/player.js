@@ -1,4 +1,3 @@
-import config from 'app/config';
 import GridSprite from 'app/objects/grid_sprite';
 
 class Player extends GridSprite {
@@ -15,6 +14,9 @@ class Player extends GridSprite {
   }
 
   handleMovement() {
+    if (this.cursors.up.isDown || this.cursors.down.isDown || this.cursors.left.isDown || this.cursors.right.isDown) {
+      this.game.camera.follow(this, Phaser.Camera.FOLLOW_TOPDOWN);
+    }
     if (this.cursors.up.isDown && this.canMoveUp) {
       this.moveUp();
     } else if (this.cursors.right.isDown && this.canMoveRight) {
@@ -27,19 +29,23 @@ class Player extends GridSprite {
   }
 
   get canMoveUp() {
-    return (this.gridY > 1) && this.dungeon.tileAt(this.gridX, this.gridY - 1).isWalkable;
+    let tile = this.dungeon.tileAt(this.gridX, this.gridY - 1);
+    return tile && tile.isWalkable;
   }
 
   get canMoveDown() {
-    return (this.gridY < config.MAP_SIZE - 1) && this.dungeon.tileAt(this.gridX, this.gridY + 1).isWalkable
+    let tile = this.dungeon.tileAt(this.gridX, this.gridY + 1);
+    return tile && tile.isWalkable;
   }
 
   get canMoveRight() {
-    return (this.gridX < config.MAP_SIZE - 1) && this.dungeon.tileAt(this.gridX + 1, this.gridY).isWalkable;
+    let tile = this.dungeon.tileAt(this.gridX + 1, this.gridY);
+    return tile && tile.isWalkable;
   }
 
   get canMoveLeft() {
-    return (this.gridX > 1) && this.dungeon.tileAt(this.gridX - 1, this.gridY).isWalkable;
+    let tile = this.dungeon.tileAt(this.gridX - 1, this.gridY);
+    return tile && tile.isWalkable;
   }
 }
 

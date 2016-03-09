@@ -23,16 +23,16 @@ function removeLastElementFromArray(array) {
   array.pop(lastElementInArray(array));
 }
 
-function printMatrixToConsole(matrix) {
-  matrix.forEach(_printRow);
-}
-
 function _printRow(row) {
   var rowString = row.reduce(function (prev, curr) {
     return prev + curr;
-  }, "");
+  }, '');
 
   console.log(rowString);
+}
+
+function printMatrixToConsole(matrix) {
+  matrix.forEach(_printRow);
 }
 
 function flatten2DArray(array) {

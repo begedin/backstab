@@ -1,12 +1,3 @@
-/*
- * Boot state
- * ===========================================================================
- *
- * The first state of the game, responsible for setting up some Phaser
- * features.
- */
-'use strict';
-
 import assets from '../data/assets';
 
 

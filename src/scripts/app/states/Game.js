@@ -6,10 +6,9 @@
  */
 
 import assets from '../data/assets';
-import Dungeon from 'app/objects/dungeon';
+import DungeonGenerator from 'app/objects/dungeon/generator';
 import Player from 'app/objects/player';
 
-import config from 'app/config'
 
 export default class Game extends Phaser.State {
 
@@ -24,53 +23,83 @@ export default class Game extends Phaser.State {
   }
 
   create() {
-    this.game.world.setBounds(0, 0, config.WORLD_BOUND_X, config.WORLD_BOUND_Y)
-    var dungeon = new Dungeon(this.game);
-    this.loadDungeon(dungeon);
-    var player = this.createPlayer(dungeon);
-    this.game.camera.follow(player, Phaser.Camera.FOLLOW_TOPDOWN);
+    this.game.world.setBounds(0, 0, 2000, 2000);
 
-    this.setup
+    this.dungeon = new DungeonGenerator(this.game);
+    this.loadDungeon(this.dungeon);
+    this.player = this.createPlayer(this.dungeon);
+
+    this.game.camera.position.setTo(this.player.position);
+    this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN);
 
     var context = this;
     this.game.input.mouse.mouseWheelCallback = function(mouseEvent) {
-      context.handleMouseWheel(event)
-    }
+      context.handleMouseWheel(mouseEvent);
+    };
   }
 
   loadDungeon(dungeon) {
-    var tiles = new Phaser.Group(this.game);
-    for (var x = 0; x < dungeon.width; x++) {
-      for (var y = 0; y < dungeon.height; y++) {
-        var tile = dungeon.tiles[x][y];
-        tiles.add(tile);
-      }
-    }
+    let tiles = new Phaser.Group(this.game);
+    dungeon.flattenedTiles.forEach((tile) => {
+      tiles.add(tile);
+    });
   }
 
   createPlayer(dungeon) {
-    var actors = new Phaser.Group(this.game);
-    var tile = dungeon.firstWalkableTile;
-    var player = new Player(this.game, dungeon, tile.gridX, tile.gridY);
-    actors.add(player);
+    this.actors = new Phaser.Group(this.game);
+    let playerPosition = dungeon.startingLocation;
+    let player = new Player(this.game, dungeon, playerPosition.x, playerPosition.y);
+    this.actors.add(player);
     return player;
   }
 
   update() {
     this.handlePlusMinus();
+    this.handleDrag();
   }
+
+  changeZoom(amount) {
+    let maxScale = 5;
+    let minScale = 0.2;
+    let currentScale = this.game.camera.scale.x;
+    let newScale = currentScale + amount;
+    if (newScale > maxScale) {
+      newScale = maxScale;
+    } else if (newScale < minScale) {
+      newScale = minScale;
+    }
+
+    if (currentScale !== newScale) {
+      this.game.camera.scale.setTo(newScale, newScale);
+    }
+  }
+
 
   handleMouseWheel() {
     var delta = this.game.input.mouse.wheelDelta;
-    var amount = delta * 0.2;
-    this.game.camera.scale.add(amount, amount);
+    this.changeZoom(delta * 0.2);
   }
 
   handlePlusMinus() {
     if (this.game.input.keyboard.isDown(Phaser.KeyCode.PLUS) || this.game.input.keyboard.isDown(Phaser.KeyCode.NUMPAD_ADD)) {
-      this.game.camera.scale.add(0.02, 0.02);
+      this.changeZoom(0.02);
     } else if (this.game.input.keyboard.isDown(Phaser.KeyCode.MINUS) || this.game.input.keyboard.isDown(Phaser.KeyCode.NUMPAD_SUBTRACT)) {
-      this.game.camera.scale.subtract(0.02, 0.02);
+      this.changeZoom(-0.02);
+    }
+  }
+
+  handleDrag() {
+    if (this.game.input.activePointer.isDown) {
+      this.game.camera.unfollow();
+      if (this.game.origDragPoint) {
+        // move the camera by the amount the mouse has moved since last update
+        this.game.camera.x += this.game.origDragPoint.x - this.game.input.activePointer.position.x;
+        this.game.camera.y += this.game.origDragPoint.y - this.game.input.activePointer.position.y;
+      }
+      // set new drag origin to current position
+      this.game.origDragPoint = this.game.input.activePointer.position.clone();
+    } else {
+      this.game.origDragPoint = null;
     }
   }
 }
