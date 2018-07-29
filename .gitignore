@@ -1,14 +1,3 @@
-.*
-*.log
-Thumbs.db
-
+yarn.lock
 dist
-build
 node_modules
-bower_components
-
-!.git*
-!.babelrc
-!.bowerrc
-!.eslintrc
-!.editorconfig
