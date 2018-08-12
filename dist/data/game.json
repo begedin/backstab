@@ -1,0 +1,13 @@
+{
+  "game": {
+    "files": [
+      { "key": "unused", "type": "image", "url": "assets/unused.png" },
+      { "key": "stone_wall", "type": "image", "url": "assets/stone_wall.png" },
+      { "key": "dirt_floor", "type": "image", "url": "assets/dirt_floor.png" },
+      { "key": "dirt_wall", "type": "image", "url": "assets/dirt_wall.png" },
+      { "key": "door", "type": "image", "url": "assets/door.png" },
+      { "key": "corridor", "type": "image", "url": "assets/corridor.png" },
+      { "key": "player", "type": "image", "url": "assets/player.png" }
+    ]
+  }
+}
