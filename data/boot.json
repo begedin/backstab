@@ -1,0 +1,16 @@
+{
+  "boot": {
+    "files": [
+      {
+        "key": "splash-screen",
+        "type": "image",
+        "url": "assets/splash-screen.png"
+      },
+      {
+        "key": "progress-bar",
+        "type": "image",
+        "url": "assets/progress-bar.png"
+      }
+    ]
+  }
+}
