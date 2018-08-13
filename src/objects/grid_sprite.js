@@ -36,28 +36,41 @@ class GridSprite extends Phaser.GameObjects.Sprite {
   }
 
   moveUp() {
-    this.moveTo({ gridY: this.gridY - 1 });
+    this.moveTo({ gridX: this.gridX, gridY: this.gridY - 1 });
   }
 
   moveDown() {
-    this.moveTo({ gridY: this.gridY + 1 });
+    this.moveTo({ gridX: this.gridX, gridY: this.gridY + 1 });
   }
 
   moveLeft() {
-    this.moveTo({ gridX: this.gridX - 1 });
+    this.moveTo({ gridX: this.gridX - 1, gridY: this.gridY });
   }
 
   moveRight() {
-    this.moveTo({ gridX: this.gridX + 1 });
+    this.moveTo({ gridX: this.gridX + 1, gridY: this.gridY });
   }
 
-  moveTo(updatedCoordinates) {
-    const tween = this.scene.add
-      .tween(this)
-      .to(updatedCoordinates, config.BASE_SPEED, Phaser.Easing.Quadratic.In);
-    this.startMotion();
-    tween.onComplete.add(this.stopMotion, this);
-    tween.start();
+  moveTo({ gridX, gridY }) {
+    const tween = this.scene.tweens.add({
+      targets: this,
+      gridX: {
+        getStart: () => this.gridX,
+        getEnd: () => gridX
+      },
+      gridY: {
+        getStart: () => this.gridY,
+        getEnd: () => gridY
+      },
+      ease: 'Sine.easeIn',
+      duration: config.BASE_SPEED,
+      onStart: () => {
+        this.startMotion();
+      },
+      onComplete: () => {
+        this.stopMotion();
+      },
+    });
   }
 
   startMotion() {

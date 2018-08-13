@@ -57,9 +57,8 @@ export default class Game extends Phaser.Scene {
   }
 
   update(delta) {
-    // this.handlePlusMinus();
     // this.handleDrag();
-    // this.player.update();
+    this.player.update();
     this.controls.update(delta);
   }
 

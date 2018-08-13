@@ -4,7 +4,7 @@ import Game from 'backstab/scenes/game';
 
 export default {
   TILE_SIZE: 32,
-  BASE_SPEED: 100,
+  BASE_SPEED: 300,
   width: 800,
   height: 600,
   backgroundColor: 'rgb(0, 0, 0)',
