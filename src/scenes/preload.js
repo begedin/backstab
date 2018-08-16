@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import SplashScreen from 'backstab/objects/splash_screen';
 
 export default class Preload extends Phaser.Scene {
   constructor() {
@@ -12,6 +11,7 @@ export default class Preload extends Phaser.Scene {
 
   preload() {
     this.load.pack('game', 'data/game.json');
+    this.load.image('tiles', 'assets/tileset.png');
   }
 
   create() {

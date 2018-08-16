@@ -37,22 +37,49 @@ const computeBounds = (x, y, length, direction) => {
   return { top, bottom, left, right };
 };
 
-const isWall = ({ x, y }, { left, right, top, bottom }, direction) =>
-  isVertical(direction) ? x === left || x === right : y === top || y === bottom;
+const computeVerticalPoints = ({ left, top, bottom }, direction) => {
+  const length = bottom - top + 1;
 
-const computePoints = ({ left, right, top, bottom }, direction) => {
-  const points = [];
+  const leftWall = [...Array(length)].map((el, i) => ({
+    x: left,
+    y: i + top,
+    terrain: Terrain.DIRT_WALL,
+  }));
 
-  for (let x = left; x <= right; x += 1) {
-    for (let y = top; y <= bottom; y += 1) {
-      const terrain = isWall({ x, y }, { left, right, top, bottom }, direction)
-        ? Terrain.DIRT_WALL
-        : Terrain.CORRIDOR;
-      points.push({ x, y, terrain });
-    }
-  }
+  const centerCorridor = [...Array(length)].map((el, i) => ({
+    x: left + 1,
+    y: i + top,
+    terrain: Terrain.CORRIDOR,
+  }));
 
-  return points;
+  const rightWall = [...Array(length)].map((el, i) => ({
+    x: left + 2,
+    y: i + top,
+    terrain: Terrain.DIRT_WALL,
+  }));
+
+  return leftWall.concat(centerCorridor).concat(rightWall);
+};
+
+const computeHorizontalPoints = ({ left, right, top }, direction) => {
+  const length = right - left + 1;
+  const topWall = [...Array(length)].map((el, i) => ({
+    x: i + left,
+    y: top,
+    terrain: Terrain.DIRT_WALL,
+  }));
+  const centerCorridor = [...Array(length)].map((el, i) => ({
+    x: i + left,
+    y: top + 1,
+    terrain: Terrain.CORRIDOR,
+  }));
+  const bottomWall = [...Array(length)].map((el, i) => ({
+    x: i + left,
+    y: top + 2,
+    terrain: Terrain.DIRT_WALL,
+  }));
+
+  return topWall.concat(centerCorridor).concat(bottomWall);
 };
 
 const computeAnchors = ({ left, right, top, bottom }, points, direction) =>
@@ -63,7 +90,12 @@ const computeAnchors = ({ left, right, top, bottom }, points, direction) =>
 class Corridor {
   constructor(x, y, length, direction) {
     const bounds = computeBounds(x, y, length, direction);
-    const points = computePoints(bounds, direction);
+
+    const points = isVertical(direction)
+      ? computeVerticalPoints(bounds, direction)
+      : computeHorizontalPoints(bounds, direction);
+
+    console.log(points);
     const anchors = computeAnchors(bounds, points, direction);
 
     this.points = points;

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import DungeonGenerator from 'backstab/objects/dungeon/generator';
 import Player from 'backstab/objects/player';
+import globals from 'backstab/globals';
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -8,16 +9,44 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.setBounds(0, 0, 500 * 32, 500 * 32);
-    const dungeon = new DungeonGenerator(this);
-    dungeon.flattenedTiles.forEach(tile => this.add.existing(tile));
+    const { TILE_SIZE } = globals;
+    const MAP_SIZE = 500;
+
+    this.cameras.main.setBounds(
+      0,
+      0,
+      MAP_SIZE * TILE_SIZE,
+      MAP_SIZE * TILE_SIZE,
+    );
+    const dungeon = new DungeonGenerator(MAP_SIZE, MAP_SIZE);
+
+    const map = this.make.tilemap({
+      tileWidth: TILE_SIZE,
+      tileHeight: TILE_SIZE,
+      width: dungeon.width,
+      height: dungeon.height,
+    });
+
+    const tileset = map.addTilesetImage(
+      'tiles',
+      'tiles',
+      TILE_SIZE,
+      TILE_SIZE,
+      1,
+      2,
+    );
+
+    map.createBlankDynamicLayer('Layer 1', tileset);
+    dungeon.features.forEach(({ points }) => {
+      points.forEach(({ x, y, terrain }) => {
+        map.putTileAt(terrain, x, y);
+      });
+    });
 
     const player = this.createPlayer(dungeon);
     this.player = this.add.existing(player);
     this.cameras.main.startFollow(player);
     this.cameras.main.disableCull = true;
-
-    const cursors = this.input.keyboard.createCursorKeys();
 
     const controlConfig = {
       camera: this.cameras.main,
@@ -27,19 +56,22 @@ export default class Game extends Phaser.Scene {
       zoomOut: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E),
     };
 
-    window.addEventListener('wheel', ({ deltaY }) => {
-      const camera = this.cameras.main;
+    window.addEventListener(
+      'wheel',
+      ({ deltaY }) => {
+        const camera = this.cameras.main;
 
-      const zoomIn = 1.5;
-      const zoomOut = 1 / zoomIn;
+        const zoomIn = 1.5;
+        const zoomOut = 1 / zoomIn;
 
-      if (deltaY > 0) {
-        camera.zoomTo(camera.zoom * zoomOut, 250);
-      } else {
-
-        camera.zoomTo(camera.zoom * zoomIn, 250);
-      }
-    }, false)
+        if (deltaY > 0) {
+          camera.zoomTo(camera.zoom * zoomOut, 250);
+        } else {
+          camera.zoomTo(camera.zoom * zoomIn, 250);
+        }
+      },
+      false,
+    );
 
     this.controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
   }

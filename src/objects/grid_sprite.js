@@ -1,15 +1,13 @@
 import Phaser from 'phaser';
-import config from 'backstab/config';
+import globals from 'backstab/globals';
+
+const { BASE_SPEED, TILE_SIZE } = globals;
+
+const gridToWorld = x => x * TILE_SIZE + Math.floor(TILE_SIZE / 2);
 
 class GridSprite extends Phaser.GameObjects.Sprite {
   constructor(scene, gridX, gridY, key, frame) {
-    super(
-      scene,
-      gridX * config.TILE_SIZE,
-      gridY * config.TILE_SIZE,
-      key,
-      frame,
-    );
+    super(scene, gridToWorld(gridX), gridToWorld(gridY), key, frame);
 
     this.grid = { x: gridX, y: gridY };
 
@@ -23,7 +21,7 @@ class GridSprite extends Phaser.GameObjects.Sprite {
 
   set gridX(value) {
     this.grid.x = value;
-    this.x = this.grid.x * config.TILE_SIZE;
+    this.x = gridToWorld(value);
   }
 
   get gridY() {
@@ -32,7 +30,7 @@ class GridSprite extends Phaser.GameObjects.Sprite {
 
   set gridY(value) {
     this.grid.y = value;
-    this.y = this.grid.y * 32;
+    this.y = gridToWorld(value);
   }
 
   moveUp() {
@@ -52,18 +50,12 @@ class GridSprite extends Phaser.GameObjects.Sprite {
   }
 
   moveTo({ gridX, gridY }) {
-    const tween = this.scene.tweens.add({
+    this.scene.tweens.add({
       targets: this,
-      gridX: {
-        getStart: () => this.gridX,
-        getEnd: () => gridX
-      },
-      gridY: {
-        getStart: () => this.gridY,
-        getEnd: () => gridY
-      },
+      gridX,
+      gridY,
       ease: 'Sine.easeIn',
-      duration: config.BASE_SPEED,
+      duration: BASE_SPEED,
       onStart: () => {
         this.startMotion();
       },

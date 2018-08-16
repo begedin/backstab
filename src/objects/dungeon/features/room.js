@@ -156,6 +156,11 @@ class Room {
 
     this.corridor = corridor;
     this.points = points;
+
+    if (directionSpecified) {
+      this.createDoor({ x, y });
+    }
+
     this.anchors = anchors;
     this.bounds = bounds;
   }

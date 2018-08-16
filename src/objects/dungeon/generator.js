@@ -1,12 +1,11 @@
 import Randomizer from 'backstab/helpers/randomizer';
 import Room from 'backstab/objects/dungeon/features/room';
-import { Terrain, Direction } from 'backstab/enums';
-import Tile from 'backstab/objects/tile';
+import { Terrain } from 'backstab/enums';
 import { cloneArray, flatten2DArray } from 'backstab/helpers/array';
 
 const createEmptyMap = (width, height) =>
-  [...Array(height)].map(y =>
-    [...Array(width)].map(x => {
+  [...Array(height)].map(x =>
+    [...Array(width)].map(y => {
       if (y === 0 || y === height - 1 || x === 0 || x === width - 1) {
         return Terrain.STONE_WALL;
       }
@@ -52,29 +51,15 @@ const tryGenerateFeature = (rng, existingFeatures) => {
   return room;
 };
 
-const generateTiles = (map, scene) =>
-  map.map((row, gridX) =>
-    row.map((type, gridY) => {
-      if (type) {
-        return new Tile(scene, type, gridX, gridY);
-      }
-      return null;
-    }),
-  );
-
 class Generator {
-  constructor(scene) {
+  constructor(width, height) {
     const FEATURE_COUNT = 10;
-    const MAP_SIZE = 500;
     const MAX_ATTEMPTS = 20;
 
     const rng = new Randomizer();
 
-    // huge square map with stone wall edges
-    const emptyMap = createEmptyMap(MAP_SIZE, MAP_SIZE);
-
     // initial room for the map
-    const initialRoom = new Room(rng, MAP_SIZE / 2, MAP_SIZE / 2);
+    const initialRoom = new Room(rng, width / 2, height / 2);
 
     const features = [initialRoom];
     let attempts = 0;
@@ -88,21 +73,20 @@ class Generator {
       attempts += 1;
     }
 
-    // placing feature tiles onto the map
-    const mapWithFeatures = placeFeatures(emptyMap, features);
-    // generating tiles (for adding tile sprites later)
-    const tiles = generateTiles(mapWithFeatures, scene);
-
     this.rng = rng;
     this.features = features;
-    this.map = mapWithFeatures;
-    this.tiles = tiles;
 
-    this.startingLocation = { x: MAP_SIZE / 2, y: MAP_SIZE / 2 };
+    const emptyMap = createEmptyMap(width, height);
+    this.map = placeFeatures(emptyMap, features);
+
+    this.startingLocation = { x: width / 2, y: height / 2 };
+
+    this.width = width;
+    this.height = height;
   }
 
-  get flattenedTiles() {
-    return flatten2DArray(this.tiles).filter(x => !!x);
+  get flattenedMap() {
+    return flatten2DArray(this.map);
   }
 
   get firstWalkableTile() {
@@ -110,7 +94,7 @@ class Generator {
   }
 
   tileAt(x, y) {
-    return this.tiles[x][y];
+    return this.map[x][y];
   }
 }
 

@@ -1,5 +1,10 @@
-import Phaser from 'phaser';
 import GridSprite from 'backstab/objects/grid_sprite';
+import { Terrain } from 'backstab/enums';
+
+const canWalkOn = terrain =>
+  terrain === Terrain.DIRT_FLOOR ||
+  terrain === Terrain.DOOR ||
+  terrain === Terrain.CORRIDOR;
 
 class Player extends GridSprite {
   constructor(scene, dungeon, gridX, gridY) {
@@ -15,14 +20,16 @@ class Player extends GridSprite {
   }
 
   handleMovement() {
-    if (
+    const isCursorKeyPressed =
       this.cursors.up.isDown ||
       this.cursors.down.isDown ||
       this.cursors.left.isDown ||
-      this.cursors.right.isDown
-    ) {
+      this.cursors.right.isDown;
+
+    if (isCursorKeyPressed) {
       this.scene.cameras.main.startFollow(this);
     }
+
     if (this.cursors.up.isDown && this.canMoveUp) {
       this.moveUp();
     } else if (this.cursors.right.isDown && this.canMoveRight) {
@@ -36,22 +43,22 @@ class Player extends GridSprite {
 
   get canMoveUp() {
     const tile = this.dungeon.tileAt(this.gridX, this.gridY - 1);
-    return tile && tile.isWalkable;
+    return tile !== undefined && canWalkOn(tile);
   }
 
   get canMoveDown() {
     const tile = this.dungeon.tileAt(this.gridX, this.gridY + 1);
-    return tile && tile.isWalkable;
+    return tile !== undefined && canWalkOn(tile);
   }
 
   get canMoveRight() {
     const tile = this.dungeon.tileAt(this.gridX + 1, this.gridY);
-    return tile && tile.isWalkable;
+    return tile !== undefined && canWalkOn(tile);
   }
 
   get canMoveLeft() {
     const tile = this.dungeon.tileAt(this.gridX - 1, this.gridY);
-    return tile && tile.isWalkable;
+    return tile !== undefined && canWalkOn(tile);
   }
 }
 
