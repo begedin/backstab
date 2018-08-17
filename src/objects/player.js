@@ -1,5 +1,16 @@
 import GridSprite from 'backstab/objects/grid_sprite';
 import { Terrain } from 'backstab/enums';
+import {
+  moveUp,
+  moveDown,
+  moveLeft,
+  moveRight,
+} from 'backstab/objects/grid/movement';
+
+const STATES = {
+  IDLE: 0,
+  MOVING: 1,
+};
 
 const canWalkOn = terrain =>
   terrain === Terrain.DIRT_FLOOR ||
@@ -11,33 +22,49 @@ class Player extends GridSprite {
     super(scene, gridX, gridY, 'player');
     this.dungeon = dungeon;
     this.cursors = scene.input.keyboard.createCursorKeys();
+    this.state = STATES.IDLE;
   }
 
   update() {
-    if (!this.isMoving) {
+    if (this.state === STATES.IDLE) {
       this.handleMovement();
     }
   }
 
   handleMovement() {
+    const { cursors, scene } = this;
     const isCursorKeyPressed =
-      this.cursors.up.isDown ||
-      this.cursors.down.isDown ||
-      this.cursors.left.isDown ||
-      this.cursors.right.isDown;
+      cursors.up.isDown ||
+      cursors.down.isDown ||
+      cursors.left.isDown ||
+      cursors.right.isDown;
 
     if (isCursorKeyPressed) {
-      this.scene.cameras.main.startFollow(this);
+      scene.cameras.main.startFollow(this);
     }
 
-    if (this.cursors.up.isDown && this.canMoveUp) {
-      this.moveUp();
-    } else if (this.cursors.right.isDown && this.canMoveRight) {
-      this.moveRight();
-    } else if (this.cursors.down.isDown && this.canMoveDown) {
-      this.moveDown();
-    } else if (this.cursors.left.isDown && this.canMoveLeft) {
-      this.moveLeft();
+    let action;
+
+    if (cursors.up.isDown && this.canMoveUp) {
+      action = moveUp(this);
+    } else if (cursors.right.isDown && this.canMoveRight) {
+      action = moveRight(this);
+    } else if (cursors.down.isDown && this.canMoveDown) {
+      action = moveDown(this);
+    } else if (cursors.left.isDown && this.canMoveLeft) {
+      action = moveLeft(this);
+    }
+
+    if (action) {
+      this.state = STATES.MOVING;
+      action.setCallback(
+        'onComplete',
+        () => {
+          this.state = STATES.IDLE;
+        },
+        [],
+        this,
+      );
     }
   }
 

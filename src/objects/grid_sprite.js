@@ -1,9 +1,5 @@
 import Phaser from 'phaser';
-import globals from 'backstab/globals';
-
-const { BASE_SPEED, TILE_SIZE } = globals;
-
-const gridToWorld = x => x * TILE_SIZE + Math.floor(TILE_SIZE / 2);
+import { gridToWorld } from 'backstab/objects/grid/convert';
 
 class GridSprite extends Phaser.GameObjects.Sprite {
   constructor(scene, gridX, gridY, key, frame) {
@@ -31,46 +27,6 @@ class GridSprite extends Phaser.GameObjects.Sprite {
   set gridY(value) {
     this.grid.y = value;
     this.y = gridToWorld(value);
-  }
-
-  moveUp() {
-    this.moveTo({ gridX: this.gridX, gridY: this.gridY - 1 });
-  }
-
-  moveDown() {
-    this.moveTo({ gridX: this.gridX, gridY: this.gridY + 1 });
-  }
-
-  moveLeft() {
-    this.moveTo({ gridX: this.gridX - 1, gridY: this.gridY });
-  }
-
-  moveRight() {
-    this.moveTo({ gridX: this.gridX + 1, gridY: this.gridY });
-  }
-
-  moveTo({ gridX, gridY }) {
-    this.scene.tweens.add({
-      targets: this,
-      gridX,
-      gridY,
-      ease: 'Sine.easeIn',
-      duration: BASE_SPEED,
-      onStart: () => {
-        this.startMotion();
-      },
-      onComplete: () => {
-        this.stopMotion();
-      },
-    });
-  }
-
-  startMotion() {
-    this.isMoving = true;
-  }
-
-  stopMotion() {
-    this.isMoving = false;
   }
 }
 
