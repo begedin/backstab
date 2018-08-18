@@ -17,7 +17,7 @@ const canWalkOn = terrain =>
   terrain === Terrain.DOOR ||
   terrain === Terrain.CORRIDOR;
 
-const canMoveTo = tile => tile !== undefined && canWalkOn(tile);
+const canMoveTo = tile => tile !== undefined && canWalkOn(tile.terrain);
 
 const canMoveUp = ({ gridX, gridY }, dungeon) =>
   canMoveTo(dungeon.tileAt(gridX, gridY - 1));

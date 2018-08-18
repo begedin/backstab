@@ -1,5 +1,6 @@
 import { Direction, Terrain } from 'backstab/enums';
-import Corridor from 'backstab/objects/dungeon/features/corridor';
+import generateCorridor from 'backstab/objects/dungeon/generator/corridor';
+import Feature from 'backstab/objects/dungeon/feature';
 
 const ROOM_MAX_WIDTH = 15;
 const ROOM_MAX_HEIGHT = 15;
@@ -119,56 +120,53 @@ const computeOwnAnchors = ({ left, right, top, bottom }, points, direction) => {
   return westAnchors.concat(northAnchors).concat(southAnchors);
 };
 
-class Room {
-  constructor(rng, anchorX, anchorY, direction) {
-    this.rng = rng;
+const mergeRectangles = (a, b) => ({
+  left: a.left < b.left ? a.left : b.left,
+  right: a.right > b.right ? a.right : b.right,
+  top: a.top < b.top ? a.top : b.top,
+  bottom: a.bottom > b.bottom ? a.bottom : b.bottom,
+});
 
-    const width = this.rng.integerInRange(4, ROOM_MAX_WIDTH);
-    const height = this.rng.integerInRange(4, ROOM_MAX_HEIGHT);
+const generate = (rng, anchorX, anchorY, direction) => {
+  const width = rng.integerInRange(4, ROOM_MAX_WIDTH);
+  const height = rng.integerInRange(4, ROOM_MAX_HEIGHT);
 
-    const anchor = { x: anchorX, y: anchorY };
+  const anchor = { x: anchorX, y: anchorY };
 
-    const directionSpecified = typeof direction === 'number';
-    const start = directionSpecified ? movePoint(anchor, 1, direction) : anchor;
+  const directionSpecified = typeof direction === 'number';
+  const start = directionSpecified ? movePoint(anchor, 1, direction) : anchor;
 
-    const corridor = directionSpecified
-      ? new Corridor(
-          start.x,
-          start.y,
-          rng.integerInRange(3, CORRIDOR_MAX_LENGTH),
-          direction,
-        )
-      : null;
+  const corridor = directionSpecified
+    ? generateCorridor(
+        start.x,
+        start.y,
+        rng.integerInRange(3, CORRIDOR_MAX_LENGTH),
+        direction,
+      )
+    : null;
 
-    const { x, y } = corridor
-      ? movePoint(start, corridor.length, direction)
-      : start;
+  const { x, y } = corridor
+    ? movePoint(start, corridor.length + 1, direction)
+    : start;
 
-    const bounds = computeBounds(x, y, width, height, direction);
+  const ownBounds = computeBounds(x, y, width, height, direction);
+  const bounds = corridor
+    ? mergeRectangles(ownBounds, corridor.bounds)
+    : ownBounds;
 
-    const roomPoints = computeOwnPoints(bounds, corridor ? start : null);
-    const points = corridor ? roomPoints.concat(corridor.points) : roomPoints;
+  const roomPoints = computeOwnPoints(ownBounds, corridor ? start : null);
+  const points = corridor ? roomPoints.concat(corridor.points) : roomPoints;
 
-    const roomAnchors = computeOwnAnchors(bounds, points, direction);
-    const anchors = corridor
-      ? roomAnchors.concat(corridor.anchors)
-      : roomAnchors;
+  const roomAnchors = computeOwnAnchors(bounds, points, direction);
+  const anchors = corridor ? roomAnchors.concat(corridor.anchors) : roomAnchors;
 
-    this.corridor = corridor;
-    this.points = points;
+  const feature = new Feature(bounds, points, anchors);
 
-    if (directionSpecified) {
-      this.createDoor({ x, y });
-    }
-
-    this.anchors = anchors;
-    this.bounds = bounds;
+  if (directionSpecified) {
+    feature.setPoint({ x, y }, Terrain.DOOR);
   }
 
-  createDoor({ x, y }) {
-    const point = this.points.find(p => p.x === x && p.y === y);
-    point.terrain = Terrain.DOOR;
-  }
-}
+  return feature;
+};
 
-export default Room;
+export default generate;

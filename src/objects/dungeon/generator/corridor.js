@@ -1,4 +1,5 @@
 import { Direction, Terrain } from 'backstab/enums';
+import Feature from 'backstab/objects/dungeon/feature';
 
 const isVertical = direction =>
   direction === Direction.NORTH || direction === Direction.SOUTH;
@@ -82,24 +83,30 @@ const computeHorizontalPoints = ({ left, right, top }) => {
   return topWall.concat(centerCorridor).concat(bottomWall);
 };
 
-const computeAnchors = ({ left, right, top, bottom }, points, direction) =>
-  isVertical(direction)
-    ? points.filter(p => p.x === left || p.x === right)
-    : points.filter(p => p.y === top || p.y === bottom);
+const computeVerticalAnchors = ({ left, right, top, bottom }, points) =>
+  points.filter(
+    p => p.y !== top && p.y !== bottom && (p.x === left || p.x === right),
+  );
 
-class Corridor {
-  constructor(x, y, length, direction) {
-    const bounds = computeBounds(x, y, length, direction);
+const computeHorizontalAnchors = ({ left, right, top, bottom }, points) =>
+  points.filter(
+    p => p.x !== left && p.x !== right && (p.y === top || p.y === bottom),
+  );
 
-    const points = isVertical(direction)
-      ? computeVerticalPoints(bounds, direction)
-      : computeHorizontalPoints(bounds, direction);
-    const anchors = computeAnchors(bounds, points, direction);
+const generate = (x, y, length, direction) => {
+  const bounds = computeBounds(x, y, length, direction);
 
-    this.points = points;
-    this.anchors = anchors;
-    this.length = length;
-  }
-}
+  const vertical = isVertical(direction);
 
-export default Corridor;
+  const points = vertical
+    ? computeVerticalPoints(bounds)
+    : computeHorizontalPoints(bounds);
+
+  const anchors = vertical
+    ? computeVerticalAnchors(bounds, points)
+    : computeHorizontalAnchors(bounds, points);
+
+  return new Feature(bounds, points, anchors);
+};
+
+export default generate;

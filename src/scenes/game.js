@@ -50,6 +50,7 @@ export default class Game extends Phaser.Scene {
     this.player = this.add.existing(player);
     this.cameras.main.startFollow(player);
     this.cameras.main.disableCull = true;
+    this.cameras.main.setZoom(0.3);
 
     const controlConfig = {
       camera: this.cameras.main,
