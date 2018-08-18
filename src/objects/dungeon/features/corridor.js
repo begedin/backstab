@@ -37,7 +37,7 @@ const computeBounds = (x, y, length, direction) => {
   return { top, bottom, left, right };
 };
 
-const computeVerticalPoints = ({ left, top, bottom }, direction) => {
+const computeVerticalPoints = ({ left, top, bottom }) => {
   const length = bottom - top + 1;
 
   const leftWall = [...Array(length)].map((el, i) => ({
@@ -61,7 +61,7 @@ const computeVerticalPoints = ({ left, top, bottom }, direction) => {
   return leftWall.concat(centerCorridor).concat(rightWall);
 };
 
-const computeHorizontalPoints = ({ left, right, top }, direction) => {
+const computeHorizontalPoints = ({ left, right, top }) => {
   const length = right - left + 1;
   const topWall = [...Array(length)].map((el, i) => ({
     x: i + left,
@@ -94,8 +94,6 @@ class Corridor {
     const points = isVertical(direction)
       ? computeVerticalPoints(bounds, direction)
       : computeHorizontalPoints(bounds, direction);
-
-    console.log(points);
     const anchors = computeAnchors(bounds, points, direction);
 
     this.points = points;

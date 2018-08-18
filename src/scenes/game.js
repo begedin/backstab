@@ -18,6 +18,7 @@ export default class Game extends Phaser.Scene {
       MAP_SIZE * TILE_SIZE,
       MAP_SIZE * TILE_SIZE,
     );
+
     const dungeon = new DungeonGenerator(MAP_SIZE, MAP_SIZE);
 
     const map = this.make.tilemap({
@@ -42,6 +43,8 @@ export default class Game extends Phaser.Scene {
         map.putTileAt(terrain, x, y);
       });
     });
+
+    this.dungeon = dungeon;
 
     const player = this.createPlayer(dungeon);
     this.player = this.add.existing(player);
@@ -77,41 +80,36 @@ export default class Game extends Phaser.Scene {
   }
 
   createPlayer(dungeon) {
-    const playerPosition = dungeon.startingLocation;
-    const player = new Player(
-      this,
-      dungeon,
-      playerPosition.x,
-      playerPosition.y,
-    );
+    const { x, y } = dungeon.startingLocation;
+    const player = new Player(this, x, y);
     return player;
   }
 
   update(delta) {
     this.handleDrag();
-    this.player.update();
+    this.player.update(this.dungeon);
     this.controls.update(delta);
   }
 
   handleDrag() {
-    if (this.input.activePointer.isDown) {
+    const { activePointer } = this.input;
+
+    if (activePointer.isDown) {
       this.cameras.main.stopFollow();
+
       if (this.origDragPoint) {
-        // move the camera by the amount the mouse has moved since last update
-        const x =
-          this.cameras.main.x +
-          this.origDragPoint.x -
-          this.input.activePointer.position.x;
-        const y =
-          this.cameras.main.y +
-          this.origDragPoint.y -
-          this.input.activePointer.position.y;
-        this.cameras.main.setPosition(x, y);
+        const { scrollX, scrollY } = this.cameras.main;
+        const { x: startX, y: startY } = this.origDragPoint;
+        const { x: dragX, y: dragY } = activePointer.position;
+
+        const newScrollX = scrollX - (dragX - startX);
+        const newScrollY = scrollY - (dragY - startY);
+
+        this.cameras.main.setScroll(newScrollX, newScrollY);
       }
-      // set new drag origin to current position
-      this.origDragPoint = this.input.activePointer.position.clone();
+      this.origDragPoint = activePointer.position.clone();
     } else {
-      this.origDragPoint = null;
+      delete this.origDragPoint;
     }
   }
 }

@@ -17,27 +17,40 @@ const canWalkOn = terrain =>
   terrain === Terrain.DOOR ||
   terrain === Terrain.CORRIDOR;
 
+const canMoveTo = tile => tile !== undefined && canWalkOn(tile);
+
+const canMoveUp = ({ gridX, gridY }, dungeon) =>
+  canMoveTo(dungeon.tileAt(gridX, gridY - 1));
+
+const canMoveDown = ({ gridX, gridY }, dungeon) =>
+  canMoveTo(dungeon.tileAt(gridX, gridY + 1));
+
+const canMoveRight = ({ gridX, gridY }, dungeon) =>
+  canMoveTo(dungeon.tileAt(gridX + 1, gridY));
+
+const canMoveLeft = ({ gridX, gridY }, dungeon) =>
+  canMoveTo(dungeon.tileAt(gridX - 1, gridY));
+
 class Player extends GridSprite {
-  constructor(scene, dungeon, gridX, gridY) {
+  constructor(scene, gridX, gridY) {
     super(scene, gridX, gridY, 'player');
-    this.dungeon = dungeon;
     this.cursors = scene.input.keyboard.createCursorKeys();
     this.state = STATES.IDLE;
   }
 
-  update() {
+  update(dungeon) {
     if (this.state === STATES.IDLE) {
-      this.handleMovement();
+      this.handleMovement(dungeon);
     }
   }
 
-  handleMovement() {
-    const { cursors, scene } = this;
+  handleMovement(dungeon) {
+    const {
+      cursors: { up, down, left, right },
+      scene,
+    } = this;
     const isCursorKeyPressed =
-      cursors.up.isDown ||
-      cursors.down.isDown ||
-      cursors.left.isDown ||
-      cursors.right.isDown;
+      up.isDown || down.isDown || left.isDown || right.isDown;
 
     if (isCursorKeyPressed) {
       scene.cameras.main.startFollow(this);
@@ -45,13 +58,13 @@ class Player extends GridSprite {
 
     let action;
 
-    if (cursors.up.isDown && this.canMoveUp) {
+    if (up.isDown && canMoveUp(this, dungeon)) {
       action = moveUp(this);
-    } else if (cursors.right.isDown && this.canMoveRight) {
+    } else if (right.isDown && canMoveRight(this, dungeon)) {
       action = moveRight(this);
-    } else if (cursors.down.isDown && this.canMoveDown) {
+    } else if (down.isDown && canMoveDown(this, dungeon)) {
       action = moveDown(this);
-    } else if (cursors.left.isDown && this.canMoveLeft) {
+    } else if (left.isDown && canMoveLeft(this, dungeon)) {
       action = moveLeft(this);
     }
 
@@ -66,26 +79,6 @@ class Player extends GridSprite {
         this,
       );
     }
-  }
-
-  get canMoveUp() {
-    const tile = this.dungeon.tileAt(this.gridX, this.gridY - 1);
-    return tile !== undefined && canWalkOn(tile);
-  }
-
-  get canMoveDown() {
-    const tile = this.dungeon.tileAt(this.gridX, this.gridY + 1);
-    return tile !== undefined && canWalkOn(tile);
-  }
-
-  get canMoveRight() {
-    const tile = this.dungeon.tileAt(this.gridX + 1, this.gridY);
-    return tile !== undefined && canWalkOn(tile);
-  }
-
-  get canMoveLeft() {
-    const tile = this.dungeon.tileAt(this.gridX - 1, this.gridY);
-    return tile !== undefined && canWalkOn(tile);
   }
 }
 
