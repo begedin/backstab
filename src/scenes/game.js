@@ -4,7 +4,6 @@ import Dummy from 'backstab/objects/enemies/dummy';
 import Player from 'backstab/objects/player';
 import globals from 'backstab/globals';
 import Randomizer from 'backstab/helpers/randomizer';
-import { Terrain } from 'backstab/enums';
 
 const setupCamera = (camera, { TILE_SIZE, MAP_SIZE }) => {
   const worldSize = TILE_SIZE * MAP_SIZE;
@@ -49,9 +48,8 @@ const createPlayer = (scene, dungeon) => {
 };
 
 const spawnEnemies = (rng, scene, dungeon) =>
-  dungeon.features.map(({ points }) => {
-    const walkablePoints = points.filter(p => p.terrain === Terrain.DIRT_FLOOR);
-    const { x, y } = rng.pick(walkablePoints);
+  dungeon.features.map(({ innerPoints }) => {
+    const { x, y } = rng.pick(innerPoints);
     return new Dummy(scene, x, y);
   });
 

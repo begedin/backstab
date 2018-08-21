@@ -1,3 +1,5 @@
+import { Terrain } from 'backstab/enums';
+
 class Feature {
   constructor(bounds, points, anchors) {
     this.bounds = bounds;
@@ -24,6 +26,10 @@ class Feature {
     const width = right - left;
     const height = bottom - top;
     return width > height ? width : height;
+  }
+
+  get innerPoints() {
+    return this.points.filter(p => p.terrain === Terrain.DIRT_FLOOR);
   }
 
   // simple rectangle overlap formula
