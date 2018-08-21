@@ -1,4 +1,4 @@
 export default {
   TILE_SIZE: 32,
-  BASE_SPEED: 300,
+  BASE_SPEED: 150,
 };

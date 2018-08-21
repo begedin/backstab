@@ -2,7 +2,7 @@ import GridSprite from 'backstab/objects/grid_sprite';
 
 class Dummy extends GridSprite {
   constructor(scene, gridX, gridY) {
-    super(scene, gridX, gridY, 'player');
+    super(scene, gridX, gridY, 'dummy');
     this.health = 1;
   }
 
