@@ -1,7 +1,10 @@
 import Phaser from 'phaser';
 import DungeonGenerator from 'backstab/objects/dungeon/generator';
+import Dummy from 'backstab/objects/enemies/dummy';
 import Player from 'backstab/objects/player';
 import globals from 'backstab/globals';
+import Randomizer from 'backstab/helpers/randomizer';
+import { Terrain } from 'backstab/enums';
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -9,6 +12,8 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
+    const rng = new Randomizer();
+
     const { TILE_SIZE } = globals;
     const MAP_SIZE = 500;
 
@@ -19,13 +24,13 @@ export default class Game extends Phaser.Scene {
       MAP_SIZE * TILE_SIZE,
     );
 
-    const dungeon = new DungeonGenerator(MAP_SIZE, MAP_SIZE);
+    this.dungeon = new DungeonGenerator(rng, MAP_SIZE, MAP_SIZE);
 
     const map = this.make.tilemap({
       tileWidth: TILE_SIZE,
       tileHeight: TILE_SIZE,
-      width: dungeon.width,
-      height: dungeon.height,
+      width: this.dungeon.width,
+      height: this.dungeon.height,
     });
 
     const tileset = map.addTilesetImage(
@@ -38,15 +43,16 @@ export default class Game extends Phaser.Scene {
     );
 
     map.createBlankDynamicLayer('Layer 1', tileset);
-    dungeon.features.forEach(({ points }) => {
+
+    this.dungeon.features.forEach(({ points }) => {
       points.forEach(({ x, y, terrain }) => {
         map.putTileAt(terrain, x, y);
       });
     });
 
-    this.dungeon = dungeon;
+    this.enemies = this.spawnEnemies(rng, this.dungeon);
 
-    const player = this.createPlayer(dungeon);
+    const player = this.createPlayer(this.dungeon);
     this.player = this.add.existing(player);
     this.cameras.main.startFollow(player);
     this.cameras.main.disableCull = true;
@@ -86,9 +92,23 @@ export default class Game extends Phaser.Scene {
     return player;
   }
 
+  spawnEnemies(rng, dungeon) {
+    const enemies = [];
+    dungeon.features.forEach(({ points }) => {
+      const walkablePoints = points.filter(
+        p => p.terrain === Terrain.DIRT_FLOOR || p.terrain === Terrain.DOOR,
+      );
+      const { x, y } = rng.pick(walkablePoints);
+      const enemy = new Dummy(this, x, y);
+      enemies.push(this.add.existing(enemy));
+    });
+    return enemies;
+  }
+
   update(delta) {
     this.handleDrag();
-    this.player.update(this.dungeon);
+    this.player.update(this.enemies, this.dungeon);
+    this.enemies.forEach(e => e.update(delta));
     this.controls.update(delta);
   }
 

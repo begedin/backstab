@@ -1,4 +1,3 @@
-import Randomizer from 'backstab/helpers/randomizer';
 import { Terrain } from 'backstab/enums';
 import generateRoom from 'backstab/objects/dungeon/generator/room';
 import generateDiamondRoom from 'backstab/objects/dungeon/generator/diamond_room';
@@ -34,11 +33,9 @@ const tryGenerateFeature = (rng, existingFeatures) => {
 };
 
 class Generator {
-  constructor(width, height) {
+  constructor(rng, width, height) {
     const FEATURE_COUNT = 40;
     const MAX_ATTEMPTS = 1000;
-
-    const rng = new Randomizer();
 
     // initial room for the map
     const initialRoom = generateRoom(rng, width / 2, height / 2);

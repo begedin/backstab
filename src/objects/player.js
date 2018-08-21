@@ -1,15 +1,12 @@
 import GridSprite from 'backstab/objects/grid_sprite';
 import { Terrain } from 'backstab/enums';
-import {
-  moveUp,
-  moveDown,
-  moveLeft,
-  moveRight,
-} from 'backstab/objects/grid/movement';
+import { moveTo } from 'backstab/objects/grid/movement';
+import { attack } from 'backstab/objects/grid/attack';
 
 const STATES = {
   IDLE: 0,
   MOVING: 1,
+  ATTACKING: 2,
 };
 
 const canWalkOn = terrain =>
@@ -19,17 +16,65 @@ const canWalkOn = terrain =>
 
 const canMoveTo = tile => tile !== undefined && canWalkOn(tile.terrain);
 
-const canMoveUp = ({ gridX, gridY }, dungeon) =>
-  canMoveTo(dungeon.tileAt(gridX, gridY - 1));
+const handleMovement = (player, dungeon, { x, y }) => {
+  if (!canMoveTo(dungeon.tileAt(x, y))) {
+    return false;
+  }
 
-const canMoveDown = ({ gridX, gridY }, dungeon) =>
-  canMoveTo(dungeon.tileAt(gridX, gridY + 1));
+  const action = moveTo(player, { gridX: x, gridY: y });
 
-const canMoveRight = ({ gridX, gridY }, dungeon) =>
-  canMoveTo(dungeon.tileAt(gridX + 1, gridY));
+  player.setState(STATES.MOVING);
+  action.setCallback(
+    'onComplete',
+    () => {
+      player.setState(STATES.IDLE);
+    },
+    [],
+  );
 
-const canMoveLeft = ({ gridX, gridY }, dungeon) =>
-  canMoveTo(dungeon.tileAt(gridX - 1, gridY));
+  return true;
+};
+
+const handleMelee = (player, enemies, { x, y }) => {
+  const enemy = enemies.find(({ gridX, gridY }) => x === gridX && y === gridY);
+
+  if (!enemy) {
+    return false;
+  }
+
+  player.setState(STATES.ATTACKING);
+  const action = attack(player, enemy);
+  action.setCallback(
+    'onComplete',
+    () => {
+      player.setState(STATES.IDLE);
+      enemy.damage(1);
+    },
+    [],
+  );
+
+  return true;
+};
+
+const getNextGridField = (
+  { gridX: x, gridY: y },
+  { up, down, left, right },
+) => {
+  if (up.isDown) {
+    return { x, y: y - 1 };
+  }
+  if (right.isDown) {
+    return { x: x + 1, y };
+  }
+  if (down.isDown) {
+    return { x, y: y + 1 };
+  }
+  if (left.isDown) {
+    return { x: x - 1, y };
+  }
+
+  return null;
+};
 
 class Player extends GridSprite {
   constructor(scene, gridX, gridY) {
@@ -38,13 +83,11 @@ class Player extends GridSprite {
     this.state = STATES.IDLE;
   }
 
-  update(dungeon) {
-    if (this.state === STATES.IDLE) {
-      this.handleMovement(dungeon);
+  update(enemies, dungeon) {
+    if (this.state !== STATES.IDLE) {
+      return;
     }
-  }
 
-  handleMovement(dungeon) {
     const {
       cursors: { up, down, left, right },
       scene,
@@ -52,33 +95,22 @@ class Player extends GridSprite {
     const isCursorKeyPressed =
       up.isDown || down.isDown || left.isDown || right.isDown;
 
-    if (isCursorKeyPressed) {
-      scene.cameras.main.startFollow(this);
+    if (!isCursorKeyPressed) {
+      return;
     }
 
-    let action;
+    scene.cameras.main.startFollow(this);
+    const nextGridField = getNextGridField(this, { up, down, left, right });
 
-    if (up.isDown && canMoveUp(this, dungeon)) {
-      action = moveUp(this);
-    } else if (right.isDown && canMoveRight(this, dungeon)) {
-      action = moveRight(this);
-    } else if (down.isDown && canMoveDown(this, dungeon)) {
-      action = moveDown(this);
-    } else if (left.isDown && canMoveLeft(this, dungeon)) {
-      action = moveLeft(this);
+    if (handleMelee(this, enemies, nextGridField)) {
+      return;
     }
 
-    if (action) {
-      this.state = STATES.MOVING;
-      action.setCallback(
-        'onComplete',
-        () => {
-          this.state = STATES.IDLE;
-        },
-        [],
-        this,
-      );
-    }
+    handleMovement(this, dungeon, nextGridField);
+  }
+
+  setState(state) {
+    this.state = state;
   }
 }
 

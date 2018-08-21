@@ -25,4 +25,4 @@ const moveLeft = gridSprite =>
 const moveRight = gridSprite =>
   moveTo(gridSprite, { gridX: gridSprite.gridX + 1, gridY: gridSprite.gridY });
 
-export { moveUp, moveDown, moveLeft, moveRight };
+export { moveUp, moveDown, moveLeft, moveRight, moveTo };
