@@ -7,7 +7,8 @@
       { "key": "dirt_wall", "type": "image", "url": "assets/dirt_wall.png" },
       { "key": "door", "type": "image", "url": "assets/door.png" },
       { "key": "corridor", "type": "image", "url": "assets/corridor.png" },
-      { "key": "player", "type": "image", "url": "assets/player.png" }
+      { "key": "player", "type": "image", "url": "assets/player.png" },
+      { "key": "dummy", "type": "image", "url": "assets/dummy.png" }
     ]
   }
 }
