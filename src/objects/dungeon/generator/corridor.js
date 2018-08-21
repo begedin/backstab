@@ -1,5 +1,6 @@
 import { Direction, Terrain } from 'backstab/enums';
 import Feature from 'backstab/objects/dungeon/feature';
+import Anchor from 'backstab/objects/dungeon/anchor';
 
 const isVertical = direction =>
   direction === Direction.NORTH || direction === Direction.SOUTH;
@@ -83,17 +84,31 @@ const computeHorizontalPoints = ({ left, right, top }) => {
   return topWall.concat(centerCorridor).concat(bottomWall);
 };
 
-const computeVerticalAnchors = ({ left, right, top, bottom }, points) =>
-  points.filter(
-    p => p.y !== top && p.y !== bottom && (p.x === left || p.x === right),
-  );
+const computeVerticalAnchors = ({ left, right, top, bottom }, points) => {
+  const leftAnchors = points
+    .filter(p => p.y !== top && p.y !== bottom && p.x === left)
+    .map(p => new Anchor(p, Direction.WEST));
+  const rightAnchors = points
+    .filter(p => p.y !== top && p.y !== bottom && p.x === right)
+    .map(p => new Anchor(p, Direction.EAST));
 
-const computeHorizontalAnchors = ({ left, right, top, bottom }, points) =>
-  points.filter(
-    p => p.x !== left && p.x !== right && (p.y === top || p.y === bottom),
-  );
+  return leftAnchors.concat(rightAnchors);
+};
 
-const generate = (x, y, length, direction) => {
+const computeHorizontalAnchors = ({ left, right, top, bottom }, points) => {
+  const topAnchors = points
+    .filter(p => p.x !== left && p.x !== right && p.y === top)
+    .map(p => new Anchor(p, Direction.NORTH));
+
+  const bottomAnchors = points
+    .filter(p => p.x !== left && p.x !== right && p.y === bottom)
+    .map(p => new Anchor(p, Direction.SOUTH));
+
+  return topAnchors.concat(bottomAnchors);
+};
+
+const generate = (rng, x, y, direction) => {
+  const length = rng.integerInRange(3, 12);
   const bounds = computeBounds(x, y, length, direction);
 
   const vertical = isVertical(direction);

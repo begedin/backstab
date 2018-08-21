@@ -1,6 +1,7 @@
 import Randomizer from 'backstab/helpers/randomizer';
 import { Terrain } from 'backstab/enums';
 import generateRoom from 'backstab/objects/dungeon/generator/room';
+import generateDiamondRoom from 'backstab/objects/dungeon/generator/diamond_room';
 
 const canPlaceFeature = (features, feature) =>
   !features.some(f => f.overlaps(feature));
@@ -13,21 +14,29 @@ const tryGenerateFeature = (rng, existingFeatures) => {
     return null;
   }
 
-  const room = generateRoom(rng, anchor.x, anchor.y, anchor.direction);
+  const {
+    attachment: { x, y },
+    direction,
+  } = anchor;
 
-  if (!canPlaceFeature(existingFeatures, room)) {
+  const newFeature =
+    rng.pick([1, 2]) === 1
+      ? generateRoom(rng, x, y, direction)
+      : generateDiamondRoom(rng, x, y, direction);
+
+  if (!canPlaceFeature(existingFeatures, newFeature)) {
     return false;
   }
 
   feature.setPoint(anchor, Terrain.DOOR);
 
-  return room;
+  return newFeature;
 };
 
 class Generator {
   constructor(width, height) {
-    const FEATURE_COUNT = 20;
-    const MAX_ATTEMPTS = 40;
+    const FEATURE_COUNT = 40;
+    const MAX_ATTEMPTS = 1000;
 
     const rng = new Randomizer();
 
