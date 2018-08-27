@@ -47,8 +47,8 @@ const handleMelee = (player, enemies, { x, y }) => {
   action.setCallback(
     'onComplete',
     () => {
-      player.setState(STATES.IDLE);
       enemy.damage(1);
+      player.setState(STATES.IDLE);
     },
     [],
   );

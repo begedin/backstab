@@ -8,9 +8,6 @@ class Dummy extends GridSprite {
 
   damage(amount) {
     this.health -= amount;
-  }
-
-  update() {
     if (this.health <= 0) {
       const index = this.scene.enemies.indexOf(this);
       this.scene.enemies.splice(index, 1);
