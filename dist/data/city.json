@@ -1,0 +1,5 @@
+{
+  "city": {
+    "files": [{ "key": "city", "type": "image", "url": "assets/city.png" }]
+  }
+}

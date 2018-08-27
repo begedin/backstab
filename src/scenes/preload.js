@@ -10,6 +10,7 @@ export default class Preload extends Phaser.Scene {
   }
 
   preload() {
+    this.load.pack('city', 'data/city.json');
     this.load.pack('game', 'data/game.json');
     this.load.image('tiles', 'assets/tileset.png');
   }
@@ -21,7 +22,7 @@ export default class Preload extends Phaser.Scene {
   update() {
     // Wait until all sound effects have been decoded into memory.
     if (this.assetsReady) {
-      this.scene.start('game');
+      this.scene.start('city');
     }
   }
 }
