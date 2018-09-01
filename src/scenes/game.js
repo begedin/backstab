@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import DungeonGenerator from 'backstab/objects/dungeon/generator';
 import Dummy from 'backstab/objects/enemies/dummy';
+import Palantir from 'backstab/objects/enemies/palantir';
 import Player from 'backstab/objects/player';
 import globals from 'backstab/globals';
 import Randomizer from 'backstab/helpers/randomizer';
@@ -48,9 +49,11 @@ const createPlayer = (scene, dungeon) => {
 };
 
 const spawnEnemies = (rng, scene, dungeon) =>
-  dungeon.features.map(({ innerPoints }) => {
-    const { x, y } = rng.pick(innerPoints);
-    return new Dummy(scene, x, y);
+  dungeon.features.map(feature => {
+    const { x, y } = rng.pick(feature.innerPoints);
+    return rng.pick([1, 2]) === 1
+      ? new Dummy(scene, feature, x, y)
+      : new Palantir(scene, rng, feature, x, y);
   });
 
 export default class Game extends Phaser.Scene {
@@ -107,8 +110,12 @@ export default class Game extends Phaser.Scene {
 
   update(delta) {
     this.handleDrag();
-    this.player.update(this.enemies, this.dungeon);
-    this.enemies.forEach(e => e.update(delta));
+    const playerActed = this.player.update(this.enemies, this.dungeon);
+
+    if (playerActed) {
+      this.enemies.forEach(e => e.update(this.player, this.enemies));
+    }
+
     this.controls.update(delta);
   }
 

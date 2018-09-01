@@ -85,7 +85,7 @@ class Player extends GridSprite {
 
   update(enemies, dungeon) {
     if (this.state !== STATES.IDLE) {
-      return;
+      return false;
     }
 
     const {
@@ -96,17 +96,18 @@ class Player extends GridSprite {
       up.isDown || down.isDown || left.isDown || right.isDown;
 
     if (!isCursorKeyPressed) {
-      return;
+      return false;
     }
 
     scene.cameras.main.startFollow(this);
     const nextGridField = getNextGridField(this, { up, down, left, right });
 
     if (handleMelee(this, enemies, nextGridField)) {
-      return;
+      return true;
     }
 
     handleMovement(this, dungeon, nextGridField);
+    return true;
   }
 
   setState(state) {

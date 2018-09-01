@@ -22,7 +22,7 @@ export default class Preload extends Phaser.Scene {
   update() {
     // Wait until all sound effects have been decoded into memory.
     if (this.assetsReady) {
-      this.scene.start('city');
+      this.scene.start('game');
     }
   }
 }

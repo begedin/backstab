@@ -29,6 +29,9 @@ const tryGenerateFeature = (rng, existingFeatures) => {
 
   feature.setPoint(anchor, Terrain.DOOR);
 
+  feature.connectTo(newFeature);
+  newFeature.connectTo(feature);
+
   return newFeature;
 };
 

@@ -5,11 +5,7 @@ class Feature {
     this.bounds = bounds;
     this.points = points;
     this.anchors = anchors;
-  }
-
-  contains({ x, y }) {
-    const { left, right, top, bottom } = this.bounds;
-    return left <= x && x <= right && top <= y && y <= bottom;
+    this.neighbors = [];
   }
 
   getPoint({ x, y }) {
@@ -41,6 +37,14 @@ class Feature {
       a.bottom > b.top &&
       a.top < b.bottom
     );
+  }
+
+  connectTo(feature) {
+    this.neighbors.push(feature);
+  }
+
+  contains({ x, y }) {
+    return this.points.some(p => p.x === x && p.y === y);
   }
 }
 
