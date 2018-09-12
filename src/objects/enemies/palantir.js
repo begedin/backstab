@@ -1,5 +1,3 @@
-import GridSprite from 'backstab/objects/grid_sprite';
-
 const DEFAULT_RANGE = 4;
 const MAX_TIME_BETWEEN_ROTATES = 4;
 
@@ -17,7 +15,7 @@ const topQuarter = ({ x, y }, points) =>
 const bottomQuarter = ({ x, y }, points) =>
   points.filter(p => p.y > y && Math.abs(y - p.y) >= Math.abs(x - p.x));
 
-const computeScanOverlays = (
+const computeSight = (
   { x, y },
   direction,
   possibleDirections,
@@ -49,8 +47,8 @@ const computeScanOverlays = (
   return quarter.filter(p => feature.contains(p));
 };
 
-const overlaps = ({ gridX: px, gridY: py }, overlays) =>
-  overlays.some(({ x, y }) => px === x && py === y);
+const overlaps = ({ x: px, y: py }, lookedAtPoints) =>
+  lookedAtPoints.some(({ x, y }) => px === x && py === y);
 
 const nextDirection = ({ x, y }, possibleDirections) => {
   const matched = possibleDirections.find(d => d.x === x && d.y === y);
@@ -62,16 +60,14 @@ const nextDirection = ({ x, y }, possibleDirections) => {
 const alertNeighbouringEnemies = (player, enemies, feature) =>
   feature.neighbors.forEach(n => n.enemies.forEach(e => e.alert(player)));
 
-class Dummy extends GridSprite {
-  constructor(scene, rng, feature, gridX, gridY) {
-    super(scene, gridX, gridY, 'palantir');
-
+class Palantir {
+  constructor(scene, rng, feature, x, y) {
     // TODO: Move to function
     const surroundingCardinalPoints = [
-      { x: gridX - 1, y: gridY },
-      { x: gridX, y: gridY - 1 },
-      { x: gridX + 1, y: gridY },
-      { x: gridX, y: gridY + 1 },
+      { x: x - 1, y },
+      { x, y: y - 1 },
+      { x: x + 1, y },
+      { x, y: y + 1 },
     ];
 
     this.possibleDirections = surroundingCardinalPoints.filter(p =>
@@ -83,31 +79,27 @@ class Dummy extends GridSprite {
     this.range = DEFAULT_RANGE;
     this.parentFeature = feature;
 
-    const overlayPoints = computeScanOverlays(
-      { x: this.gridX, y: this.gridY },
+    this.lookedAtPoints = computeSight(
+      { x, y },
       this.direction,
       this.possibleDirections,
       this.range,
       this.parentFeature,
     );
 
-    this.overlays = scene.add.group();
-    overlayPoints.forEach(p => {
-      const sprite = new GridSprite(scene, p.x, p.y, 'palantir-overlay');
-      this.overlays.add(sprite, true);
-    });
-
     this.timeSinceLastRotate = 0;
     this.health = 1;
+
+    this.x = x;
+    this.y = y;
+
+    this.name = 'palantir';
   }
 
   damage(amount) {
     this.health -= amount;
     if (this.health <= 0) {
-      const index = this.scene.enemies.indexOf(this);
-      this.scene.enemies.splice(index, 1);
-      this.overlays.clear(true, true);
-      this.destroy();
+      this.status = 'DEAD';
     }
   }
 
@@ -123,24 +115,20 @@ class Dummy extends GridSprite {
   }
 
   rotate() {
-    const newDirection = nextDirection(this.direction, this.possibleDirections);
+    const { direction, possibleDirections, x, y, range, parentFeature } = this;
+    const newDirection = nextDirection(direction, possibleDirections);
     this.direction = newDirection;
-    const overlayPoints = computeScanOverlays(
-      { x: this.gridX, y: this.gridY },
-      this.direction,
-      this.possibleDirections,
-      this.range,
-      this.parentFeature,
+
+    this.lookedAtPoints = computeSight(
+      { x, y },
+      direction,
+      possibleDirections,
+      range,
+      parentFeature,
     );
 
-    this.overlays.clear(true, true);
-
-    overlayPoints.forEach(p => {
-      const sprite = new GridSprite(this.scene, p.x, p.y, 'palantir-overlay');
-      this.overlays.add(sprite, true);
-    });
     this.timeSinceLastRotate = 0;
   }
 }
 
-export default Dummy;
+export default Palantir;
