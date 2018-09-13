@@ -5,6 +5,7 @@ class Dummy {
     this.x = x;
     this.y = y;
     this.name = 'dummy';
+    this.seenPoints = [];
   }
 
   damage(amount) {

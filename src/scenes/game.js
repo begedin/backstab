@@ -121,15 +121,31 @@ export default class Game extends Phaser.Scene {
 
     // drawing enemies
     this.enemySprites = enemies.map(e => {
-      if (e.name === 'dummy') {
-        return this.add.sprite(gridToWorld(e.x), gridToWorld(e.y), 'dummy');
-      }
+      const sprite = this.add.sprite(
+        gridToWorld(e.x),
+        gridToWorld(e.y),
+        e.name,
+      );
+      // const losConfig = e.seenPoints.map(p => ({
+      //   x: gridToWorld(p.x),
+      //   y: gridToWorld(p.y),
+      //   key: 'los',
+      // }));
+      //
+      // console.log(sprite.x, sprite.y, losConfig);
+      // if (losConfig.length > 0) {
+      //   sprite.lineOfSight = this.add.group(losConfig);
+      // } else {
+      //   sprite.lineOfSight = this.add.group();
+      // }
 
-      if (e.name === 'palantir') {
-        return this.add.sprite(gridToWorld(e.x), gridToWorld(e.y), 'palantir');
-      }
-
-      return null;
+      sprite.lineOfSight = [];
+      e.seenPoints.forEach(p =>
+        sprite.lineOfSight.push(
+          this.add.sprite(gridToWorld(p.x), gridToWorld(p.y), 'los'),
+        ),
+      );
+      return sprite;
     });
 
     // setting up camera
