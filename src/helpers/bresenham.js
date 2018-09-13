@@ -8,9 +8,6 @@ const bresenhamLine = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => {
   const sy = y1 < y2 ? 1 : -1;
   let err = dx - dy;
 
-  // Set first coordinates
-  points.push({ x: x1, y: y1 });
-
   let x = x1;
   let y = y1;
 
