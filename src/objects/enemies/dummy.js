@@ -1,19 +1,22 @@
-import GridSprite from 'backstab/objects/grid_sprite';
-
-class Dummy extends GridSprite {
-  constructor(scene, feature, gridX, gridY) {
-    super(scene, gridX, gridY, 'dummy');
+class Dummy {
+  constructor(feature, x, y) {
     this.parentFeature = feature;
     this.health = 1;
+    this.x = x;
+    this.y = y;
+    this.name = 'dummy';
+    this.seenPoints = [];
   }
 
   damage(amount) {
     this.health -= amount;
     if (this.health <= 0) {
-      const index = this.scene.enemies.indexOf(this);
-      this.scene.enemies.splice(index, 1);
-      this.destroy();
+      this.status = 'DEAD';
     }
+  }
+
+  alert() {
+    this.isAlerted = true;
   }
 }
 
