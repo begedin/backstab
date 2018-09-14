@@ -6,6 +6,7 @@ class Feature {
     this.points = points;
     this.anchors = anchors;
     this.neighbors = [];
+    this.enemies = [];
   }
 
   getPoint({ x, y }) {

@@ -3,23 +3,18 @@ import computeSight from 'backstab/objects/behavior/sight';
 const DEFAULT_RANGE = 4;
 const MAX_TIME_BETWEEN_ROTATES = 4;
 
-const overlaps = ({ x: px, y: py }, lookedAtPoints) =>
-  lookedAtPoints.some(({ x, y }) => px === x && py === y);
+const overlaps = ({ x: px, y: py }, seenPoints) =>
+  seenPoints.some(({ x, y }) => px === x && py === y);
 
-const nextDirection = ({ x, y }, possibleDirections) => {
-  const matched = possibleDirections.find(d => d.x === x && d.y === y);
-  const index =
-    (possibleDirections.indexOf(matched) + 1) % possibleDirections.length;
-  return possibleDirections[index];
-};
+const nextDirection = (current, all) =>
+  all[(all.indexOf(current) + 1) % all.length];
 
-const alertNeighbouringEnemies = (player, enemies, feature) =>
-  feature.neighbors.forEach(n => n.enemies.forEach(e => e.alert(player)));
+const alertEnemies = ({ enemies }) => enemies.forEach(e => e.alert());
 
-const DIRECTIONS = ['EAST', 'WEST', 'NORTH', 'SOUTH'];
+const DIRECTIONS = ['NORTH', 'EAST', 'WEST', 'SOUTH'];
 
 class Palantir {
-  constructor(scene, rng, feature, x, y) {
+  constructor(rng, feature, x, y) {
     this.direction = rng.pick(DIRECTIONS);
     this.range = DEFAULT_RANGE;
     this.parentFeature = feature;
@@ -47,31 +42,36 @@ class Palantir {
     }
   }
 
-  update(player, enemies) {
+  update({ player }) {
     this.timeSinceLastRotate += 1;
+
     if (this.timeSinceLastRotate > MAX_TIME_BETWEEN_ROTATES) {
       this.rotate();
     }
 
-    if (overlaps(player, this.overlays.children.entries)) {
-      alertNeighbouringEnemies(player, enemies, this.parentFeature);
+    if (overlaps(player, this.seenPoints)) {
+      alertEnemies(this.parentFeature);
+      this.parentFeature.neighbors.forEach(alertEnemies);
     }
   }
 
   rotate() {
-    const { direction, possibleDirections, x, y, range, parentFeature } = this;
-    const newDirection = nextDirection(direction, possibleDirections);
+    const { direction, x, y, range, parentFeature } = this;
+    const newDirection = nextDirection(direction, DIRECTIONS);
     this.direction = newDirection;
 
-    this.lookedAtPoints = computeSight(
+    this.seenPoints = computeSight(
       { x, y },
-      direction,
-      possibleDirections,
+      newDirection,
       range,
       parentFeature,
     );
 
     this.timeSinceLastRotate = 0;
+  }
+
+  alert() {
+    this.isAlerted = true;
   }
 }
 

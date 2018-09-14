@@ -14,6 +14,10 @@ class Dummy {
       this.status = 'DEAD';
     }
   }
+
+  alert() {
+    this.isAlerted = true;
+  }
 }
 
 export default Dummy;
