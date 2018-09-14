@@ -1,5 +1,4 @@
 yarn.lock
-dist/bundle.js
 node_modules
 .DS_store
 yarn-error.log

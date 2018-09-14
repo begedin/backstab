@@ -29,7 +29,8 @@
     "build:production": "webpack --env.production",
     "clean": "rimraf dist/bundle.js",
     "watch": "webpack --watch",
-    "serve": "webpack-dev-server --hot"
+    "serve": "webpack-dev-server --hot",
+    "deploy:ghpages": "git subtree push --prefix dist origin gh-pages"
   },
   "license": "MIT",
   "repository": "https://github.com/begedin/backstab.git",
