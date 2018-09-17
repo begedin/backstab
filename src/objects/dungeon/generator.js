@@ -12,7 +12,7 @@ const connectFeatures = (featureA, featureB) => {
 };
 
 const addDoor = (feature, { x, y }) => {
-  feature.objects.push({ x, y, type: 'door' });
+  feature.objects.push({ x, y, type: Tiles.DOOR });
 };
 
 const tryGenerateFeature = (rng, existingFeatures) => {

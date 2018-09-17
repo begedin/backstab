@@ -93,7 +93,7 @@ const generate = (rng, x, y, direction) => {
 
   const feature = new Feature(bounds, points, anchors);
   feature.setPoint({ x, y }, Tiles.DIRT_FLOOR);
-  feature.objects.push({ x, y, type: 'door' });
+  feature.objects.push({ x, y, type: Tiles.DOOR });
 
   return feature;
 };

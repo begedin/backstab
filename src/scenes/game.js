@@ -12,6 +12,7 @@ import { meleeAttackTween, moveTween } from 'backstab/objects/action_tweens';
 const setupCamera = (camera, { TILE_SIZE, MAP_SIZE }) => {
   const worldSize = TILE_SIZE * MAP_SIZE;
   camera.setBounds(0, 0, worldSize, worldSize);
+  camera.setRoundPixels(true);
 };
 
 const buildTilemapConfig = ({ TILE_SIZE, MAP_SIZE }) => ({
@@ -29,17 +30,20 @@ const buildControlConfig = (camera, keyboard) => ({
   zoomOut: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E),
 });
 
+const ZOOM_LEVELS = [1 / 32, 1 / 16, 1 / 8, 1 / 4, 1 / 2, 1, 2];
+
 const setupMouseScrollControl = camera => {
   window.addEventListener(
     'wheel',
     ({ deltaY }) => {
-      const zoomIn = 1.5;
-      const zoomOut = 1 / zoomIn;
+      const currentZoomIndex = ZOOM_LEVELS.indexOf(camera.zoom);
 
-      if (deltaY > 0) {
-        camera.zoomTo(camera.zoom * zoomOut, 250);
-      } else {
-        camera.zoomTo(camera.zoom * zoomIn, 250);
+      if (deltaY > 0 && currentZoomIndex < ZOOM_LEVELS.length - 1) {
+        camera.zoomTo(ZOOM_LEVELS[currentZoomIndex + 1], 250);
+      }
+
+      if (deltaY < 0 && currentZoomIndex > 0) {
+        camera.zoomTo(ZOOM_LEVELS[currentZoomIndex - 1], 250);
       }
     },
     false,
@@ -152,7 +156,7 @@ export default class Game extends Phaser.Scene {
     const { x, y } = dungeon.startingLocation;
     camera.setScroll(gridToWorld(x), gridToWorld(y));
     camera.disableCull = true;
-    camera.setZoom(0.3);
+    camera.setZoom(1 / 2);
 
     // setting up controls
     const { keyboard } = this.input;
@@ -188,17 +192,22 @@ export default class Game extends Phaser.Scene {
       'tiles',
       TILE_SIZE,
       TILE_SIZE,
-      1,
-      2,
+      0,
+      0,
     );
-    this.dungeonTileMap.createBlankDynamicLayer('Layer 1', tileset);
+    this.dungeonTileMap.createBlankDynamicLayer('terrain', tileset);
+    this.dungeonTileMap.createBlankDynamicLayer('features', tileset);
 
     const { gameData } = this;
     const { dungeon, enemies } = gameData;
 
-    dungeon.features.forEach(({ points }) => {
+    dungeon.features.forEach(({ points, objects }) => {
       points.forEach(({ x, y, terrain }) => {
-        this.dungeonTileMap.putTileAt(terrain, x, y);
+        this.dungeonTileMap.putTileAt(terrain, x, y, false, 'terrain');
+      });
+
+      objects.forEach(({ x, y, type }) => {
+        this.dungeonTileMap.putTileAt(type, x, y, false, 'features');
       });
     });
 

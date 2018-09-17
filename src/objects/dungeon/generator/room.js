@@ -105,7 +105,7 @@ const generate = (rng, x, y, direction) => {
   const directionSpecified = typeof direction === 'number';
   if (directionSpecified) {
     feature.setPoint({ x, y }, Tiles.DIRT_FLOOR);
-    feature.objects.push({ x, y, type: 'door' });
+    feature.objects.push({ x, y, type: Tiles.DOOR });
   }
 
   return feature;

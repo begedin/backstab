@@ -9,6 +9,7 @@ const Tiles = {
   CORRIDOR: 0,
   DIRT_FLOOR: 1,
   DIRT_WALL: 2,
+  DOOR: 3,
 };
 
 const Feature = {
