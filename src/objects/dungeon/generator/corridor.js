@@ -1,4 +1,4 @@
-import { Direction, Terrain } from 'backstab/enums';
+import { Direction, Tiles } from 'backstab/enums';
 import Feature from 'backstab/objects/dungeon/feature';
 import Anchor from 'backstab/objects/dungeon/anchor';
 
@@ -45,19 +45,19 @@ const computeVerticalPoints = ({ left, top, bottom }) => {
   const leftWall = [...Array(length)].map((el, i) => ({
     x: left,
     y: i + top,
-    terrain: Terrain.DIRT_WALL,
+    terrain: Tiles.DIRT_WALL,
   }));
 
   const centerCorridor = [...Array(length)].map((el, i) => ({
     x: left + 1,
     y: i + top,
-    terrain: Terrain.CORRIDOR,
+    terrain: Tiles.CORRIDOR,
   }));
 
   const rightWall = [...Array(length)].map((el, i) => ({
     x: left + 2,
     y: i + top,
-    terrain: Terrain.DIRT_WALL,
+    terrain: Tiles.DIRT_WALL,
   }));
 
   return leftWall.concat(centerCorridor).concat(rightWall);
@@ -68,17 +68,17 @@ const computeHorizontalPoints = ({ left, right, top }) => {
   const topWall = [...Array(length)].map((el, i) => ({
     x: i + left,
     y: top,
-    terrain: Terrain.DIRT_WALL,
+    terrain: Tiles.DIRT_WALL,
   }));
   const centerCorridor = [...Array(length)].map((el, i) => ({
     x: i + left,
     y: top + 1,
-    terrain: Terrain.CORRIDOR,
+    terrain: Tiles.CORRIDOR,
   }));
   const bottomWall = [...Array(length)].map((el, i) => ({
     x: i + left,
     y: top + 2,
-    terrain: Terrain.DIRT_WALL,
+    terrain: Tiles.DIRT_WALL,
   }));
 
   return topWall.concat(centerCorridor).concat(bottomWall);

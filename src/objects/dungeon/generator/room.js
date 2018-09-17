@@ -1,4 +1,4 @@
-import { Direction, Terrain } from 'backstab/enums';
+import { Direction, Tiles } from 'backstab/enums';
 import Feature from 'backstab/objects/dungeon/feature';
 import Anchor from 'backstab/objects/dungeon/anchor';
 
@@ -41,18 +41,16 @@ const computeBounds = (x, y, width, height, direction) => {
 const isWall = ({ x, y }, { left, right, top, bottom }) =>
   x === left || x === right || y === top || y === bottom;
 
-const computePoints = ({ left, right, top, bottom }, anchor) => {
+const computePoints = ({ left, right, top, bottom }) => {
   const points = [];
 
   for (let x = left; x <= right; x += 1) {
     for (let y = top; y <= bottom; y += 1) {
       let terrain;
-      if (anchor && anchor.x === x && anchor.y === y) {
-        terrain = Terrain.DOOR;
-      } else if (isWall({ x, y }, { left, right, top, bottom })) {
-        terrain = Terrain.DIRT_WALL;
+      if (isWall({ x, y }, { left, right, top, bottom })) {
+        terrain = Tiles.DIRT_WALL;
       } else {
-        terrain = Terrain.DIRT_FLOOR;
+        terrain = Tiles.DIRT_FLOOR;
       }
       points.push({ x, y, terrain });
     }
@@ -98,16 +96,16 @@ const generate = (rng, x, y, direction) => {
   const width = rng.integerInRange(5, ROOM_MAX_WIDTH);
   const height = rng.integerInRange(5, ROOM_MAX_HEIGHT);
 
-  const directionSpecified = typeof direction === 'number';
-
   const bounds = computeBounds(x, y, width, height, direction);
-  const points = computePoints(bounds, null);
+  const points = computePoints(bounds);
   const anchors = computeAnchors(bounds, points, direction);
 
   const feature = new Feature(bounds, points, anchors);
 
+  const directionSpecified = typeof direction === 'number';
   if (directionSpecified) {
-    feature.setPoint({ x, y }, Terrain.DOOR);
+    feature.setPoint({ x, y }, Tiles.DIRT_FLOOR);
+    feature.objects.push({ x, y, type: 'door' });
   }
 
   return feature;

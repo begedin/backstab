@@ -1,5 +1,5 @@
 import bresenhamLine from 'backstab/helpers/bresenham';
-import { Terrain } from 'backstab/enums';
+import { Tiles } from 'backstab/enums';
 
 const getFarthestPoints = ({ x, y }, direction, visionRange) => {
   switch (direction) {
@@ -36,7 +36,7 @@ const computeSight = ({ x, y }, direction, visionRange, feature) => {
   bresenhamLines.forEach(points => {
     points.forEach(point => {
       const tile = feature.getPoint({ x: point.x, y: point.y });
-      if (tile && tile.terrain === Terrain.DIRT_FLOOR) {
+      if (tile && tile.terrain === Tiles.DIRT_FLOOR) {
         sightPoints.push({ x: point.x, y: point.y });
       }
     });

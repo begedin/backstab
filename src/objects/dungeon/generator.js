@@ -1,10 +1,19 @@
-import { Terrain } from 'backstab/enums';
+import { Tiles } from 'backstab/enums';
 import generateRoom from 'backstab/objects/dungeon/generator/room';
 import generateDiamondRoom from 'backstab/objects/dungeon/generator/diamond_room';
 import Dungeon from 'backstab/objects/dungeon';
 
 const canPlaceFeature = (features, feature) =>
   !features.some(f => f.overlaps(feature));
+
+const connectFeatures = (featureA, featureB) => {
+  featureA.neighbors.push(featureB);
+  featureB.neighbors.push(featureA);
+};
+
+const addDoor = (feature, { x, y }) => {
+  feature.objects.push({ x, y, type: 'door' });
+};
 
 const tryGenerateFeature = (rng, existingFeatures) => {
   const feature = rng.pick(existingFeatures);
@@ -28,10 +37,10 @@ const tryGenerateFeature = (rng, existingFeatures) => {
     return false;
   }
 
-  feature.setPoint(anchor, Terrain.DOOR);
+  feature.setPoint(anchor, Tiles.DIRT_FLOOR);
+  addDoor(feature, anchor);
 
-  feature.connectTo(newFeature);
-  newFeature.connectTo(feature);
+  connectFeatures(newFeature, feature);
 
   return newFeature;
 };

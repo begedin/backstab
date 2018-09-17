@@ -1,9 +1,9 @@
-import { Terrain } from 'backstab/enums';
+import { Tiles } from 'backstab/enums';
 
 const canWalkOn = terrain =>
-  terrain === Terrain.DIRT_FLOOR ||
-  terrain === Terrain.DOOR ||
-  terrain === Terrain.CORRIDOR;
+  terrain === Tiles.DIRT_FLOOR ||
+  terrain === Tiles.DOOR ||
+  terrain === Tiles.CORRIDOR;
 
 const canMoveTo = tile => tile && canWalkOn(tile.terrain);
 
