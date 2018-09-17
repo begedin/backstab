@@ -11,7 +11,7 @@ const nextDirection = (current, all) =>
 
 const alertEnemies = ({ enemies }) => enemies.forEach(e => e.alert());
 
-const DIRECTIONS = ['NORTH', 'EAST', 'WEST', 'SOUTH'];
+const DIRECTIONS = ['NORTH', 'EAST', 'SOUTH', 'WEST'];
 
 class Palantir {
   constructor(rng, feature, x, y) {

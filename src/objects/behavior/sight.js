@@ -15,12 +15,12 @@ const getFarthestPoints = ({ x, y }, direction, visionRange) => {
       }));
     case 'EAST':
       return [...Array(visionRange * 2 + 1)].map((el, i) => ({
-        x: x - visionRange,
+        x: x + visionRange,
         y: y - visionRange + i,
       }));
     case 'WEST':
       return [...Array(visionRange * 2 + 1)].map((el, i) => ({
-        x: x + visionRange,
+        x: x - visionRange,
         y: y - visionRange + i,
       }));
     default:
