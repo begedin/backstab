@@ -1,4 +1,4 @@
-import { Terrain } from 'backstab/enums';
+import { Tiles } from 'backstab/enums';
 
 class Feature {
   constructor(bounds, points, anchors) {
@@ -7,6 +7,7 @@ class Feature {
     this.anchors = anchors;
     this.neighbors = [];
     this.enemies = [];
+    this.objects = [];
   }
 
   getPoint({ x, y }) {
@@ -26,7 +27,7 @@ class Feature {
   }
 
   get innerPoints() {
-    return this.points.filter(p => p.terrain === Terrain.DIRT_FLOOR);
+    return this.points.filter(p => p.terrain === Tiles.DIRT_FLOOR);
   }
 
   // simple rectangle overlap formula
@@ -38,10 +39,6 @@ class Feature {
       a.bottom > b.top &&
       a.top < b.bottom
     );
-  }
-
-  connectTo(feature) {
-    this.neighbors.push(feature);
   }
 
   contains({ x, y }) {

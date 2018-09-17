@@ -5,13 +5,11 @@ const Direction = {
   WEST: 3,
 };
 
-const Terrain = {
+const Tiles = {
   CORRIDOR: 0,
   DIRT_FLOOR: 1,
   DIRT_WALL: 2,
   DOOR: 3,
-  STONE_WALL: 4,
-  UNUSED: 5,
 };
 
 const Feature = {
@@ -19,4 +17,4 @@ const Feature = {
   CORRIDOR: 1,
 };
 
-export { Terrain, Direction, Feature };
+export { Tiles, Direction, Feature };
