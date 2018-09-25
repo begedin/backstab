@@ -5,7 +5,7 @@ import Palantir from 'backstab/objects/enemies/palantir';
 import Player from 'backstab/objects/player';
 import globals from 'backstab/globals';
 import Randomizer from 'backstab/helpers/randomizer';
-
+import Controller from 'backstab/objects/controller';
 import { gridToWorld } from 'backstab/objects/grid/convert';
 import { meleeAttackTween, moveTween } from 'backstab/objects/action_tweens';
 import { renderInitial, renderUpdated } from 'backstab/objects/renderer';
@@ -15,7 +15,6 @@ const setupCamera = (camera, tileSize, mapSize, { x, y }) => {
   camera.setBounds(0, 0, worldSize, worldSize);
   camera.setRoundPixels(true);
   camera.setScroll(gridToWorld(x), gridToWorld(y));
-  // camera.disableCull = true;
   camera.setZoom(1 / 2);
 };
 
@@ -29,46 +28,24 @@ const buildControlConfig = (camera, keyboard) => ({
 
 const ZOOM_LEVELS = [1 / 32, 1 / 16, 1 / 8, 1 / 4, 1 / 2, 1, 2];
 
-const setupMouseScrollControl = camera => {
-  window.addEventListener(
-    'wheel',
-    ({ deltaY }) => {
-      const currentZoomIndex = ZOOM_LEVELS.indexOf(camera.zoom);
-
-      if (deltaY > 0 && currentZoomIndex < ZOOM_LEVELS.length - 1) {
-        camera.zoomTo(ZOOM_LEVELS[currentZoomIndex + 1], 250);
-      }
-
-      if (deltaY < 0 && currentZoomIndex > 0) {
-        camera.zoomTo(ZOOM_LEVELS[currentZoomIndex - 1], 250);
-      }
-    },
-    false,
-  );
+const zoomIn = camera => {
+  const currentZoomIndex = ZOOM_LEVELS.indexOf(camera.zoom);
+  if (currentZoomIndex < ZOOM_LEVELS.length - 1) {
+    camera.zoomTo(ZOOM_LEVELS[currentZoomIndex + 1], 250);
+  }
 };
 
-const getPlayerCommand = ({ up, down, left, right }) => {
-  if (up.isDown) {
-    return 'UP';
+const zoomOut = camera => {
+  const currentZoomIndex = ZOOM_LEVELS.indexOf(camera.zoom);
+  if (currentZoomIndex > 0) {
+    camera.zoomTo(ZOOM_LEVELS[currentZoomIndex - 1], 250);
   }
-
-  if (down.isDown) {
-    return 'DOWN';
-  }
-
-  if (left.isDown) {
-    return 'LEFT';
-  }
-
-  if (right.isDown) {
-    return 'RIGHT';
-  }
-
-  return false;
 };
 
-const tickTurn = gameData =>
-  gameData.enemies.forEach(e => e.update && e.update(gameData));
+const scrollCamera = (camera, { x, y }) => {
+  camera.stopFollow();
+  camera.setScroll(camera.scrollX - x, camera.scrollY - y);
+};
 
 const spawnDungeon = (rng, mapSize) =>
   new DungeonGenerator(rng, mapSize, mapSize);
@@ -109,11 +86,6 @@ export default class Game extends Phaser.Scene {
     // setting up camera
     const { main: camera } = this.cameras;
     setupCamera(camera, TILE_SIZE, mapSize, dungeon.startingLocation);
-    setupMouseScrollControl(camera);
-    // setting up controls
-    const { keyboard } = this.input;
-    const controlConfig = buildControlConfig(camera, keyboard);
-    this.controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
 
     const { playerSprite, enemySprites, dungeonTileMap } = renderInitial(
       this,
@@ -124,20 +96,26 @@ export default class Game extends Phaser.Scene {
     this.playerSprite = playerSprite;
     this.enemySprites = enemySprites;
     this.dungeonTileMap = dungeonTileMap;
+
+    // setting up controls
+    const { keyboard } = this.input;
+    const controlConfig = buildControlConfig(camera, keyboard);
+    this.controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
+    const controller = new Controller(this.input);
+
+    controller.on('zoomIn', () => zoomIn(camera));
+    controller.on('zoomOut', () => zoomOut(camera));
+    controller.on('drag', amount => scrollCamera(camera, amount));
+    controller.on('playerUp', () => this.handlePlayerInput('UP'));
+    controller.on('playerDown', () => this.handlePlayerInput('DOWN'));
+    controller.on('playerLeft', () => this.handlePlayerInput('LEFT'));
+    controller.on('playerRight', () => this.handlePlayerInput('RIGHT'));
+
+    this.controller = controller;
   }
 
   update(delta) {
-    this.handleDrag();
-
-    let playerAction;
-
-    if (!this.lockedFromInput) {
-      playerAction = this.handlePlayerInput();
-    }
-
-    if (playerAction) {
-      tickTurn(this.gameData);
-    }
+    this.controller.update(this.turnInProgress);
 
     const { TILE_SIZE } = globals;
     renderUpdated(this, this.gameData, TILE_SIZE);
@@ -145,70 +123,38 @@ export default class Game extends Phaser.Scene {
     this.controls.update(delta);
   }
 
-  handleDrag() {
-    const { activePointer } = this.input;
+  handlePlayerInput(command) {
+    const { gameData } = this;
+    const { player } = gameData;
 
-    if (activePointer.isDown) {
-      this.cameras.main.stopFollow();
-
-      if (this.origDragPoint) {
-        const { scrollX, scrollY } = this.cameras.main;
-        const { x: startX, y: startY } = this.origDragPoint;
-        const { x: dragX, y: dragY } = activePointer.position;
-
-        const newScrollX = scrollX - (dragX - startX);
-        const newScrollY = scrollY - (dragY - startY);
-
-        this.cameras.main.setScroll(newScrollX, newScrollY);
-      }
-      this.origDragPoint = activePointer.position.clone();
-    } else {
-      delete this.origDragPoint;
-    }
-  }
-
-  handlePlayerInput() {
-    const command = getPlayerCommand(this.input.keyboard.createCursorKeys());
-
-    if (!command) {
-      return false;
+    const action = player.command(command, gameData);
+    if (!action) {
+      return;
     }
 
-    const {
-      gameData,
-      gameData: { player },
-    } = this;
-    const result = player.command(command, gameData);
-
-    if (!result) {
-      return null;
-    }
-
-    this.cameras.main.startFollow(this.playerSprite);
-    this.lockedFromInput = true;
-
+    const { type } = action;
     const timeline = this.tweens.createTimeline();
 
-    // player action
-    const { type } = result;
-
     if (type === 'ATTACKING') {
-      const { data: enemy } = result;
+      const { data: enemy } = action;
       timeline.add(meleeAttackTween(player, enemy));
       enemy.damage(player.meleeAttack);
     }
 
     if (type === 'MOVING') {
-      const { data } = result;
+      const { data } = action;
       timeline.add(moveTween(player, data));
     }
 
     timeline.play();
 
     timeline.setCallback('onComplete', () => {
-      this.lockedFromInput = false;
+      this.turnInProgress = false;
     });
 
-    return result;
+    gameData.enemies.forEach(e => e.update && e.update(gameData));
+
+    this.cameras.main.startFollow(this.playerSprite);
+    this.turnInProgress = true;
   }
 }
