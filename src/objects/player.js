@@ -38,6 +38,8 @@ class Player {
     this.x = x;
     this.y = y;
     this.meleeAttack = 1;
+    this.health = 10;
+    this.maxHealth = 10;
   }
 
   command(type, gameData) {

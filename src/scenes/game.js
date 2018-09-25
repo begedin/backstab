@@ -72,11 +72,12 @@ const spawn = (rng, tileSize, mapSize) => {
 
 export default class Game extends Phaser.Scene {
   constructor() {
-    super('game');
+    super('Game');
   }
 
   create() {
     const rng = new Randomizer();
+    this.scene.launch('GameUI');
 
     const { TILE_SIZE } = globals;
     const mapSize = 500;

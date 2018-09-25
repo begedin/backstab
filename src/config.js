@@ -1,6 +1,7 @@
 import Boot from 'backstab/scenes/boot';
 import Preload from 'backstab/scenes/preload';
 import Game from 'backstab/scenes/game';
+import GameUI from 'backstab/scenes/gameUI';
 import City from 'backstab/scenes/city';
 
 export default {
@@ -9,5 +10,5 @@ export default {
   pixelArt: true,
   roundPixels: false,
   backgroundColor: 'rgb(0, 0, 0)',
-  scene: [Boot, Preload, Game, City],
+  scene: [Boot, Preload, Game, GameUI, City],
 };
