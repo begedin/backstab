@@ -1,14 +1,22 @@
-class Dummy {
+import Entity from 'backstab/objects/Entity';
+
+class Dummy extends Entity {
   constructor(feature, x, y) {
+    super(
+      { strength: 1, constitution: 5, dexterity: 1, perception: 1 },
+      { damage: 0, accuracy: 1 },
+    );
+    this.healthFactor = 1;
+    this.health = this.maxHealth;
+
     this.parentFeature = feature;
-    this.health = 1;
     this.x = x;
     this.y = y;
     this.name = 'dummy';
     this.seenPoints = [];
   }
 
-  damage(amount) {
+  takeDamage(amount) {
     this.health -= amount;
     if (this.health <= 0) {
       this.status = 'DEAD';

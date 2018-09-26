@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import DungeonGenerator from 'backstab/objects/dungeon/generator';
-import Dummy from 'backstab/objects/enemies/dummy';
-import Palantir from 'backstab/objects/enemies/palantir';
-import Player from 'backstab/objects/player';
+import Dummy from 'backstab/objects/enemies/Dummy';
+import Palantir from 'backstab/objects/enemies/Palantir';
+import Player from 'backstab/objects/Player';
 import globals from 'backstab/globals';
 import Randomizer from 'backstab/helpers/randomizer';
 import Controller from 'backstab/objects/controller';
@@ -77,6 +77,7 @@ export default class Game extends Phaser.Scene {
 
   create() {
     const rng = new Randomizer();
+    this.rng = rng;
     this.scene.launch('GameUI');
 
     const { TILE_SIZE } = globals;
@@ -125,7 +126,7 @@ export default class Game extends Phaser.Scene {
   }
 
   handlePlayerInput(command) {
-    const { gameData } = this;
+    const { gameData, rng } = this;
     const { player } = gameData;
 
     const action = player.command(command, gameData);
@@ -139,7 +140,9 @@ export default class Game extends Phaser.Scene {
     if (type === 'ATTACKING') {
       const { data: enemy } = action;
       timeline.add(meleeAttackTween(player, enemy));
-      enemy.damage(player.meleeAttack);
+      if (player.didMeleeHit(rng, enemy)) {
+        enemy.takeDamage(player.meleeDamage(rng, enemy));
+      }
     }
 
     if (type === 'MOVING') {

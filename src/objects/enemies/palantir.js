@@ -1,4 +1,5 @@
 import computeSight from 'backstab/objects/behavior/sight';
+import Entity from 'backstab/objects/Entity';
 
 const DEFAULT_RANGE = 4;
 const MAX_TIME_BETWEEN_ROTATES = 4;
@@ -13,8 +14,15 @@ const alertEnemies = ({ enemies }) => enemies.forEach(e => e.alert());
 
 const DIRECTIONS = ['NORTH', 'EAST', 'SOUTH', 'WEST'];
 
-class Palantir {
+class Palantir extends Entity {
   constructor(rng, feature, x, y) {
+    super(
+      { strength: 1, constitution: 5, dexterity: 1, perception: 1 },
+      { damage: 0, accuracy: 1 },
+    );
+    this.healthFactor = 2;
+    this.health = this.maxHealth;
+
     this.direction = rng.pick(DIRECTIONS);
     this.range = DEFAULT_RANGE;
     this.parentFeature = feature;
@@ -27,7 +35,6 @@ class Palantir {
     );
 
     this.timeSinceLastRotate = 0;
-    this.health = 1;
 
     this.x = x;
     this.y = y;
@@ -35,7 +42,7 @@ class Palantir {
     this.name = 'palantir';
   }
 
-  damage(amount) {
+  takeDamage(amount) {
     this.health -= amount;
     if (this.health <= 0) {
       this.status = 'DEAD';
