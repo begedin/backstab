@@ -30,6 +30,30 @@ const computeLineOfSightGraphic = (graphics, enemy, tileSize) => {
   return graphics;
 };
 
+const computeHealthBarGraphic = (graphics, enemy, tileSize) => {
+  const { health, maxHealth, x, y } = enemy;
+
+  graphics.clear();
+  const left = x * tileSize;
+  const top = y * tileSize - 15;
+  const width = tileSize;
+  const height = 10;
+
+  graphics.fillStyle(0x000000);
+  graphics.fillRect(left, top, width, height);
+
+  graphics.fillStyle(0xff0000);
+  const innerMax = tileSize - 4;
+  const innerLeft = left + 2;
+  const innerTop = top + 2;
+  const innerWidth = (health / maxHealth) * innerMax;
+  const innerHeight = height - 4;
+
+  graphics.fillRect(innerLeft, innerTop, innerWidth, innerHeight);
+
+  return graphics;
+};
+
 const createDungeonTileMap = (scene, gameData, tileSize, mapSize) => {
   const tilemapConfig = buildTilemapConfig(tileSize, mapSize);
   const dungeonTileMap = scene.make.tilemap(tilemapConfig);
@@ -72,8 +96,16 @@ const createPlayerSprite = (scene, gameData) => {
 const createEnemySprites = (scene, { enemies }, tileSize) =>
   enemies.map(e => {
     const sprite = scene.add.sprite(gridToWorld(e.x), gridToWorld(e.y), e.name);
-    const graphics = scene.add.graphics();
-    sprite.lineOfSight = computeLineOfSightGraphic(graphics, e, tileSize);
+    sprite.lineOfSight = computeLineOfSightGraphic(
+      scene.add.graphics(),
+      e,
+      tileSize,
+    );
+    sprite.healthBar = computeHealthBarGraphic(
+      scene.add.graphics(),
+      e,
+      tileSize,
+    );
     return sprite;
   });
 
@@ -102,8 +134,10 @@ const updateEnemyStates = (enemySprites, enemies, tileSize) => {
     if (enemy.status === 'DEAD') {
       sprite.destroy();
       sprite.lineOfSight.destroy();
+      sprite.healthBar.destroy();
     } else {
       computeLineOfSightGraphic(sprite.lineOfSight, enemy, tileSize);
+      computeHealthBarGraphic(sprite.healthBar, enemy, tileSize);
       sprite.setPosition(gridToWorld(enemy.x), gridToWorld(enemy.y));
     }
   });
