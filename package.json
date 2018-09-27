@@ -30,7 +30,7 @@
     "clean": "rimraf dist/bundle.js",
     "watch": "webpack --watch",
     "serve": "webpack-dev-server --hot",
-    "deploy:ghpages": "git subtree push --prefix dist origin gh-pages"
+    "deploy:ghpages": "git push origin --delete gh-pages && git subtree push --prefix dist origin gh-pages"
   },
   "license": "MIT",
   "repository": "https://github.com/begedin/backstab.git",
