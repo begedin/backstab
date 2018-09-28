@@ -23,6 +23,9 @@ class Dummy extends Entity {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  act() {}
+
   alert() {
     this.isAlerted = true;
   }

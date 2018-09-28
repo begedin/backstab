@@ -122,10 +122,6 @@ const renderInitial = (scene, gameData, tileSize, mapSize) => {
   return { dungeonTileMap, enemySprites, playerSprite };
 };
 
-const updatePlayerState = (playerSprite, player) => {
-  playerSprite.setPosition(gridToWorld(player.x), gridToWorld(player.y));
-};
-
 const updateEnemyStates = (enemySprites, enemies, tileSize) => {
   enemies.forEach(enemy => {
     const index = enemies.indexOf(enemy);
@@ -138,16 +134,14 @@ const updateEnemyStates = (enemySprites, enemies, tileSize) => {
     } else {
       computeLineOfSightGraphic(sprite.lineOfSight, enemy, tileSize);
       computeHealthBarGraphic(sprite.healthBar, enemy, tileSize);
-      sprite.setPosition(gridToWorld(enemy.x), gridToWorld(enemy.y));
     }
   });
 };
 
 const renderUpdated = (scene, gameData, tileSize) => {
-  const { playerSprite, enemySprites } = scene;
-  const { player, enemies } = gameData;
+  const { enemySprites } = scene;
+  const { enemies } = gameData;
 
-  updatePlayerState(playerSprite, player);
   updateEnemyStates(enemySprites, enemies, tileSize);
 };
 

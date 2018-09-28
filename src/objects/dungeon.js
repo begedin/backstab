@@ -7,9 +7,8 @@ class Dungeon {
   }
 
   tileAt(x, y) {
-    return this.features
-      .find(feature => feature.contains({ x, y }))
-      .getPoint({ x, y });
+    const feature = this.features.find(f => f.contains({ x, y }));
+    return feature ? feature.getPoint({ x, y }) : null;
   }
 }
 

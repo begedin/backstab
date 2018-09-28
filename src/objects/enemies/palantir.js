@@ -1,4 +1,4 @@
-import computeSight from 'backstab/objects/behavior/sight';
+import computeSight from 'backstab/behavior/sight';
 import Entity from 'backstab/objects/Entity';
 
 const DEFAULT_RANGE = 4;
@@ -49,7 +49,7 @@ class Palantir extends Entity {
     }
   }
 
-  update({ player }) {
+  act({ player }) {
     this.timeSinceLastRotate += 1;
 
     if (this.timeSinceLastRotate > MAX_TIME_BETWEEN_ROTATES) {

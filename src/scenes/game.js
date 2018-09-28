@@ -7,8 +7,13 @@ import globals from 'backstab/globals';
 import Randomizer from 'backstab/helpers/randomizer';
 import Controller from 'backstab/objects/controller';
 import { gridToWorld } from 'backstab/objects/grid/convert';
-import { meleeAttackTween, moveTween } from 'backstab/objects/action_tweens';
+import {
+  bumpTween,
+  damageEffectTween,
+  moveTween,
+} from 'backstab/objects/actionTweens';
 import { renderInitial, renderUpdated } from 'backstab/objects/renderer';
+import { enterPosition } from 'backstab/behavior/actions';
 
 const setupCamera = (camera, tileSize, mapSize, { x, y }) => {
   const worldSize = tileSize * mapSize;
@@ -70,6 +75,39 @@ const spawn = (rng, tileSize, mapSize) => {
   return { dungeon, enemies, player };
 };
 
+const getCoordinatesFromDirection = ({ x, y }, direction) => {
+  switch (direction) {
+    case 'UP':
+      return { x, y: y - 1 };
+    case 'DOWN':
+      return { x, y: y + 1 };
+    case 'LEFT':
+      return { x: x - 1, y };
+    case 'RIGHT':
+      return { x: x + 1, y };
+    default:
+      throw new Error('Invalid direction');
+  }
+};
+
+const getPlayerAction = (command, rng, { player, dungeon, enemies }) => {
+  switch (command) {
+    case 'UP':
+    case 'DOWN':
+    case 'LEFT':
+    case 'RIGHT':
+      return enterPosition(
+        rng,
+        player,
+        getCoordinatesFromDirection(player, command),
+        dungeon,
+        enemies,
+      );
+    default:
+      return null;
+  }
+};
+
 export default class Game extends Phaser.Scene {
   constructor() {
     super('Game');
@@ -108,10 +146,10 @@ export default class Game extends Phaser.Scene {
     controller.on('zoomIn', () => zoomIn(camera));
     controller.on('zoomOut', () => zoomOut(camera));
     controller.on('drag', amount => scrollCamera(camera, amount));
-    controller.on('playerUp', () => this.handlePlayerInput('UP'));
-    controller.on('playerDown', () => this.handlePlayerInput('DOWN'));
-    controller.on('playerLeft', () => this.handlePlayerInput('LEFT'));
-    controller.on('playerRight', () => this.handlePlayerInput('RIGHT'));
+    controller.on('playerUp', () => this.handleInput('UP'));
+    controller.on('playerDown', () => this.handleInput('DOWN'));
+    controller.on('playerLeft', () => this.handleInput('LEFT'));
+    controller.on('playerRight', () => this.handleInput('RIGHT'));
 
     this.controller = controller;
   }
@@ -125,29 +163,64 @@ export default class Game extends Phaser.Scene {
     this.controls.update(delta);
   }
 
-  handlePlayerInput(command) {
-    const { gameData, rng } = this;
-    const { player } = gameData;
+  handleInput(command) {
+    const { gameData, rng, playerSprite, enemySprites } = this;
+    const action = getPlayerAction(command, rng, gameData);
 
-    const action = player.command(command, gameData);
     if (!action) {
       return;
     }
 
-    const { type } = action;
+    this.turnInProgress = true;
+
+    const { type, outcome } = action;
     const timeline = this.tweens.createTimeline();
 
-    if (type === 'ATTACKING') {
-      const { data: enemy } = action;
-      timeline.add(meleeAttackTween(player, enemy));
-      if (player.didMeleeHit(rng, enemy)) {
-        enemy.takeDamage(player.meleeDamage(rng, enemy));
-      }
+    const { enemies } = gameData;
+
+    if (type === 'MELEE_ATTACK') {
+      const { target: enemy, value } = outcome;
+      const index = enemies.indexOf(enemy);
+      const enemySprite = enemySprites[index];
+      const { x, y } = enemySprite;
+
+      const text = this.add.text(x, y - globals.TILE_SIZE, value);
+      text.setOrigin(0.5);
+      const tween = this.add.tween(
+        damageEffectTween(text, {
+          x,
+          y: y - 2 * globals.TILE_SIZE,
+        }),
+      );
+
+      tween.setCallback(
+        'onComplete',
+        () => {
+          text.destroy();
+        },
+        this,
+      );
+
+      timeline.add(bumpTween(playerSprite, enemySprite));
     }
 
-    if (type === 'MOVING') {
-      const { data } = action;
-      timeline.add(moveTween(player, data));
+    if (type === 'MOVE') {
+      const { target: gridLocation } = outcome;
+      const { x, y } = {
+        x: gridToWorld(gridLocation.x),
+        y: gridToWorld(gridLocation.y),
+      };
+
+      timeline.add(moveTween(playerSprite, { x, y }));
+    }
+
+    if (type === 'BUMP') {
+      const { target: gridLocation } = outcome;
+      const { x, y } = {
+        x: gridToWorld(gridLocation.x),
+        y: gridToWorld(gridLocation.y),
+      };
+      timeline.add(bumpTween(playerSprite, { x, y }));
     }
 
     timeline.play();
@@ -156,9 +229,8 @@ export default class Game extends Phaser.Scene {
       this.turnInProgress = false;
     });
 
-    gameData.enemies.forEach(e => e.update && e.update(gameData));
+    enemies.forEach(e => e.act(gameData));
 
     this.cameras.main.startFollow(this.playerSprite);
-    this.turnInProgress = true;
   }
 }
