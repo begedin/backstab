@@ -1,6 +1,7 @@
 import { Direction, Tiles } from 'backstab/enums';
 import Feature from 'backstab/objects/dungeon/feature';
 import Anchor from 'backstab/objects/dungeon/anchor';
+import * as Random from 'backstab/Random';
 
 const SIZES = [7, 9, 11, 13, 15, 17];
 
@@ -84,8 +85,8 @@ const computeAnchors = ({ top, bottom, left, right }) => {
   ];
 };
 
-const generate = (rng, x, y, direction) => {
-  const size = rng.pick(SIZES);
+const generate = (x, y, direction) => {
+  const size = Random.pick(SIZES);
 
   const bounds = computeBounds(x, y, size, direction);
   const points = computePoints(size, bounds);

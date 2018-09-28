@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
+
+import * as Random from 'backstab/Random';
 import DungeonGenerator from 'backstab/objects/dungeon/generator';
 import Dummy from 'backstab/objects/enemies/Dummy';
 import Palantir from 'backstab/objects/enemies/Palantir';
 import Player from 'backstab/objects/Player';
 import globals from 'backstab/globals';
-import Randomizer from 'backstab/helpers/randomizer';
 import Controller from 'backstab/objects/controller';
 import { gridToWorld } from 'backstab/objects/grid/convert';
 import {
@@ -52,21 +53,20 @@ const scrollCamera = (camera, { x, y }) => {
   camera.setScroll(camera.scrollX - x, camera.scrollY - y);
 };
 
-const spawnDungeon = (rng, mapSize) =>
-  new DungeonGenerator(rng, mapSize, mapSize);
+const spawnDungeon = mapSize => new DungeonGenerator(mapSize, mapSize);
 
-const spawn = (rng, tileSize, mapSize) => {
+const spawn = (tileSize, mapSize) => {
   // spawning everything
-  const dungeon = spawnDungeon(rng, mapSize);
+  const dungeon = spawnDungeon(mapSize);
   const { startingLocation } = dungeon;
   const player = new Player(startingLocation.x, startingLocation.y);
   const enemies = dungeon.features.map(feature => {
-    const { x, y } = rng.pick(feature.innerPoints);
+    const { x, y } = Random.pick(feature.innerPoints);
 
     const enemy =
-      rng.pick([1, 2]) === 1
+      Random.pick([1, 2]) === 1
         ? new Dummy(feature, x, y)
-        : new Palantir(rng, feature, x, y);
+        : new Palantir(feature, x, y);
 
     feature.enemies.push(enemy);
     return enemy;
@@ -90,14 +90,13 @@ const getCoordinatesFromDirection = ({ x, y }, direction) => {
   }
 };
 
-const getPlayerAction = (command, rng, { player, dungeon, enemies }) => {
+const getPlayerAction = (command, { player, dungeon, enemies }) => {
   switch (command) {
     case 'UP':
     case 'DOWN':
     case 'LEFT':
     case 'RIGHT':
       return enterPosition(
-        rng,
         player,
         getCoordinatesFromDirection(player, command),
         dungeon,
@@ -114,13 +113,11 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    const rng = new Randomizer();
-    this.rng = rng;
     this.scene.launch('GameUI');
 
     const { TILE_SIZE } = globals;
     const mapSize = 500;
-    const { dungeon, player, enemies } = spawn(rng, TILE_SIZE, mapSize);
+    const { dungeon, player, enemies } = spawn(TILE_SIZE, mapSize);
     this.gameData = { player, dungeon, enemies };
 
     // setting up camera
@@ -164,8 +161,8 @@ export default class Game extends Phaser.Scene {
   }
 
   handleInput(command) {
-    const { gameData, rng, playerSprite, enemySprites } = this;
-    const action = getPlayerAction(command, rng, gameData);
+    const { gameData, playerSprite, enemySprites } = this;
+    const action = getPlayerAction(command, gameData);
 
     if (!action) {
       return;

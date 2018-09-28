@@ -28,14 +28,15 @@ const getFarthestPoints = ({ x, y }, direction, visionRange) => {
   }
 };
 
-const computeSight = ({ x, y }, direction, visionRange, feature) => {
-  const farthestPoints = getFarthestPoints({ x, y }, direction, visionRange);
+const computeSight = ({ x, y, direction, range, parentFeature }) => {
+  const farthestPoints = getFarthestPoints({ x, y }, direction, range);
   const bresenhamLines = farthestPoints.map(p => bresenhamLine({ x, y }, p));
 
   const sightPoints = [];
+
   bresenhamLines.forEach(points => {
     points.forEach(point => {
-      const tile = feature.getPoint({ x: point.x, y: point.y });
+      const tile = parentFeature.getPoint({ x: point.x, y: point.y });
       if (tile && tile.terrain === Tiles.DIRT_FLOOR) {
         sightPoints.push({ x: point.x, y: point.y });
       }

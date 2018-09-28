@@ -1,3 +1,5 @@
+import * as Random from 'backstab/Random';
+
 class Attributes {
   constructor({ strength, constitution, dexterity, perception }) {
     this.strength = strength;
@@ -29,28 +31,31 @@ class Entity {
     return this.attributes.strength;
   }
 
-  actsThisTurn(rng) {
-    const initiative = rng.integerInRange(1, this.attributes.dexterity + 1);
+  actsThisTurn() {
+    const initiative = Random.integerInRange(1, this.attributes.dexterity + 1);
     return initiative !== 1;
   }
 
-  didMeleeHit(rng, target) {
-    return (
-      rng.integerInRange(0, this.weapon.accuracy + this.attributes.strength) >
-      rng.integerInRange(0, target.attributes.constitution)
+  didMeleeHit(target) {
+    const accuracy = this.weapon.accuracy + this.attributes.strength;
+    const dodgeFactor = Random.integerInRange(
+      0,
+      target.attributes.constitution,
     );
+    return Random.integerInRange(0, accuracy) > dodgeFactor;
   }
 
-  meleeDamage(rng /* target */) {
-    return rng.integerInRange(1, this.attributes.strength + this.weapon.damage);
+  meleeDamage(/* target */) {
+    const maxDamage = this.attributes.strength + this.weapon.damage;
+    return Random.integerInRange(1, maxDamage);
   }
 
   // // TODO: computeDistance
   // didRangedHit(target) {
   //   const distance = computeDistance(this, target);
   //   return (
-  //     rng.integerInRange(0, this.weapon.accuracy + this.attributes.dexterity) >
-  //     rng.integerInRange(0, target.attributes.dexterity + distance)
+  //     Random.integerInRange(0, this.weapon.accuracy + this.attributes.dexterity) >
+  //     Random.integerInRange(0, target.attributes.dexterity + distance)
   //   );
   // }
 }

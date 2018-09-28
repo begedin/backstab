@@ -1,4 +1,5 @@
 import { Tiles } from 'backstab/enums';
+import * as Random from 'backstab/Random';
 import generateRoom from 'backstab/objects/dungeon/generator/room';
 import generateDiamondRoom from 'backstab/objects/dungeon/generator/diamond_room';
 import Dungeon from 'backstab/objects/dungeon';
@@ -15,9 +16,9 @@ const addDoor = (feature, { x, y }) => {
   feature.objects.push({ x, y, type: Tiles.DOOR });
 };
 
-const tryGenerateFeature = (rng, existingFeatures) => {
-  const feature = rng.pick(existingFeatures);
-  const anchor = rng.pick(feature.anchors);
+const tryGenerateFeature = existingFeatures => {
+  const feature = Random.pick(existingFeatures);
+  const anchor = Random.pick(feature.anchors);
 
   if (!anchor) {
     return null;
@@ -29,9 +30,9 @@ const tryGenerateFeature = (rng, existingFeatures) => {
   } = anchor;
 
   const newFeature =
-    rng.pick([1, 2]) === 1
-      ? generateRoom(rng, x, y, direction)
-      : generateDiamondRoom(rng, x, y, direction);
+    Random.pick([1, 2]) === 1
+      ? generateRoom(x, y, direction)
+      : generateDiamondRoom(x, y, direction);
 
   if (!canPlaceFeature(existingFeatures, newFeature)) {
     return false;
@@ -46,12 +47,12 @@ const tryGenerateFeature = (rng, existingFeatures) => {
 };
 
 class Generator {
-  constructor(rng, width, height) {
+  constructor(width, height) {
     const FEATURE_COUNT = 40;
     const MAX_ATTEMPTS = 1000;
 
     // initial room for the map
-    const initialRoom = generateRoom(rng, width / 2, height / 2);
+    const initialRoom = generateRoom(width / 2, height / 2);
 
     const features = [initialRoom];
 
@@ -59,7 +60,7 @@ class Generator {
 
     // remaining features for the map
     while (features.length < FEATURE_COUNT && attempts <= MAX_ATTEMPTS) {
-      const feature = tryGenerateFeature(rng, features);
+      const feature = tryGenerateFeature(features);
       if (feature) {
         features.push(feature);
       }

@@ -1,6 +1,6 @@
-const meleeAttack = (rng, attacker, defender) => {
-  if (attacker.didMeleeHit(rng, defender)) {
-    const damage = attacker.meleeDamage(rng, defender);
+const meleeAttack = (attacker, defender) => {
+  if (attacker.didMeleeHit(defender)) {
+    const damage = attacker.meleeDamage(defender);
     defender.takeDamage(damage);
     return damage;
   }
@@ -13,7 +13,7 @@ const canMoveTo = (subject, location, dungeon) => {
   return tile && subject.walkableTerrains.indexOf(tile.terrain) > -1;
 };
 
-const enterPosition = (rng, subject, location, dungeon, creatures) => {
+const enterPosition = (subject, location, dungeon, creatures) => {
   const creature = creatures.find(
     c => c.x === location.x && c.y === location.y && c.status !== 'DEAD',
   );
@@ -23,7 +23,7 @@ const enterPosition = (rng, subject, location, dungeon, creatures) => {
       type: 'MELEE_ATTACK',
       outcome: {
         target: creature,
-        value: meleeAttack(rng, subject, creature),
+        value: meleeAttack(subject, creature),
       },
     };
   }

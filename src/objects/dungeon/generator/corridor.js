@@ -1,4 +1,5 @@
 import { Direction, Tiles } from 'backstab/enums';
+import * as Random from 'backstab/Random';
 import Feature from 'backstab/objects/dungeon/feature';
 import Anchor from 'backstab/objects/dungeon/anchor';
 
@@ -107,8 +108,8 @@ const computeHorizontalAnchors = ({ left, right, top, bottom }, points) => {
   return topAnchors.concat(bottomAnchors);
 };
 
-const generate = (rng, x, y, direction) => {
-  const length = rng.integerInRange(3, 12);
+const generate = (x, y, direction) => {
+  const length = Random.integerInRange(3, 12);
   const bounds = computeBounds(x, y, length, direction);
 
   const vertical = isVertical(direction);
