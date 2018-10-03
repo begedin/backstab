@@ -124,16 +124,7 @@ export default class Game extends Phaser.Scene {
     const { main: camera } = this.cameras;
     setupCamera(camera, TILE_SIZE, mapSize, dungeon.startingLocation);
 
-    const { playerSprite, enemySprites, dungeonTileMap } = renderInitial(
-      this,
-      this.gameData,
-      TILE_SIZE,
-      500,
-    );
-    this.playerSprite = playerSprite;
-    this.enemySprites = enemySprites;
-    this.dungeonTileMap = dungeonTileMap;
-
+    this.renderData = renderInitial(this, TILE_SIZE, 500);
     // setting up controls
     const { keyboard } = this.input;
     const controlConfig = buildControlConfig(camera, keyboard);
@@ -155,13 +146,14 @@ export default class Game extends Phaser.Scene {
     this.controller.update(this.turnInProgress);
 
     const { TILE_SIZE } = globals;
-    renderUpdated(this, this.gameData, TILE_SIZE);
+    renderUpdated(this, TILE_SIZE);
 
     this.controls.update(delta);
   }
 
   handleInput(command) {
-    const { gameData, playerSprite, enemySprites } = this;
+    const { gameData, renderData } = this;
+    const { playerContainer, enemyContainers } = renderData;
     const action = getPlayerAction(command, gameData);
 
     if (!action) {
@@ -178,8 +170,8 @@ export default class Game extends Phaser.Scene {
     if (type === 'MELEE_ATTACK') {
       const { target: enemy, value } = outcome;
       const index = enemies.indexOf(enemy);
-      const enemySprite = enemySprites[index];
-      const { x, y } = enemySprite;
+      const enemyContainer = enemyContainers[index];
+      const { x, y } = enemyContainer;
 
       const text = this.add.text(x, y - globals.TILE_SIZE, value);
       text.setOrigin(0.5);
@@ -198,7 +190,7 @@ export default class Game extends Phaser.Scene {
         this,
       );
 
-      timeline.add(bumpTween(playerSprite, enemySprite));
+      timeline.add(bumpTween(playerContainer, enemyContainer));
     }
 
     if (type === 'MOVE') {
@@ -208,7 +200,7 @@ export default class Game extends Phaser.Scene {
         y: gridToWorld(gridLocation.y),
       };
 
-      timeline.add(moveTween(playerSprite, { x, y }));
+      timeline.add(moveTween(playerContainer, { x, y }));
     }
 
     if (type === 'BUMP') {
@@ -217,7 +209,7 @@ export default class Game extends Phaser.Scene {
         x: gridToWorld(gridLocation.x),
         y: gridToWorld(gridLocation.y),
       };
-      timeline.add(bumpTween(playerSprite, { x, y }));
+      timeline.add(bumpTween(playerContainer, { x, y }));
     }
 
     timeline.play();
@@ -228,6 +220,6 @@ export default class Game extends Phaser.Scene {
 
     enemies.forEach(e => e.act(gameData));
 
-    this.cameras.main.startFollow(this.playerSprite);
+    this.cameras.main.startFollow(playerContainer);
   }
 }
