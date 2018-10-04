@@ -31,9 +31,9 @@ class Entity {
     return this.attributes.strength;
   }
 
-  actsThisTurn() {
+  rollInitiative() {
     const initiative = Random.integerInRange(1, this.attributes.dexterity + 1);
-    return initiative !== 1;
+    return initiative * 100;
   }
 
   didMeleeHit(target) {

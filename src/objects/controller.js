@@ -21,7 +21,7 @@ class Controller extends Phaser.Events.EventEmitter {
     this.input = input;
   }
 
-  update(turnInProgress) {
+  update(isPlayersTurn) {
     const { activePointer } = this.input;
 
     if (activePointer.isDown) {
@@ -40,7 +40,7 @@ class Controller extends Phaser.Events.EventEmitter {
       delete this.origDragPoint;
     }
 
-    if (turnInProgress) {
+    if (!isPlayersTurn) {
       return;
     }
 

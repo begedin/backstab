@@ -13,7 +13,7 @@ import {
   damageEffectTween,
   moveTween,
 } from 'backstab/objects/actionTweens';
-import { renderInitial, renderUpdated } from 'backstab/objects/renderer';
+import { renderInitial, renderUpdated } from 'backstab/renderers/entities';
 import { enterPosition } from 'backstab/behavior/actions';
 
 const setupCamera = (camera, tileSize, mapSize, { x, y }) => {
@@ -73,6 +73,20 @@ const spawn = (tileSize, mapSize) => {
   });
 
   return { dungeon, enemies, player };
+};
+
+const computeInitialTurnOrder = actors =>
+  actors
+    .map(actor => ({ actor, energy: actor.rollInitiative() }))
+    .sort(({ energy: a }, { energy: b }) => a - b);
+
+const updateTurnOrder = (queue, previousAction = {}) => {
+  const { cost = 100 } = previousAction;
+  const { actor, energy } = queue[0];
+  return queue
+    .slice(1, queue.length)
+    .concat({ actor, energy: energy - cost })
+    .sort(({ energy: a }, { energy: b }) => b - a);
 };
 
 const getCoordinatesFromDirection = ({ x, y }, direction) => {
@@ -140,32 +154,49 @@ export default class Game extends Phaser.Scene {
     controller.on('playerRight', () => this.handleInput('RIGHT'));
 
     this.controller = controller;
+
+    this.turnQueue = computeInitialTurnOrder(enemies.concat(player));
+  }
+
+  get currentTurnSlot() {
+    return this.turnQueue[0];
   }
 
   update(delta) {
-    this.controller.update(this.turnInProgress);
+    const isPlayersTurn = this.currentTurnSlot.actor === this.gameData.player;
 
-    const { TILE_SIZE } = globals;
-    renderUpdated(this, TILE_SIZE);
+    if (!isPlayersTurn) {
+      const { gameData, currentTurnSlot } = this;
+      currentTurnSlot.actor.act(gameData);
+      this.turnQueue = updateTurnOrder(this.turnQueue);
+      this.events.emit('turnChange', this.turnQueue);
+    }
 
+    this.controller.update(isPlayersTurn);
     this.controls.update(delta);
+
+    renderUpdated(this, globals.TILE_SIZE);
   }
 
   handleInput(command) {
-    const { gameData, renderData } = this;
-    const { playerContainer, enemyContainers } = renderData;
-    const action = getPlayerAction(command, gameData);
+    if (this.isPlayerTurnInProgress) {
+      return;
+    }
 
+    const { gameData, renderData } = this;
+
+    const action = getPlayerAction(command, gameData);
     if (!action) {
       return;
     }
 
-    this.turnInProgress = true;
-
-    const { type, outcome } = action;
-    const timeline = this.tweens.createTimeline();
+    this.isPlayerTurnInProgress = true;
 
     const { enemies } = gameData;
+    const { playerContainer, enemyContainers } = renderData;
+
+    const timeline = this.tweens.createTimeline();
+    const { type, outcome } = action;
 
     if (type === 'MELEE_ATTACK') {
       const { target: enemy, value } = outcome;
@@ -212,13 +243,13 @@ export default class Game extends Phaser.Scene {
       timeline.add(bumpTween(playerContainer, { x, y }));
     }
 
-    timeline.play();
-
     timeline.setCallback('onComplete', () => {
-      this.turnInProgress = false;
+      this.isPlayerTurnInProgress = false;
+      this.turnQueue = updateTurnOrder(this.turnQueue);
+      this.events.emit('turnChange', this.turnQueue);
     });
 
-    enemies.forEach(e => e.act(gameData));
+    timeline.play();
 
     this.cameras.main.startFollow(playerContainer);
   }

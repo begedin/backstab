@@ -14,6 +14,7 @@ class Player extends Entity {
     this.healthFactor = 3;
     this.health = this.maxHealth;
     this.walkableTerrains = [Tiles.DIRT_FLOOR, Tiles.DOOR, Tiles.CORRIDOR];
+    this.name = 'Conan';
   }
 
   setPosition(x, y) {

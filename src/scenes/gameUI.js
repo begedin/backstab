@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import renderTurnOrder from 'backstab/renderers/turnOrder';
 
 const updateHealth = (
   { playerHealthBar, playerHealthText },
@@ -34,10 +35,19 @@ export default class GameUI extends Phaser.Scene {
     this.playerHealthText = this.add.text(60, 25);
 
     updateHealth(this, game.gameData.player);
+    this.turnOrderContainer = renderTurnOrder(this, game.turnQueue);
 
     game.events.on(
       'healthChange',
       (current, max) => updateHealth(this, current, max),
+      this,
+    );
+
+    game.events.on(
+      'turnChange',
+      () => {
+        this.turnOrderContainer = renderTurnOrder(this, game.turnQueue);
+      },
       this,
     );
   }
