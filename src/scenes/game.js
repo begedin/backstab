@@ -59,14 +59,18 @@ const spawn = (tileSize, mapSize) => {
   // spawning everything
   const dungeon = spawnDungeon(mapSize);
   const { startingLocation } = dungeon;
-  const player = new Player(startingLocation.x, startingLocation.y);
+  const player = new Player(
+    startingLocation.x,
+    startingLocation.y,
+    Phaser.Utils.String.UUID(),
+  );
   const enemies = dungeon.features.map(feature => {
     const { x, y } = Random.pick(feature.innerPoints);
 
     const enemy =
       Random.pick([1, 2]) === 1
-        ? new Dummy(feature, x, y)
-        : new Palantir(feature, x, y);
+        ? new Dummy(feature, x, y, Phaser.Utils.String.UUID())
+        : new Palantir(feature, x, y, Phaser.Utils.String.UUID());
 
     feature.enemies.push(enemy);
     return enemy;
@@ -139,6 +143,7 @@ export default class Game extends Phaser.Scene {
     setupCamera(camera, TILE_SIZE, mapSize, dungeon.startingLocation);
 
     this.renderData = renderInitial(this, TILE_SIZE, 500);
+
     // setting up controls
     const { keyboard } = this.input;
     const controlConfig = buildControlConfig(camera, keyboard);

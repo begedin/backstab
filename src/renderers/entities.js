@@ -85,11 +85,13 @@ const createDungeonTileMap = (scene, gameData, tileSize, mapSize) => {
 };
 
 const createPlayerContainer = scene => {
-  const { dungeon } = scene.gameData;
+  const { dungeon, player } = scene.gameData;
   const { startingLocation: p } = dungeon;
   const sprite = scene.add.sprite(0, 0, 'player');
   sprite.name = 'sprite';
-  return scene.add.container(gridToWorld(p.x), gridToWorld(p.y), [sprite]);
+  return scene.add
+    .container(gridToWorld(p.x), gridToWorld(p.y), [sprite])
+    .setData('id', player.id);
 };
 
 const createEnemyContainers = (scene, tileSize) =>
@@ -106,7 +108,9 @@ const createEnemyContainers = (scene, tileSize) =>
     healthBar.name = 'healthBar';
 
     const children = [sprite, lineOfSight, healthBar];
-    return scene.add.container(gridToWorld(e.x), gridToWorld(e.y), children);
+    return scene.add
+      .container(gridToWorld(e.x), gridToWorld(e.y), children)
+      .setData('id', e.id);
   });
 
 const renderInitial = (scene, tileSize, mapSize) => {

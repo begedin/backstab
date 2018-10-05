@@ -14,10 +14,12 @@ const overlaps = ({ x: px, y: py }, seenPoints) =>
 const alertEnemies = ({ enemies }) => enemies.forEach(e => e.alert());
 
 class Palantir extends Entity {
-  constructor(feature, x, y) {
+  constructor(feature, x, y, id) {
     super(
       { strength: 1, constitution: 5, dexterity: 1, perception: 1 },
       { damage: 0, accuracy: 1 },
+      'palantir',
+      id,
     );
     this.healthFactor = 2;
     this.health = this.maxHealth;
@@ -30,7 +32,6 @@ class Palantir extends Entity {
 
     this.seenPoints = computeSight(this);
     this.timeSinceLastRotate = 0;
-    this.name = 'palantir';
   }
 
   takeDamage(amount) {

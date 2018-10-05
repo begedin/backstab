@@ -17,6 +17,43 @@ const updateHealth = (
   playerHealthText.setOrigin(0.5);
 };
 
+const findContainerSlot = (scene, actorContainer) =>
+  scene.turnOrderContainer.list.find(
+    c => c.getData('id') === actorContainer.getData('id'),
+  );
+
+const highlightContainerSlot = (scene, actorContainer) => {
+  const slot = findContainerSlot(scene, actorContainer);
+  return slot && slot.getByName('highlight').setVisible(true);
+};
+
+const unhighlightContainerSlot = (scene, actorContainer) => {
+  const slot = findContainerSlot(scene, actorContainer);
+  return slot && slot.getByName('highlight').setVisible(false);
+};
+
+const setupHoverSpriteHighlightsSlot = (
+  scene,
+  { playerContainer, enemyContainers },
+) => {
+  const playerSprite = playerContainer.getByName('sprite').setInteractive();
+  playerSprite.on('pointerover', () =>
+    highlightContainerSlot(scene, playerContainer),
+  );
+  playerSprite.on('pointerout', () =>
+    unhighlightContainerSlot(scene, playerContainer),
+  );
+  enemyContainers.forEach(enemyContainer => {
+    const enemySprite = enemyContainer.getByName('sprite').setInteractive();
+    enemySprite.on('pointerover', () =>
+      highlightContainerSlot(scene, enemyContainer),
+    );
+    enemySprite.on('pointerout', () =>
+      unhighlightContainerSlot(scene, enemyContainer),
+    );
+  });
+};
+
 export default class GameUI extends Phaser.Scene {
   constructor() {
     super('GameUI');
@@ -34,6 +71,8 @@ export default class GameUI extends Phaser.Scene {
     // create health text
     this.playerHealthText = this.add.text(60, 25);
 
+    setupHoverSpriteHighlightsSlot(this, game.renderData, game.turnQueue);
+
     updateHealth(this, game.gameData.player);
     this.turnOrderContainer = renderTurnOrder(this, game.turnQueue);
 
@@ -49,6 +88,13 @@ export default class GameUI extends Phaser.Scene {
         this.turnOrderContainer = renderTurnOrder(this, game.turnQueue);
       },
       this,
+    );
+
+    game.events.on('actorHoverIn', actor =>
+      highlightContainerSlot(this, actor),
+    );
+    game.events.on('actorHoverOut', actor =>
+      unhighlightContainerSlot(this, actor),
     );
   }
 }

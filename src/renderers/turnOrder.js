@@ -4,14 +4,25 @@ const renderSlot = (scene, { actor, energy }, offset) => {
   rectangle.strokeRect(0, 0, 50, 50);
   rectangle.fillStyle(0x000000);
   rectangle.fillRect(0, 0, 50, 50);
+  rectangle.name = 'border';
 
   const nameText = scene.add.text(0, 0);
   nameText.setText(actor.name.slice(0, 3));
+  nameText.name = 'name';
 
   const energyText = scene.add.text(0, 15);
   energyText.setText(energy);
+  energyText.name = 'energy';
 
-  return scene.add.container(offset * 50, 0, [rectangle, nameText, energyText]);
+  const highlight = scene.add.graphics();
+  highlight.lineStyle(3, 0x00ff00);
+  highlight.strokeRect(0, 0, 50, 50);
+  highlight.name = 'highlight';
+  highlight.setVisible(false);
+
+  return scene.add
+    .container(offset * 50, 0, [rectangle, nameText, energyText, highlight])
+    .setData('id', actor.id);
 };
 
 const renderSlots = (scene, turnQueue) => {

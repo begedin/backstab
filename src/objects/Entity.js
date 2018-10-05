@@ -17,10 +17,12 @@ class Weapon {
 }
 
 class Entity {
-  constructor(attributes, weapon) {
+  constructor(attributes, weapon, name, id) {
     this.attributes = new Attributes(attributes);
     this.weapon = new Weapon(weapon);
     this.healthFactor = 1;
+    this.name = name;
+    this.id = id;
   }
 
   get maxHealth() {
