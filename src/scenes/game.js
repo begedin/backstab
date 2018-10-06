@@ -79,18 +79,30 @@ const spawn = (tileSize, mapSize) => {
   return { dungeon, enemies, player };
 };
 
-const computeInitialTurnOrder = actors =>
-  actors
-    .map(actor => ({ actor, energy: actor.rollInitiative() }))
-    .sort(({ energy: a }, { energy: b }) => a - b);
+const pairWithEnergy = actor => ({ actor, energy: 0 });
+const regenerateEnergy = ({ actor, energy }) => ({
+  actor,
+  energy: energy + actor.rollInitiative(),
+});
+const compareByEnergy = ({ energy: a }, { energy: b }) => b - a;
 
-const updateTurnOrder = (queue, previousAction = {}) => {
-  const { cost = 100 } = previousAction;
+const createTurnQueue = actors =>
+  actors
+    .map(pairWithEnergy)
+    .map(regenerateEnergy)
+    .sort(compareByEnergy);
+
+const updateTurnQueue = (queue, previousAction = {}) => {
+  const { cost = 500 } = previousAction;
   const { actor, energy } = queue[0];
-  return queue
+  const newEnergy = energy - cost;
+  const unsortedQueue = queue
     .slice(1, queue.length)
-    .concat({ actor, energy: energy - cost })
-    .sort(({ energy: a }, { energy: b }) => b - a);
+    .concat({ actor, energy: energy - cost });
+
+  return newEnergy > 0
+    ? unsortedQueue.sort(compareByEnergy)
+    : unsortedQueue.map(regenerateEnergy).sort(compareByEnergy);
 };
 
 const getCoordinatesFromDirection = ({ x, y }, direction) => {
@@ -160,7 +172,7 @@ export default class Game extends Phaser.Scene {
 
     this.controller = controller;
 
-    this.turnQueue = computeInitialTurnOrder(enemies.concat(player));
+    this.turnQueue = createTurnQueue(enemies.concat(player));
   }
 
   get currentTurnSlot() {
@@ -173,7 +185,7 @@ export default class Game extends Phaser.Scene {
     if (!isPlayersTurn) {
       const { gameData, currentTurnSlot } = this;
       currentTurnSlot.actor.act(gameData);
-      this.turnQueue = updateTurnOrder(this.turnQueue);
+      this.turnQueue = updateTurnQueue(this.turnQueue);
       this.events.emit('turnChange', this.turnQueue);
     }
 
@@ -250,7 +262,7 @@ export default class Game extends Phaser.Scene {
 
     timeline.setCallback('onComplete', () => {
       this.isPlayerTurnInProgress = false;
-      this.turnQueue = updateTurnOrder(this.turnQueue);
+      this.turnQueue = updateTurnQueue(this.turnQueue);
       this.events.emit('turnChange', this.turnQueue);
     });
 
