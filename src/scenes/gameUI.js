@@ -1,5 +1,8 @@
 import Phaser from 'phaser';
-import renderTurnOrder from 'backstab/renderers/turnOrder';
+import {
+  renderInitialTurnOrder,
+  updateTurnOrder,
+} from 'backstab/renderers/turnOrder';
 
 const updateHealth = (
   { playerHealthBar, playerHealthText },
@@ -74,7 +77,8 @@ export default class GameUI extends Phaser.Scene {
     setupHoverSpriteHighlightsSlot(this, game.renderData, game.turnQueue);
 
     updateHealth(this, game.gameData.player);
-    this.turnOrderContainer = renderTurnOrder(this, game.turnQueue);
+    this.turnOrderContainer = renderInitialTurnOrder(this, game.turnQueue);
+    updateTurnOrder(this.turnOrderContainer, game.turnQueue);
 
     game.events.on(
       'healthChange',
@@ -85,7 +89,7 @@ export default class GameUI extends Phaser.Scene {
     game.events.on(
       'turnChange',
       () => {
-        this.turnOrderContainer = renderTurnOrder(this, game.turnQueue);
+        updateTurnOrder(this.turnOrderContainer, game.turnQueue);
       },
       this,
     );

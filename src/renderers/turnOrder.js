@@ -1,4 +1,6 @@
-const renderSlot = (scene, { actor, energy }, offset) => {
+// precreation
+
+const renderInitialSlot = (scene, offset) => {
   const rectangle = scene.add.graphics();
   rectangle.lineStyle(3, 0xffffff);
   rectangle.strokeRect(0, 0, 50, 50);
@@ -7,11 +9,9 @@ const renderSlot = (scene, { actor, energy }, offset) => {
   rectangle.name = 'border';
 
   const nameText = scene.add.text(0, 0);
-  nameText.setText(actor.name.slice(0, 3));
   nameText.name = 'name';
 
   const energyText = scene.add.text(0, 15);
-  energyText.setText(energy);
   energyText.name = 'energy';
 
   const highlight = scene.add.graphics();
@@ -22,25 +22,36 @@ const renderSlot = (scene, { actor, energy }, offset) => {
 
   return scene.add
     .container(offset * 50, 0, [rectangle, nameText, energyText, highlight])
-    .setData('id', actor.id);
+    .setData('id', null);
 };
 
-const renderSlots = (scene, turnQueue) => {
-  const visibleQueue = turnQueue.slice(0, 10);
-  const total = visibleQueue.length;
-  return visibleQueue.map((slot, index) =>
-    renderSlot(scene, slot, index - total / 2),
-  );
-};
+const renderInitialSlots = scene =>
+  new Array(10)
+    .fill()
+    .map((item, index) => renderInitialSlot(scene, index - 10 / 2));
 
-const renderTurnOrder = (scene, turnQueue) => {
+const renderInitialTurnOrder = scene => {
   const { width, height } = scene.cameras.main;
-  const {
-    turnOrderContainer = scene.add.container(width / 2, height - 75),
-  } = scene;
-  turnOrderContainer.removeAll();
-  turnOrderContainer.add(renderSlots(scene, turnQueue));
-  return turnOrderContainer;
+  const slots = scene.add.container(width / 2, height - 75);
+
+  slots.add(renderInitialSlots(scene));
+  return slots;
 };
 
-export default renderTurnOrder;
+// updating
+
+const getItemsToRender = queue => queue.slice(0, 10);
+
+const updateSlot = (slot, { actor, energy }) => {
+  slot.getByName('name').setText(actor.name.slice(0, 3));
+  slot.getByName('energy').setText(energy);
+  slot.setData('id', actor.id);
+};
+
+const updateTurnOrder = (slots, queue) =>
+  getItemsToRender(queue).forEach((item, index) => {
+    const slot = slots.getAt(index);
+    updateSlot(slot, item);
+  });
+
+export { renderInitialTurnOrder, updateTurnOrder };
