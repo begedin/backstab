@@ -60,6 +60,13 @@ class Entity {
   //     Random.integerInRange(0, target.attributes.dexterity + distance)
   //   );
   // }
+
+  takeDamage(amount) {
+    this.health -= amount;
+    if (this.health <= 0) {
+      this.status = 'DEAD';
+    }
+  }
 }
 
 export default Entity;

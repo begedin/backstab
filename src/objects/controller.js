@@ -44,6 +44,14 @@ class Controller extends Phaser.Events.EventEmitter {
       return;
     }
 
+    const space = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.SPACE,
+    );
+
+    if (space.isDown) {
+      this.emit('playerWait');
+    }
+
     const { up, down, left, right } = this.input.keyboard.createCursorKeys();
 
     if (up.isDown) {

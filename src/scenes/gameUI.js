@@ -80,11 +80,7 @@ export default class GameUI extends Phaser.Scene {
     this.turnOrderContainer = renderInitialTurnOrder(this, game.turnQueue);
     updateTurnOrder(this.turnOrderContainer, game.turnQueue);
 
-    game.events.on(
-      'healthChange',
-      (current, max) => updateHealth(this, current, max),
-      this,
-    );
+    game.events.on('healthChange', player => updateHealth(this, player), this);
 
     game.events.on(
       'turnChange',

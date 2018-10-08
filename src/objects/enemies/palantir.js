@@ -34,13 +34,6 @@ class Palantir extends Entity {
     this.timeSinceLastRotate = 0;
   }
 
-  takeDamage(amount) {
-    this.health -= amount;
-    if (this.health <= 0) {
-      this.status = 'DEAD';
-    }
-  }
-
   act({ player }) {
     this.timeSinceLastRotate += 1;
 
@@ -52,6 +45,8 @@ class Palantir extends Entity {
       alertEnemies(this.parentFeature);
       this.parentFeature.neighbors.forEach(alertEnemies);
     }
+
+    return null;
   }
 
   rotate() {

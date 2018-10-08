@@ -17,13 +17,6 @@ class Dummy extends Entity {
     this.seenPoints = [];
   }
 
-  takeDamage(amount) {
-    this.health -= amount;
-    if (this.health <= 0) {
-      this.status = 'DEAD';
-    }
-  }
-
   // eslint-disable-next-line class-methods-use-this
   act() {}
 
