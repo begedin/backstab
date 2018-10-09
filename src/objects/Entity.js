@@ -1,4 +1,5 @@
 import * as Random from 'backstab/Random';
+import { maxHealth, inventoryCapacity } from 'backstab/behavior/attributes';
 
 class Attributes {
   constructor({ strength, constitution, dexterity, perception }) {
@@ -17,55 +18,18 @@ class Weapon {
 }
 
 class Entity {
-  constructor(attributes, weapon, name, id) {
+  constructor(x, y, id, name, attributes, weapon) {
+    this.x = x;
+    this.y = y;
+    this.id = id;
+    this.name = name;
+
     this.attributes = new Attributes(attributes);
     this.weapon = new Weapon(weapon);
-    this.healthFactor = 1;
-    this.name = name;
-    this.id = id;
-  }
 
-  get maxHealth() {
-    return this.healthFactor * this.attributes.constitution;
-  }
-
-  get inventoryCapacity() {
-    return this.attributes.strength;
-  }
-
-  rollInitiative() {
-    const initiative = Random.integerInRange(1, this.attributes.dexterity + 1);
-    return initiative * 100;
-  }
-
-  didMeleeHit(target) {
-    const accuracy = this.weapon.accuracy + this.attributes.strength;
-    const dodgeFactor = Random.integerInRange(
-      0,
-      target.attributes.constitution,
-    );
-    return Random.integerInRange(0, accuracy) > dodgeFactor;
-  }
-
-  meleeDamage(/* target */) {
-    const maxDamage = this.attributes.strength + this.weapon.damage;
-    return Random.integerInRange(1, maxDamage);
-  }
-
-  // // TODO: computeDistance
-  // didRangedHit(target) {
-  //   const distance = computeDistance(this, target);
-  //   return (
-  //     Random.integerInRange(0, this.weapon.accuracy + this.attributes.dexterity) >
-  //     Random.integerInRange(0, target.attributes.dexterity + distance)
-  //   );
-  // }
-
-  takeDamage(amount) {
-    this.health -= amount;
-    if (this.health <= 0) {
-      this.status = 'DEAD';
-    }
+    this.maxHealth = maxHealth(this);
+    this.health = this.maxHealth;
+    this.inventoryCapacity = inventoryCapacity(this);
   }
 }
 

@@ -9,6 +9,8 @@ import Player from 'backstab/objects/Player';
 import globals from 'backstab/globals';
 import Controller from 'backstab/objects/controller';
 import { gridToWorld } from 'backstab/objects/grid/convert';
+import { turnEnergy } from 'backstab/behavior/attributes';
+
 import {
   bumpTween,
   damageEffectTween,
@@ -92,7 +94,7 @@ const spawn = (tileSize, mapSize) => {
 const pairWithEnergy = actor => ({ actor, energy: 0 });
 const regenerateEnergy = ({ actor, energy }) => ({
   actor,
-  energy: energy + actor.rollInitiative(),
+  energy: energy + turnEnergy(actor),
 });
 const compareByEnergy = ({ energy: a }, { energy: b }) => b - a;
 

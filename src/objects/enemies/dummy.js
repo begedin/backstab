@@ -3,17 +3,15 @@ import Entity from 'backstab/objects/Entity';
 class Dummy extends Entity {
   constructor(feature, x, y, id) {
     super(
+      x,
+      y,
+      id,
+      'dummy',
       { strength: 1, constitution: 5, dexterity: 1, perception: 1 },
       { damage: 0, accuracy: 1 },
-      'dummy',
-      id,
     );
-    this.healthFactor = 1;
-    this.health = this.maxHealth;
 
     this.parentFeature = feature;
-    this.x = x;
-    this.y = y;
     this.seenPoints = [];
   }
 

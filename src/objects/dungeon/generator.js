@@ -48,7 +48,7 @@ const tryGenerateFeature = existingFeatures => {
 
 class Generator {
   constructor(width, height) {
-    const FEATURE_COUNT = 40;
+    const FEATURE_COUNT = 10;
     const MAX_ATTEMPTS = 1000;
 
     // initial room for the map

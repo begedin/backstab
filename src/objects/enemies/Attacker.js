@@ -15,17 +15,15 @@ const attackIfInMeleeRange = (attacker, defender) => {
 class Attacker extends Entity {
   constructor(feature, x, y, id) {
     super(
+      x,
+      y,
+      id,
+      'attacker',
       { strength: 2, constitution: 5, dexterity: 4, perception: 5 },
       { damage: 2, accuracy: 5 },
-      'attacker',
-      id,
     );
-    this.healthFactor = 2;
-    this.health = this.maxHealth;
 
     this.parentFeature = feature;
-    this.x = x;
-    this.y = y;
     this.seenPoints = [];
   }
 

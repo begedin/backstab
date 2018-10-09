@@ -16,19 +16,17 @@ const alertEnemies = ({ enemies }) => enemies.forEach(e => e.alert());
 class Palantir extends Entity {
   constructor(feature, x, y, id) {
     super(
+      x,
+      y,
+      id,
+      'palantir',
       { strength: 1, constitution: 5, dexterity: 1, perception: 1 },
       { damage: 0, accuracy: 1 },
-      'palantir',
-      id,
     );
-    this.healthFactor = 2;
-    this.health = this.maxHealth;
 
     this.direction = randomDirection();
     this.range = DEFAULT_RANGE;
     this.parentFeature = feature;
-    this.x = x;
-    this.y = y;
 
     this.seenPoints = computeSight(this);
     this.timeSinceLastRotate = 0;
