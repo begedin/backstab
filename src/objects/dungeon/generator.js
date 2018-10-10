@@ -1,4 +1,4 @@
-import { Tiles } from 'backstab/enums';
+import { Terrain } from 'backstab/enums';
 import * as Random from 'backstab/Random';
 import generateRoom from 'backstab/objects/dungeon/generator/room';
 import generateDiamondRoom from 'backstab/objects/dungeon/generator/diamond_room';
@@ -13,7 +13,7 @@ const connectFeatures = (featureA, featureB) => {
 };
 
 const addDoor = (feature, { x, y }) => {
-  feature.objects.push({ x, y, type: Tiles.DOOR });
+  feature.objects.push({ x, y, type: Terrain.DOOR });
 };
 
 const tryGenerateFeature = existingFeatures => {
@@ -38,7 +38,7 @@ const tryGenerateFeature = existingFeatures => {
     return false;
   }
 
-  feature.setPoint(anchor, Tiles.DIRT_FLOOR);
+  feature.setPoint(anchor, Terrain.DIRT_FLOOR);
   addDoor(feature, anchor);
 
   connectFeatures(newFeature, feature);

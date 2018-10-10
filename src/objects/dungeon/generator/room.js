@@ -1,4 +1,4 @@
-import { Direction, Tiles } from 'backstab/enums';
+import { Direction, Terrain } from 'backstab/enums';
 import * as Random from 'backstab/Random';
 import Feature from 'backstab/objects/dungeon/feature';
 import Anchor from 'backstab/objects/dungeon/anchor';
@@ -49,9 +49,9 @@ const computePoints = ({ left, right, top, bottom }) => {
     for (let y = top; y <= bottom; y += 1) {
       let terrain;
       if (isWall({ x, y }, { left, right, top, bottom })) {
-        terrain = Tiles.DIRT_WALL;
+        terrain = Terrain.DIRT_WALL;
       } else {
-        terrain = Tiles.DIRT_FLOOR;
+        terrain = Terrain.DIRT_FLOOR;
       }
       points.push({ x, y, terrain });
     }
@@ -105,8 +105,8 @@ const generate = (x, y, direction) => {
 
   const directionSpecified = typeof direction === 'number';
   if (directionSpecified) {
-    feature.setPoint({ x, y }, Tiles.DIRT_FLOOR);
-    feature.objects.push({ x, y, type: Tiles.DOOR });
+    feature.setPoint({ x, y }, Terrain.DIRT_FLOOR);
+    feature.objects.push({ x, y, type: Terrain.DOOR });
   }
 
   return feature;

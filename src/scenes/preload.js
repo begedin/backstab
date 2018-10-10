@@ -12,7 +12,13 @@ export default class Preload extends Phaser.Scene {
   preload() {
     this.load.pack('city', 'data/city.json');
     this.load.pack('game', 'data/game.json');
-    this.load.image('tiles', 'assets/tileset.png');
+    this.load.image('tileset', 'assets/tileset.png');
+    this.load.spritesheet('characters', 'assets/characters.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+      margin: 0,
+      spacing: 1,
+    });
   }
 
   create() {

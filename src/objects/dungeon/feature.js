@@ -1,4 +1,4 @@
-import { Tiles } from 'backstab/enums';
+import { Terrain } from 'backstab/enums';
 
 class Feature {
   constructor(bounds, points, anchors) {
@@ -27,7 +27,7 @@ class Feature {
   }
 
   get innerPoints() {
-    return this.points.filter(p => p.terrain === Tiles.DIRT_FLOOR);
+    return this.points.filter(p => p.terrain === Terrain.DIRT_FLOOR);
   }
 
   // simple rectangle overlap formula

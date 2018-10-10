@@ -24,7 +24,7 @@ const setupCamera = (camera, tileSize, mapSize, { x, y }) => {
   camera.setBounds(0, 0, worldSize, worldSize);
   camera.setRoundPixels(true);
   camera.setScroll(gridToWorld(x), gridToWorld(y));
-  camera.setZoom(1 / 2);
+  camera.setZoom(1);
 };
 
 const buildControlConfig = (camera, keyboard) => ({
@@ -35,7 +35,7 @@ const buildControlConfig = (camera, keyboard) => ({
   zoomOut: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E),
 });
 
-const ZOOM_LEVELS = [1 / 32, 1 / 16, 1 / 8, 1 / 4, 1 / 2, 1, 2];
+const ZOOM_LEVELS = [1 / 16, 1 / 8, 1 / 4, 1 / 2, 1, 2];
 
 const zoomIn = camera => {
   const currentZoomIndex = ZOOM_LEVELS.indexOf(camera.zoom);
@@ -58,7 +58,7 @@ const scrollCamera = (camera, { x, y }) => {
 
 const spawnDungeon = mapSize => new DungeonGenerator(mapSize, mapSize);
 
-const spawn = (tileSize, mapSize) => {
+const spawn = mapSize => {
   // spawning everything
   const dungeon = spawnDungeon(mapSize);
   const { startingLocation } = dungeon;
@@ -159,15 +159,15 @@ export default class Game extends Phaser.Scene {
   create() {
     this.scene.launch('GameUI');
 
-    const { TILE_SIZE } = globals;
     const mapSize = 500;
-    const { dungeon, player, enemies } = spawn(TILE_SIZE, mapSize);
+    const { dungeon, player, enemies } = spawn(mapSize);
     this.gameData = { player, dungeon, enemies };
 
     // setting up camera
     const { main: camera } = this.cameras;
-    setupCamera(camera, TILE_SIZE, mapSize, dungeon.startingLocation);
 
+    const { TILE_SIZE } = globals;
+    setupCamera(camera, TILE_SIZE, mapSize, dungeon.startingLocation);
     this.renderData = renderInitial(this, TILE_SIZE, 500);
 
     // setting up controls
