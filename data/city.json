@@ -1,8 +1,0 @@
-{
-  "city": {
-    "files": [
-      { "key": "city", "type": "image", "url": "assets/city.png" },
-      { "key": "city-data", "type": "json", "url": "assets/city.json" }
-    ]
-  }
-}
