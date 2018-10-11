@@ -109,10 +109,10 @@ const createDungeonTileMap = (scene, gameData, tileSize, mapSize) => {
 };
 
 const frames = {
-  dummy: 0,
-  attacker: 54,
-  palantir: 108,
-  player: 162,
+  dummy: 'character-1',
+  attacker: 'character-12',
+  palantir: 'character-7',
+  player: 'character-22',
 };
 
 const createPlayerContainer = scene => {

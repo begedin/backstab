@@ -1,7 +1,0 @@
-{
-  "game": {
-    "files": [
-      { "key": "tileset", "type": "image", "url": "assets/tileset.png" }
-    ]
-  }
-}

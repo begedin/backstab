@@ -12,11 +12,6 @@ export default class Boot extends Phaser.Scene {
     this.gameSetup();
   }
 
-  preload() {
-    // Load the required assets to display our splash screen, later.
-    this.load.pack('boot', 'data/boot.json');
-  }
-
   create() {
     // Immediately after loading the boot assets, go to the next game state.
     this.scene.start('preload');
