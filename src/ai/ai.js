@@ -14,15 +14,15 @@ const attackIfInMeleeRange = (attacker, defender) => {
 };
 
 const increaseRotationCounter = entity =>
-  entity.set('timeSinceLastRotate', entity.timeSinceLastRotate + 1);
+  entity.set('timeSinceLastRotation', entity.timeSinceLastRotation + 1);
 
 const shouldRotate = entity =>
-  entity.timeSinceLastRotate >= entity.timeBetweenRotations;
+  entity.timeSinceLastRotation >= entity.timeBetweenRotations;
 
 const rotate = entity => {
   entity.set('direction', nextClockWiseDirection(entity.direction));
   entity.set('seenPoints', computeSight(entity));
-  entity.set('timeSinceLastRotate', 0);
+  entity.set('timeSinceLastRotation', 0);
 };
 
 const detects = (entity, player) =>
@@ -32,6 +32,10 @@ const alertEnemies = ({ enemies }) =>
   enemies.forEach(e => e.set('isAlerted', true));
 
 const act = (entity, gameData) => {
+  if (entity.status === 'DEAD') {
+    return null;
+  }
+
   if (entity.state === 'attacker') {
     return attackIfInMeleeRange(entity, gameData.player);
   }

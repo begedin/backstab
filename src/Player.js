@@ -1,5 +1,5 @@
 import { Terrain } from 'backstab/enums';
-import Entity from 'backstab/objects/Entity';
+import Entity from 'backstab/Entity';
 
 class Player extends Entity {
   constructor(x, y, id) {

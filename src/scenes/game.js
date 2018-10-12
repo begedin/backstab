@@ -1,11 +1,9 @@
 import Phaser from 'phaser';
 
 import * as Random from 'backstab/Random';
+import CreatureFactory from 'backstab/CreatureFactory';
 import DungeonGenerator from 'backstab/objects/dungeon/generator';
-import Attacker from 'backstab/objects/enemies/Attacker';
-import Dummy from 'backstab/objects/enemies/Dummy';
-import Palantir from 'backstab/objects/enemies/Palantir';
-import Player from 'backstab/objects/Player';
+import Player from 'backstab/Player';
 import globals from 'backstab/globals';
 import Controller from 'backstab/objects/controller';
 import { gridToWorld } from 'backstab/objects/grid/convert';
@@ -72,19 +70,21 @@ const spawn = mapSize => {
     const { x, y } = Random.pick(feature.innerPoints);
 
     let enemy;
-    switch (Random.pick([1, 2, 3])) {
+
+    switch (Random.pick([3, 3, 3])) {
       case 1:
-        enemy = new Dummy(feature, x, y, Phaser.Utils.String.UUID());
+        enemy = CreatureFactory.createDummy(feature, x, y);
         break;
       case 2:
-        enemy = new Palantir(feature, x, y, Phaser.Utils.String.UUID());
+        enemy = CreatureFactory.createAttacker(feature, x, y);
         break;
       case 3:
-        enemy = new Attacker(feature, x, y, Phaser.Utils.String.UUID());
+        enemy = CreatureFactory.createPalantir(feature, x, y);
         break;
       default:
         break;
     }
+
     feature.enemies.push(enemy);
     return enemy;
   });
