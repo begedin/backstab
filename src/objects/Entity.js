@@ -1,4 +1,3 @@
-import * as Random from 'backstab/Random';
 import { maxHealth, inventoryCapacity } from 'backstab/behavior/attributes';
 
 class Attributes {
@@ -30,6 +29,10 @@ class Entity {
     this.maxHealth = maxHealth(this);
     this.health = this.maxHealth;
     this.inventoryCapacity = inventoryCapacity(this);
+  }
+
+  set(key, value) {
+    this[key] = value;
   }
 }
 

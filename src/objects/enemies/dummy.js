@@ -13,10 +13,8 @@ class Dummy extends Entity {
 
     this.parentFeature = feature;
     this.seenPoints = [];
+    this.state = 'dummy';
   }
-
-  // eslint-disable-next-line class-methods-use-this
-  act() {}
 
   alert() {
     this.isAlerted = true;

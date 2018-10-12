@@ -1,17 +1,6 @@
 import computeSight from 'backstab/behavior/sight';
 import Entity from 'backstab/objects/Entity';
-import {
-  randomDirection,
-  nextClockWiseDirection,
-} from 'backstab/behavior/rotation';
-
-const DEFAULT_RANGE = 4;
-const MAX_TIME_BETWEEN_ROTATES = 4;
-
-const overlaps = ({ x: px, y: py }, seenPoints) =>
-  seenPoints.some(({ x, y }) => px === x && py === y);
-
-const alertEnemies = ({ enemies }) => enemies.forEach(e => e.alert());
+import { randomDirection } from 'backstab/behavior/rotation';
 
 class Palantir extends Entity {
   constructor(feature, x, y, id) {
@@ -25,36 +14,12 @@ class Palantir extends Entity {
     );
 
     this.direction = randomDirection();
-    this.range = DEFAULT_RANGE;
+    this.range = 4;
     this.parentFeature = feature;
 
     this.seenPoints = computeSight(this);
     this.timeSinceLastRotate = 0;
-  }
-
-  act({ player }) {
-    this.timeSinceLastRotate += 1;
-
-    if (this.timeSinceLastRotate > MAX_TIME_BETWEEN_ROTATES) {
-      this.rotate();
-    }
-
-    if (overlaps(player, this.seenPoints)) {
-      alertEnemies(this.parentFeature);
-      this.parentFeature.neighbors.forEach(alertEnemies);
-    }
-
-    return null;
-  }
-
-  rotate() {
-    this.direction = nextClockWiseDirection(this.direction);
-    this.seenPoints = computeSight(this);
-    this.timeSinceLastRotate = 0;
-  }
-
-  alert() {
-    this.isAlerted = true;
+    this.timeBetweenRotations = 4;
   }
 }
 

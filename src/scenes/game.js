@@ -10,6 +10,7 @@ import globals from 'backstab/globals';
 import Controller from 'backstab/objects/controller';
 import { gridToWorld } from 'backstab/objects/grid/convert';
 import { turnEnergy } from 'backstab/behavior/attributes';
+import act from 'backstab/ai/ai';
 
 import {
   bumpTween,
@@ -292,7 +293,7 @@ export default class Game extends Phaser.Scene {
 
     if (!isPlayersTurn && !this.isActionInProgress) {
       const { gameData, currentTurnSlot } = this;
-      const action = currentTurnSlot.actor.act(gameData);
+      const action = act(currentTurnSlot.actor, gameData);
       if (action) {
         this.playbackAction(action);
       } else {
