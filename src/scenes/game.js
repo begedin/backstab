@@ -5,11 +5,11 @@ import CreatureFactory from 'backstab/CreatureFactory';
 import DungeonGenerator from 'backstab/objects/dungeon/generator';
 import Player from 'backstab/Player';
 import globals from 'backstab/globals';
-import Controller from 'backstab/objects/controller';
+import CameraController, { setupCamera } from 'backstab/CameraController';
+import PlayerController from 'backstab/PlayerController';
 import { gridToWorld } from 'backstab/objects/grid/convert';
 import act from 'backstab/ai/ai';
 import { createTurnQueue, updateTurnQueue } from 'backstab/TurnSystem';
-
 import {
   bumpTween,
   damageEffectTween,
@@ -17,43 +17,6 @@ import {
 } from 'backstab/objects/actionTweens';
 import { renderInitial, renderUpdated } from 'backstab/renderers/entities';
 import { enterPosition, wait } from 'backstab/behavior/actions';
-
-const setupCamera = (camera, tileSize, mapSize, { x, y }) => {
-  const worldSize = tileSize * mapSize;
-  camera.setBounds(0, 0, worldSize, worldSize);
-  camera.setRoundPixels(true);
-  camera.setScroll(gridToWorld(x), gridToWorld(y));
-  camera.setZoom(1);
-};
-
-const buildControlConfig = (camera, keyboard) => ({
-  camera,
-  speed: 0.5,
-  disableCull: true,
-  zoomIn: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-  zoomOut: keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E),
-});
-
-const ZOOM_LEVELS = [1 / 16, 1 / 8, 1 / 4, 1 / 2, 1, 2];
-
-const zoomIn = camera => {
-  const currentZoomIndex = ZOOM_LEVELS.indexOf(camera.zoom);
-  if (currentZoomIndex < ZOOM_LEVELS.length - 1) {
-    camera.zoomTo(ZOOM_LEVELS[currentZoomIndex + 1], 250);
-  }
-};
-
-const zoomOut = camera => {
-  const currentZoomIndex = ZOOM_LEVELS.indexOf(camera.zoom);
-  if (currentZoomIndex > 0) {
-    camera.zoomTo(ZOOM_LEVELS[currentZoomIndex - 1], 250);
-  }
-};
-
-const scrollCamera = (camera, { x, y }) => {
-  camera.stopFollow();
-  camera.setScroll(camera.scrollX - x, camera.scrollY - y);
-};
 
 const spawnDungeon = mapSize => new DungeonGenerator(mapSize, mapSize);
 
@@ -143,24 +106,17 @@ export default class Game extends Phaser.Scene {
 
     const { TILE_SIZE } = globals;
     setupCamera(camera, TILE_SIZE, mapSize, dungeon.startingLocation);
-    this.renderData = renderInitial(this, TILE_SIZE, 500);
+    this.renderData = renderInitial(this, TILE_SIZE, mapSize);
 
-    // setting up controls
-    const { keyboard } = this.input;
-    const controlConfig = buildControlConfig(camera, keyboard);
-    this.controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
-    const controller = new Controller(this.input);
+    this.cameraController = new CameraController(camera, this.input);
 
-    controller.on('zoomIn', () => zoomIn(camera));
-    controller.on('zoomOut', () => zoomOut(camera));
-    controller.on('drag', amount => scrollCamera(camera, amount));
-    controller.on('playerUp', () => this.handleInput('UP'));
-    controller.on('playerDown', () => this.handleInput('DOWN'));
-    controller.on('playerLeft', () => this.handleInput('LEFT'));
-    controller.on('playerRight', () => this.handleInput('RIGHT'));
-    controller.on('playerWait', () => this.handleInput('WAIT'));
-
-    this.controller = controller;
+    const playerController = new PlayerController(this.input);
+    playerController.on('playerUp', () => this.handleInput('UP'));
+    playerController.on('playerDown', () => this.handleInput('DOWN'));
+    playerController.on('playerLeft', () => this.handleInput('LEFT'));
+    playerController.on('playerRight', () => this.handleInput('RIGHT'));
+    playerController.on('playerWait', () => this.handleInput('WAIT'));
+    this.playerController = playerController;
 
     this.turnQueue = createTurnQueue(enemies.concat(player));
   }
@@ -265,6 +221,10 @@ export default class Game extends Phaser.Scene {
   update(delta) {
     const isPlayersTurn = this.currentTurnSlot.actor === this.gameData.player;
 
+    if (isPlayersTurn) {
+      this.playerController.update();
+    }
+
     if (!isPlayersTurn && !this.isActionInProgress) {
       const { gameData, currentTurnSlot } = this;
       const action = act(currentTurnSlot.actor, gameData);
@@ -276,8 +236,7 @@ export default class Game extends Phaser.Scene {
       }
     }
 
-    this.controller.update(isPlayersTurn);
-    this.controls.update(delta);
+    this.cameraController.update(delta);
 
     renderUpdated(this, globals.TILE_SIZE);
   }
