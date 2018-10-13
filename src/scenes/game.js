@@ -7,8 +7,8 @@ import Player from 'backstab/Player';
 import globals from 'backstab/globals';
 import Controller from 'backstab/objects/controller';
 import { gridToWorld } from 'backstab/objects/grid/convert';
-import { turnEnergy } from 'backstab/behavior/attributes';
 import act from 'backstab/ai/ai';
+import { createTurnQueue, updateTurnQueue } from 'backstab/TurnSystem';
 
 import {
   bumpTween,
@@ -90,32 +90,6 @@ const spawn = mapSize => {
   });
 
   return { dungeon, enemies, player };
-};
-
-const pairWithEnergy = actor => ({ actor, energy: 0 });
-const regenerateEnergy = ({ actor, energy }) => ({
-  actor,
-  energy: energy + turnEnergy(actor),
-});
-const compareByEnergy = ({ energy: a }, { energy: b }) => b - a;
-
-const createTurnQueue = actors =>
-  actors
-    .map(pairWithEnergy)
-    .map(regenerateEnergy)
-    .sort(compareByEnergy);
-
-const updateTurnQueue = (queue, previousAction = {}) => {
-  const { cost = 500 } = previousAction;
-  const { actor, energy } = queue[0];
-  const newEnergy = energy - cost;
-  const unsortedQueue = queue
-    .slice(1, queue.length)
-    .concat({ actor, energy: energy - cost });
-
-  return newEnergy > 0
-    ? unsortedQueue.sort(compareByEnergy)
-    : unsortedQueue.map(regenerateEnergy).sort(compareByEnergy);
 };
 
 const getCoordinatesFromDirection = ({ x, y }, direction) => {
