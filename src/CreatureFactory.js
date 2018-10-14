@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import Entity from 'backstab/Entity';
 import computeSight from 'backstab/behavior/sight';
 import { randomDirection } from 'backstab/behavior/rotation';
+import { Terrain } from 'backstab/enums';
 
 const CreatureFactory = {
   createDummy(feature, x, y) {
@@ -19,7 +20,7 @@ const CreatureFactory = {
     const creature = new Entity(x, y, id, name, attributes, weapon);
     creature.set('parentFeature', feature);
     creature.set('seenPoints', []);
-    creature.set('state', 'dummy');
+    creature.set('walkableTerrains', [Terrain.DIRT_FLOOR, Terrain.CORRIDOR]);
     return creature;
   },
 
@@ -37,7 +38,7 @@ const CreatureFactory = {
     const creature = new Entity(x, y, id, name, attributes, weapon);
     creature.set('parentFeature', feature);
     creature.set('seenPoints', []);
-    creature.set('state', 'attacker');
+    creature.set('walkableTerrains', [Terrain.DIRT_FLOOR, Terrain.CORRIDOR]);
     return creature;
   },
 
@@ -57,9 +58,9 @@ const CreatureFactory = {
     creature.set('range', 4);
     creature.set('parentFeature', feature);
     creature.set('seenPoints', computeSight(creature));
-    creature.set('state', 'palantir');
     creature.set('timeSinceLastRotation', 0);
     creature.set('timeBetweenRotations', 4);
+    creature.set('walkableTerrains', [Terrain.DIRT_FLOOR, Terrain.CORRIDOR]);
     return creature;
   },
 };

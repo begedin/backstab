@@ -34,6 +34,11 @@ class Entity {
   set(key, value) {
     this[key] = value;
   }
+
+  setPosition(x, y) {
+    this.x = x;
+    this.y = y;
+  }
 }
 
 export default Entity;

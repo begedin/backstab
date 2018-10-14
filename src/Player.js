@@ -13,11 +13,6 @@ class Player extends Entity {
     );
     this.walkableTerrains = [Terrain.DIRT_FLOOR, Terrain.CORRIDOR];
   }
-
-  setPosition(x, y) {
-    this.x = x;
-    this.y = y;
-  }
 }
 
 export default Player;

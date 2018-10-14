@@ -1,9 +1,10 @@
 {
   "name": "backstab",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "private": false,
   "description": "A ROGUElike",
   "dependencies": {
+    "easystarjs": "^0.4.3",
     "phaser": "^3.11.0"
   },
   "devDependencies": {

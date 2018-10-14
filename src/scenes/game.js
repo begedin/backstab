@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import * as Random from 'backstab/Random';
 import CreatureFactory from 'backstab/CreatureFactory';
 import DungeonGenerator from 'backstab/objects/dungeon/generator';
+import { getGrid } from 'backstab/objects/dungeon';
 import Player from 'backstab/Player';
 import globals from 'backstab/globals';
 import CameraController, { setupCamera } from 'backstab/CameraController';
@@ -17,6 +18,7 @@ import {
 } from 'backstab/objects/actionTweens';
 import { renderInitial, renderUpdated } from 'backstab/renderers/entities';
 import { enterPosition, wait } from 'backstab/behavior/actions';
+import { js as EasystarJs } from 'easystarjs';
 
 const spawnDungeon = mapSize => new DungeonGenerator(mapSize, mapSize);
 
@@ -97,8 +99,16 @@ export default class Game extends Phaser.Scene {
   create() {
     this.scene.launch('GameUI');
 
-    const mapSize = 500;
+    const mapSize = 80;
     const { dungeon, player, enemies } = spawn(mapSize);
+
+    const easystar = new EasystarJs();
+    const grid = getGrid(dungeon);
+    easystar.setGrid(grid);
+    easystar.setAcceptableTiles([0, 1]);
+    easystar.enableSync();
+    this.pathfinder = easystar;
+
     this.gameData = { player, dungeon, enemies };
 
     // setting up camera
@@ -169,14 +179,19 @@ export default class Game extends Phaser.Scene {
     }
 
     if (type === 'MOVE') {
-      const { target: gridLocation } = outcome;
-      const { playerContainer } = this.renderData;
+      const { subject, target: gridLocation } = outcome;
+      const { playerContainer, enemyContainers } = this.renderData;
+      const allContainers = enemyContainers.concat(playerContainer);
+      const subjectContainer = allContainers.find(
+        c => c.getData('id') === subject.id,
+      );
+
       const { x, y } = {
         x: gridToWorld(gridLocation.x),
         y: gridToWorld(gridLocation.y),
       };
 
-      timeline.add(moveTween(playerContainer, { x, y }));
+      timeline.add(moveTween(subjectContainer, { x, y }));
     }
 
     if (type === 'BUMP') {
@@ -226,8 +241,8 @@ export default class Game extends Phaser.Scene {
     }
 
     if (!isPlayersTurn && !this.isActionInProgress) {
-      const { gameData, currentTurnSlot } = this;
-      const action = act(currentTurnSlot.actor, gameData);
+      const { gameData, currentTurnSlot, pathfinder } = this;
+      const action = act(currentTurnSlot.actor, gameData, pathfinder);
       if (action) {
         this.playbackAction(action);
       } else {

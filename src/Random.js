@@ -17,4 +17,6 @@ const weightedPick = array => {
   }).item;
 };
 
-export { integerInRange, pick, weightedPick };
+const frac = () => rng.frac();
+
+export { integerInRange, pick, weightedPick, frac };

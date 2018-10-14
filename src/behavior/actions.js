@@ -1,4 +1,5 @@
 import { integerInRange as randomIntegerInRange } from 'backstab/Random';
+import computeSight from 'backstab/behavior/sight';
 
 const meleeAccuracy = entity =>
   entity.weapon.accuracy + entity.attributes.strength;
@@ -43,6 +44,7 @@ const meleeAttack = (attacker, target) => {
 
 const move = (subject, location) => {
   subject.setPosition(location.x, location.y);
+  subject.set('seenPoints', computeSight(subject));
   return { type: 'MOVE', outcome: { subject, target: location } };
 };
 
