@@ -1,4 +1,7 @@
-import { nextClockWiseDirection } from 'backstab/behavior/rotation';
+import {
+  directionBetween,
+  nextClockWiseDirection,
+} from 'backstab/behavior/rotation';
 import computeSight from 'backstab/behavior/sight';
 import { pick, frac } from 'backstab/Random';
 import { enterPosition, wait } from 'backstab/behavior/actions';
@@ -20,11 +23,14 @@ const increaseRotationCounter = entity =>
 const shouldRotate = entity =>
   entity.timeSinceLastRotation >= entity.timeBetweenRotations;
 
-const rotate = entity => {
-  entity.set('direction', nextClockWiseDirection(entity.direction));
+const rotate = (entity, direction) => {
+  entity.set('direction', direction);
   entity.set('seenPoints', computeSight(entity));
   entity.set('timeSinceLastRotation', 0);
 };
+
+const rotateClockwise = entity =>
+  rotate(entity, nextClockWiseDirection(entity.direction));
 
 const detects = (entity, player) =>
   entity.seenPoints.some(({ x, y }) => x === player.x && y === player.y);
@@ -52,7 +58,7 @@ const act = (entity, gameData, pathfinder) => {
     }
 
     if (shouldRotate(entity)) {
-      rotate(entity);
+      rotateClockwise(entity);
     } else {
       increaseRotationCounter(entity);
     }
@@ -76,6 +82,8 @@ const act = (entity, gameData, pathfinder) => {
     }
 
     const next = entity.patrolPath[currentIndex + 1];
+    const nextDirection = directionBetween(entity, next);
+    rotate(entity, nextDirection);
     return enterPosition(entity, next, dungeon, [player]);
   }
 
