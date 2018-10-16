@@ -5,9 +5,9 @@ const computeLineOfSightGraphic = (graphics, enemy, tileSize) => {
   graphics.clear();
 
   if (enemy.isAlerted) {
-    graphics.fillStyle(0xff0000, 1);
+    graphics.fillStyle(0xff0000, 0.5);
   } else {
-    graphics.fillStyle(0xff700b, 1);
+    graphics.fillStyle(0xff700b, 0.5);
   }
 
   const { x: ex, y: ey } = enemy;
