@@ -5,6 +5,7 @@ import {
 import computeSight from 'backstab/behavior/sight';
 import { pick, frac } from 'backstab/Random';
 import { enterPosition, wait } from 'backstab/behavior/actions';
+
 // import { enterPosition, wait, meleeAttack } from 'backstab/behavior/actions';
 // const isInMeleeRange = ({ x: x1, y: y1 }, { x: x2, y: y2 }) =>
 //   Math.abs(x1 - x2) + Math.abs(y1 - y2) === 1;
@@ -38,9 +39,31 @@ const detects = (entity, player) =>
 const alertEnemies = ({ enemies }) =>
   enemies.forEach(e => e.set('isAlerted', true));
 
+const moveTowardsPlayerPosition = (entity, { dungeon, player }, pathfinder) => {
+  const { lastKnownPlayerPosition: target } = entity;
+
+  let next;
+  pathfinder.findPath(entity.x, entity.y, target.x, target.y, path => {
+    [, next] = path;
+  });
+  pathfinder.calculate();
+
+  const nextDirection = directionBetween(entity, next);
+  rotate(entity, nextDirection);
+  return enterPosition(entity, next, dungeon, [player]);
+};
+
 const act = (entity, gameData, pathfinder) => {
   const { dungeon, player } = gameData;
+
   if (entity.status === 'DEAD') {
+    return null;
+  }
+
+  if (detects(entity, player) && entity.state !== 'alerted') {
+    alertEnemies(entity.parentFeature);
+    entity.parentFeature.neighbors.forEach(alertEnemies);
+    entity.set('state', 'alerted');
     return null;
   }
 
@@ -63,11 +86,6 @@ const act = (entity, gameData, pathfinder) => {
       increaseRotationCounter(entity);
     }
 
-    if (detects(entity, player)) {
-      alertEnemies(entity.parentFeature);
-      entity.parentFeature.neighbors.forEach(alertEnemies);
-    }
-
     return wait(entity);
   }
 
@@ -85,6 +103,40 @@ const act = (entity, gameData, pathfinder) => {
     const nextDirection = directionBetween(entity, next);
     rotate(entity, nextDirection);
     return enterPosition(entity, next, dungeon, [player]);
+  }
+
+  if (entity.state === 'alerted') {
+    if (!detects(entity, player)) {
+      entity.set('state', 'searching');
+      return null;
+    }
+
+    entity.set('lastKnownPlayerPosition', { x: player.x, y: player.y });
+    return moveTowardsPlayerPosition(entity, { dungeon, player }, pathfinder);
+  }
+
+  if (entity.state === 'searching') {
+    if (detects(entity, player)) {
+      entity.set('state', 'alerted');
+      return null;
+    }
+
+    const {
+      lastKnownPlayerPosition: target,
+      timeSinceLastSeenPlayer = 0,
+    } = entity;
+    if (target.x === entity.x && target.y === entity.y) {
+      if (timeSinceLastSeenPlayer >= 3) {
+        entity.set('state', 'standing');
+        return null;
+      }
+
+      entity.set('timeSinceLastSeenPlayer', timeSinceLastSeenPlayer + 1);
+      // TODO: Pick random direction to search in
+      return null;
+    }
+
+    return moveTowardsPlayerPosition(entity, { dungeon, player }, pathfinder);
   }
 
   return wait(entity);
