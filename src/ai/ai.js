@@ -53,40 +53,44 @@ const moveTowardsPlayerPosition = (entity, { dungeon, player }, pathfinder) => {
   return enterPosition(entity, next, dungeon, [player]);
 };
 
-const act = (entity, gameData, pathfinder) => {
+const decide = (entity, gameData, pathfinder) => {
   const { dungeon, player } = gameData;
 
   if (entity.status === 'DEAD') {
-    return null;
+    return { type: 'DEAD' };
   }
 
   if (detects(entity, player) && entity.state !== 'alerted') {
-    alertEnemies(entity.parentFeature);
-    entity.parentFeature.neighbors.forEach(alertEnemies);
-    entity.set('state', 'alerted');
-    return null;
+    return { type: 'ENEMY_DETECTED', data: { entity, player } };
   }
 
   if (!entity.state || entity.state === 'standing') {
     if (frac() > 0.5) {
       // easystar.js works asynchronously
       // this is a "hacky" way of getting a synchronous result
-      const target = pick(entity.parentFeature.innerPoints);
-      entity.set('patrolTarget', target);
-      pathfinder.findPath(entity.x, entity.y, target.x, target.y, path => {
-        entity.set('patrolPath', path);
-      });
+      const patrolTarget = pick(entity.parentFeature.innerPoints);
+      let patrolPath;
+      pathfinder.findPath(
+        entity.x,
+        entity.y,
+        patrolTarget.x,
+        patrolTarget.y,
+        path => {
+          patrolPath = path;
+        },
+      );
       pathfinder.calculate();
-      entity.set('state', 'moving');
+
+      return {
+        type: 'START_MOVING',
+        data: { entity, patrolTarget, patrolPath },
+      };
     }
 
     if (shouldRotate(entity)) {
-      rotateClockwise(entity);
-    } else {
-      increaseRotationCounter(entity);
+      return { type: 'ROTATE_CLOCKWISE', data: { entity } };
     }
-
-    return wait(entity);
+    return { type: 'INCREASE_ROTATION_COUNTER', data: { entity } };
   }
 
   if (entity.state === 'moving') {
@@ -95,51 +99,127 @@ const act = (entity, gameData, pathfinder) => {
     );
 
     if (currentIndex === entity.patrolPath.length - 1) {
-      entity.set('state', 'standing');
-      return wait(entity);
+      return { type: 'STOP_MOVING', data: { entity } };
     }
 
-    const next = entity.patrolPath[currentIndex + 1];
-    const nextDirection = directionBetween(entity, next);
-    rotate(entity, nextDirection);
-    return enterPosition(entity, next, dungeon, [player]);
+    const type = 'MOVE_ALONG_PATROL_PATH';
+    return { type, data: { dungeon, entity, currentIndex, player } };
   }
 
   if (entity.state === 'alerted') {
     if (!detects(entity, player)) {
-      entity.set('state', 'searching');
-      return null;
+      return { type: 'START_SEARCHING', data: { entity } };
     }
 
-    entity.set('lastKnownPlayerPosition', { x: player.x, y: player.y });
-    return moveTowardsPlayerPosition(entity, { dungeon, player }, pathfinder);
+    return {
+      type: 'MOVE_TOWARDS_PLAYER',
+      data: { entity, player, dungeon, pathfinder },
+    };
   }
 
   if (entity.state === 'searching') {
-    if (detects(entity, player)) {
-      entity.set('state', 'alerted');
-      return null;
-    }
-
     const {
       lastKnownPlayerPosition: target,
       timeSinceLastSeenPlayer = 0,
     } = entity;
     if (target.x === entity.x && target.y === entity.y) {
       if (timeSinceLastSeenPlayer >= 3) {
-        entity.set('state', 'standing');
-        return null;
+        return { type: 'STOP_SEARCHING', data: { entity } };
       }
 
-      entity.set('timeSinceLastSeenPlayer', timeSinceLastSeenPlayer + 1);
-      // TODO: Pick random direction to search in
-      return null;
+      return { type: 'INCREASE_SEARCH_COUNTER', data: { entity } };
     }
 
+    return {
+      type: 'MOVE_TOWARDS_PLAYER_POSITION',
+      data: { entity, dungeon, pathfinder, player },
+    };
+  }
+
+  return null;
+};
+
+const actOut = ({ type, data }) => {
+  if (type === 'ENEMY_DETECTED') {
+    const { entity } = data;
+    alertEnemies(entity.parentFeature);
+    entity.parentFeature.neighbors.forEach(alertEnemies);
+    entity.set('state', 'alerted');
+    return wait(entity);
+  }
+
+  if (type === 'START_MOVING') {
+    const { entity, patrolPath, patrolTarget } = data;
+    entity.set('patrolPath', patrolPath);
+    entity.set('patrolTarget', patrolTarget);
+    entity.set('state', 'moving');
+    return wait(entity);
+  }
+
+  if (type === 'STOP_MOVING') {
+    const { entity } = data;
+    entity.set('state', 'standing');
+    return wait(entity);
+  }
+
+  if (type === 'MOVE_ALONG_PATROL_PATH') {
+    const { currentIndex, dungeon, entity, player } = data;
+    const next = entity.patrolPath[currentIndex + 1];
+    const nextDirection = directionBetween(entity, next);
+    rotate(entity, nextDirection);
+    return enterPosition(entity, next, dungeon, [player]);
+  }
+
+  if (type === 'ROTATE_CLOCKWISE') {
+    const { entity } = data;
+    rotateClockwise(entity);
+    return wait(entity);
+  }
+
+  if (type === 'INCREASE_ROTATION_COUNTER') {
+    const { entity } = data;
+    increaseRotationCounter(entity);
+    return wait(entity);
+  }
+
+  if (type === 'START_SEARCHING') {
+    const { entity } = data;
+    entity.set('state', 'searching');
+    return wait(entity);
+  }
+
+  if (type === 'INCREASE_SEARCH_COUNTER') {
+    const { entity } = data;
+    const { timeSinceLastSeenPlayer = 0 } = entity;
+    entity.set('timeSinceLastSeenPlayer', timeSinceLastSeenPlayer + 1);
+    return wait(entity);
+  }
+
+  if (type === 'MOVE_TOWARDS_PLAYER_POSITION') {
+    const { entity, dungeon, player, pathfinder } = data;
     return moveTowardsPlayerPosition(entity, { dungeon, player }, pathfinder);
   }
 
+  if (type === 'STOP_SEARCHING') {
+    const { entity } = data;
+    entity.set('state', 'standing');
+    entity.set('isAlerted', false);
+    return wait(entity);
+  }
+
+  if (type === 'MOVE_TOWARDS_PLAYER') {
+    const { dungeon, entity, player, pathfinder } = data;
+    entity.set('lastKnownPlayerPosition', { x: player.x, y: player.y });
+    return moveTowardsPlayerPosition(entity, { dungeon, player }, pathfinder);
+  }
+
+  const { entity } = data;
   return wait(entity);
+};
+
+const act = (entity, gameData, pathfinder) => {
+  const action = decide(entity, gameData, pathfinder);
+  return actOut(action);
 };
 
 export default act;
