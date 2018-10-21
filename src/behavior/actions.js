@@ -71,4 +71,4 @@ const enterPosition = (subject, location, dungeon, creatures) => {
 
 const wait = subject => ({ type: 'WAIT', outcome: { subject } });
 
-export { enterPosition, meleeAttack, wait };
+export { enterPosition, meleeAttack, wait, move };

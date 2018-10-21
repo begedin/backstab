@@ -14,7 +14,7 @@ const createTurnQueue = actors =>
     .sort(compareByEnergy);
 
 const updateTurnQueue = (queue, previousAction = {}) => {
-  const { cost = 500 } = previousAction;
+  const { cost = 1000 } = previousAction;
   const { actor, energy } = queue[0];
   const newEnergy = energy - cost;
   const unsortedQueue = queue

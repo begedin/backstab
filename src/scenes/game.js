@@ -9,7 +9,7 @@ import globals from 'backstab/globals';
 import CameraController, { setupCamera } from 'backstab/CameraController';
 import PlayerController from 'backstab/PlayerController';
 import { gridToWorld } from 'backstab/objects/grid/convert';
-import act from 'backstab/ai/ai';
+import { decide, execute } from 'backstab/AI';
 import { createTurnQueue, updateTurnQueue } from 'backstab/TurnSystem';
 import {
   bumpTween,
@@ -242,13 +242,15 @@ export default class Game extends Phaser.Scene {
 
     if (!isPlayersTurn && !this.isActionInProgress) {
       const { gameData, currentTurnSlot, pathfinder } = this;
-      const action = act(currentTurnSlot.actor, gameData, pathfinder);
-      if (action) {
-        this.playbackAction(action);
-      } else {
-        this.turnQueue = updateTurnQueue(this.turnQueue);
-        this.events.emit('turnChange', this.turnQueue);
+
+      if (currentTurnSlot.actor.status !== 'DEAD') {
+        const action = decide(currentTurnSlot.actor, gameData, pathfinder);
+        const outcome = execute(action);
+        this.playbackAction(outcome);
       }
+
+      this.turnQueue = updateTurnQueue(this.turnQueue);
+      this.events.emit('turnChange', this.turnQueue);
     }
 
     this.cameraController.update(delta);
