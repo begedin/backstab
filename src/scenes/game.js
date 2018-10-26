@@ -16,8 +16,8 @@ import {
   damageEffectTween,
   moveTween,
 } from 'backstab/objects/actionTweens';
+import performPlayerCommand from 'backstab/actions/performPlayerCommand';
 import { renderInitial, renderUpdated } from 'backstab/renderers/entities';
-import { enterPosition, wait } from 'backstab/behavior/actions';
 import { js as EasystarJs } from 'easystarjs';
 
 const spawnDungeon = mapSize => new DungeonGenerator(mapSize, mapSize);
@@ -57,40 +57,6 @@ const spawn = mapSize => {
   return { dungeon, enemies, player };
 };
 
-const getCoordinatesFromDirection = ({ x, y }, direction) => {
-  switch (direction) {
-    case 'UP':
-      return { x, y: y - 1 };
-    case 'DOWN':
-      return { x, y: y + 1 };
-    case 'LEFT':
-      return { x: x - 1, y };
-    case 'RIGHT':
-      return { x: x + 1, y };
-    default:
-      throw new Error('Invalid direction');
-  }
-};
-
-const getPlayerAction = (command, { player, dungeon, enemies }) => {
-  switch (command) {
-    case 'UP':
-    case 'DOWN':
-    case 'LEFT':
-    case 'RIGHT':
-      return enterPosition(
-        player,
-        getCoordinatesFromDirection(player, command),
-        dungeon,
-        enemies,
-      );
-    case 'WAIT':
-      return wait(player);
-    default:
-      return null;
-  }
-};
-
 export default class Game extends Phaser.Scene {
   constructor() {
     super('Game');
@@ -121,11 +87,7 @@ export default class Game extends Phaser.Scene {
     this.cameraController = new CameraController(camera, this.input);
 
     const playerController = new PlayerController(this.input);
-    playerController.on('playerUp', () => this.handleInput('UP'));
-    playerController.on('playerDown', () => this.handleInput('DOWN'));
-    playerController.on('playerLeft', () => this.handleInput('LEFT'));
-    playerController.on('playerRight', () => this.handleInput('RIGHT'));
-    playerController.on('playerWait', () => this.handleInput('WAIT'));
+    playerController.on('command', command => this.handleInput(command));
     this.playerController = playerController;
 
     this.turnQueue = createTurnQueue(enemies.concat(player));
@@ -263,7 +225,7 @@ export default class Game extends Phaser.Scene {
       return;
     }
 
-    const action = getPlayerAction(command, this.gameData);
+    const action = performPlayerCommand(command, this.gameData);
 
     if (!action) {
       return;

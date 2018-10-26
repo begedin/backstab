@@ -1,5 +1,4 @@
 import { integerInRange as randomIntegerInRange } from 'backstab/Random';
-import computeSight from 'backstab/behavior/sight';
 
 const meleeAccuracy = entity =>
   entity.weapon.accuracy + entity.attributes.strength;
@@ -42,33 +41,4 @@ const meleeAttack = (attacker, target) => {
   };
 };
 
-const move = (subject, location) => {
-  subject.setPosition(location.x, location.y);
-  subject.set('seenPoints', computeSight(subject));
-  return { type: 'MOVE', outcome: { subject, target: location } };
-};
-
-const canMoveTo = (subject, location, dungeon) => {
-  const tile = dungeon.tileAt(location.x, location.y);
-  return tile && subject.walkableTerrains.indexOf(tile.terrain) > -1;
-};
-
-const enterPosition = (subject, location, dungeon, creatures) => {
-  const creature = creatures.find(
-    c => c.x === location.x && c.y === location.y && c.status !== 'DEAD',
-  );
-
-  if (creature) {
-    return meleeAttack(subject, creature);
-  }
-
-  if (canMoveTo(subject, location, dungeon)) {
-    return move(subject, location);
-  }
-
-  return { type: 'BUMP', outcome: { subject, target: location } };
-};
-
-const wait = subject => ({ type: 'WAIT', outcome: { subject } });
-
-export { enterPosition, meleeAttack, wait, move };
+export default meleeAttack;

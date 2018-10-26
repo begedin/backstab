@@ -18,22 +18,30 @@ class PlayerController extends Phaser.Events.EventEmitter {
     const { up, down, left, right } = this.input.keyboard.createCursorKeys();
 
     if (up.isDown) {
-      this.emit('playerUp');
+      this.emit('command', 'UP');
       return;
     }
 
     if (down.isDown) {
-      this.emit('playerDown');
+      this.emit('command', 'DOWN');
       return;
     }
 
     if (left.isDown) {
-      this.emit('playerLeft');
+      this.emit('command', 'LEFT');
       return;
     }
 
     if (right.isDown) {
-      this.emit('playerRight');
+      this.emit('command', 'RIGHT');
+    }
+
+    if (this.input.keyboard.addKey(190).isDown) {
+      this.emit('command', 'DOWN_STAIRS');
+    }
+
+    if (this.input.keyboard.addKey(188).isDown) {
+      this.emit('command', 'UP_STAIRS');
     }
   }
 }

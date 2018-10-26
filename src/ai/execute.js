@@ -1,6 +1,8 @@
 import { directionBetween } from 'backstab/behavior/rotation';
 import computeSight from 'backstab/behavior/sight';
-import { move, meleeAttack, wait } from 'backstab/behavior/actions';
+import move from 'backstab/actions/move';
+import meleeAttack from 'backstab/actions/meleeAttack';
+import wait from 'backstab/actions/wait';
 
 const rotate = (entity, direction) => {
   entity.set('direction', direction);
