@@ -64,7 +64,7 @@ export default class GameUI extends Phaser.Scene {
   }
 
   create() {
-    const game = this.scene.get('Game');
+    const game = this.scene.get('DungeonLevel');
     // create empty health bar
     this.playerHealthBar = this.add.graphics();
     this.playerHealthBar.lineStyle(3, 0xffffff);

@@ -22,7 +22,7 @@ const computePath = ({ x: x1, y: y1 }, { x: x2, y: y2 }, pathfinder) => {
 };
 
 const maybeChangeState = (entity, gameData, pathfinder) => {
-  const { player } = gameData;
+  const { player } = gameData.dungeon;
 
   if (detects(entity, player) && entity.state !== STATES.ALERTED) {
     entity.set('state', STATES.ALERTED);
@@ -83,7 +83,7 @@ const decide = (entity, gameData, pathfinder) => {
   }
 
   if (entity.state === STATES.ALERTED) {
-    const { player } = gameData;
+    const { player } = gameData.dungeon;
     entity.set('lastKnownPlayerPosition', { x: player.x, y: player.y });
     const [, target] = computePath(entity, player, pathfinder);
 
@@ -97,7 +97,7 @@ const decide = (entity, gameData, pathfinder) => {
   if (entity.state === STATES.SEARCHING) {
     const { lastKnownPlayerPosition } = entity;
     const [, target] = computePath(entity, lastKnownPlayerPosition, pathfinder);
-    const { player } = gameData;
+    const { player } = gameData.dungeon;
     if (player.x === target.x && player.y === target.y) {
       return { type: 'MELEE_ATTACK', data: { entity, target: player } };
     }

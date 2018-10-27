@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import Dungeon from 'backstab/Dungeon';
 
 export default class Preload extends Phaser.Scene {
   constructor() {
@@ -25,7 +26,9 @@ export default class Preload extends Phaser.Scene {
   update() {
     // Wait until all sound effects have been decoded into memory.
     if (this.assetsReady) {
-      this.scene.start('Game');
+      const dungeon = new Dungeon();
+      dungeon.ascend();
+      this.scene.start('DungeonLevel', dungeon);
     }
   }
 }

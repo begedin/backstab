@@ -1,5 +1,6 @@
-const goUpStairs = (entity, dungeon) => {
-  console.log('up stairs', entity, dungeon);
-};
+const goUpStairs = (entity, dungeon) => ({
+  type: 'UP_STAIRS',
+  outcome: { subject: entity, dungeon },
+});
 
 export default goUpStairs;

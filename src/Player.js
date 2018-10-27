@@ -2,10 +2,10 @@ import { Terrain } from 'backstab/enums';
 import Entity from 'backstab/Entity';
 
 class Player extends Entity {
-  constructor(x, y, id) {
+  constructor(id) {
     super(
-      x,
-      y,
+      -1,
+      -1,
       id,
       'Conan',
       { strength: 5, constitution: 6, dexterity: 8, perception: 4 },

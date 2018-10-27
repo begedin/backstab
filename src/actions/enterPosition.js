@@ -2,7 +2,7 @@ import meleeAttack from 'backstab/actions/meleeAttack';
 import move from 'backstab/actions/move';
 
 const canMoveTo = (subject, location, dungeon) => {
-  const tile = dungeon.tileAt(location.x, location.y);
+  const tile = dungeon.currentLevel.tileAt(location.x, location.y);
   return tile && subject.walkableTerrains.indexOf(tile.terrain) > -1;
 };
 

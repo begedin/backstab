@@ -58,17 +58,16 @@ const frames = {
 };
 
 const createPlayerContainer = scene => {
-  const { dungeon, player } = scene.gameData;
-  const { startingLocation: p } = dungeon;
+  const { player } = scene.gameData.dungeon;
   const sprite = scene.add.sprite(0, 0, 'characters', frames.player);
   sprite.name = 'sprite';
   return scene.add
-    .container(gridToWorld(p.x), gridToWorld(p.y), [sprite])
+    .container(gridToWorld(player.x), gridToWorld(player.y), [sprite])
     .setData('id', player.id);
 };
 
 const createEnemyContainers = (scene, tileSize) =>
-  scene.gameData.enemies.map(e => {
+  scene.gameData.dungeon.currentLevel.enemies.map(e => {
     const sprite = scene.add.sprite(0, 0, 'characters', frames[e.name]);
     sprite.name = 'sprite';
 

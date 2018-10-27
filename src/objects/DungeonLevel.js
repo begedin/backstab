@@ -1,4 +1,4 @@
-class Dungeon {
+class DungeonLevel {
   constructor(startingLocation, features, width, height) {
     this.startingLocation = startingLocation;
     this.features = features;
@@ -31,4 +31,4 @@ const getGrid = (dungeon, size = 500) => {
 };
 
 export { getGrid };
-export default Dungeon;
+export default DungeonLevel;

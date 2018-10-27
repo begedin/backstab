@@ -1,10 +1,5 @@
 import Phaser from 'phaser';
-
-import * as Random from 'backstab/Random';
-import CreatureFactory from 'backstab/CreatureFactory';
-import DungeonGenerator from 'backstab/objects/dungeon/generator';
-import { getGrid } from 'backstab/objects/dungeon';
-import Player from 'backstab/Player';
+import { getGrid } from 'backstab/objects/DungeonLevel';
 import globals from 'backstab/globals';
 import CameraController, { setupCamera } from 'backstab/CameraController';
 import PlayerController from 'backstab/PlayerController';
@@ -19,70 +14,38 @@ import {
 import performPlayerCommand from 'backstab/actions/performPlayerCommand';
 import { renderInitial, renderUpdated } from 'backstab/renderers/entities';
 import { js as EasystarJs } from 'easystarjs';
+import Player from 'backstab/Player';
 
-const spawnDungeon = mapSize => new DungeonGenerator(mapSize, mapSize);
-
-const spawn = mapSize => {
-  // spawning everything
-  const dungeon = spawnDungeon(mapSize);
-  const { startingLocation } = dungeon;
-  const player = new Player(
-    startingLocation.x,
-    startingLocation.y,
-    Phaser.Utils.String.UUID(),
-  );
-  const enemies = dungeon.features.map(feature => {
-    const { x, y } = Random.pick(feature.innerPoints);
-
-    let enemy;
-
-    switch (Random.pick([3, 3, 3])) {
-      case 1:
-        enemy = CreatureFactory.createDummy(feature, x, y);
-        break;
-      case 2:
-        enemy = CreatureFactory.createAttacker(feature, x, y);
-        break;
-      case 3:
-        enemy = CreatureFactory.createPalantir(feature, x, y);
-        break;
-      default:
-        break;
-    }
-
-    feature.enemies.push(enemy);
-    return enemy;
-  });
-
-  return { dungeon, enemies, player };
-};
-
-export default class Game extends Phaser.Scene {
+export default class DungeonLevel extends Phaser.Scene {
   constructor() {
-    super('Game');
+    super('DungeonLevel');
   }
 
-  create() {
+  create(dungeon) {
     this.scene.launch('GameUI');
 
-    const mapSize = 80;
-    const { dungeon, player, enemies } = spawn(mapSize);
+    const { player, currentLevel } = dungeon;
+    const { enemies } = currentLevel;
+    const grid = getGrid(currentLevel);
 
     const easystar = new EasystarJs();
-    const grid = getGrid(dungeon);
     easystar.setGrid(grid);
     easystar.setAcceptableTiles([0, 1]);
     easystar.enableSync();
     this.pathfinder = easystar;
 
+    const mapSize = grid[0].length;
+
     this.gameData = { player, dungeon, enemies };
 
     // setting up camera
     const { main: camera } = this.cameras;
+    camera.fadeIn(1000);
 
     const { TILE_SIZE } = globals;
-    setupCamera(camera, TILE_SIZE, mapSize, dungeon.startingLocation);
+    setupCamera(camera, TILE_SIZE, mapSize, player);
     this.renderData = renderInitial(this, TILE_SIZE, mapSize);
+    camera.startFollow(this.renderData.playerContainer);
 
     this.cameraController = new CameraController(camera, this.input);
 
@@ -229,6 +192,22 @@ export default class Game extends Phaser.Scene {
 
     if (!action) {
       return;
+    }
+
+    if (action.type === 'DOWN_STAIRS') {
+      this.isActionInProgress = true;
+      this.gameData.dungeon.ascend();
+
+      this.cameras.main.once(
+        'camerafadeoutcomplete',
+        () => {
+          this.isActionInProgress = false;
+          this.scene.restart(this.gameData.dungeon);
+        },
+        this,
+      );
+
+      this.cameras.main.fadeOut(1000);
     }
 
     this.playbackAction(action);

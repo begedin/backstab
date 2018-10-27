@@ -2,7 +2,7 @@ import { Terrain } from 'backstab/enums';
 import * as Random from 'backstab/Random';
 import generateRoom from 'backstab/objects/dungeon/generator/room';
 import generateDiamondRoom from 'backstab/objects/dungeon/generator/diamond_room';
-import Dungeon from 'backstab/objects/dungeon';
+import DungeonLevel from 'backstab/objects/DungeonLevel';
 
 const canPlaceFeature = (features, feature) =>
   !features.some(f => f.overlaps(feature));
@@ -67,7 +67,7 @@ class Generator {
       attempts += 1;
     }
 
-    return new Dungeon(
+    return new DungeonLevel(
       { x: width / 2, y: height / 2 },
       features,
       width,

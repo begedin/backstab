@@ -43,9 +43,11 @@ const createDungeonTileMap = (scene, gameData, tileSize, mapSize) => {
   dungeonTileMap.createBlankDynamicLayer('terrain', tileset);
   dungeonTileMap.createBlankDynamicLayer('features', tileset);
 
-  const { dungeon } = gameData;
+  const {
+    dungeon: { currentLevel: dungeonLevel },
+  } = gameData;
 
-  dungeon.features.forEach(({ points, objects }) => {
+  dungeonLevel.features.forEach(({ points, objects }) => {
     points.forEach(({ x, y, terrain }) => {
       const tile = terrainToTileIndex(terrain);
       dungeonTileMap.putTileAt(tile, x, y, false, 'terrain');
