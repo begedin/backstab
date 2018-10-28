@@ -50,6 +50,7 @@ const maybeChangeState = (entity, gameData, pathfinder) => {
       );
       const next = patrolPath[currentIndex + 1];
       if (player.x === next.x && player.y === next.y) {
+        entity.set('lastKnownPlayerPosition', { x: player.x, y: player.y });
         entity.set('state', STATES.ALERTED);
       }
     }

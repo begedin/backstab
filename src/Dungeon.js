@@ -41,7 +41,7 @@ class Dungeon {
     this.player = new Player(Phaser.Utils.String.UUID());
   }
 
-  ascend() {
+  descend() {
     const { currentLevelIndex, levels } = this;
     if (!levels[currentLevelIndex + 1]) {
       this.spawnLevel();
@@ -52,7 +52,7 @@ class Dungeon {
     this.player.setPosition(startingLocation.x, startingLocation.y);
   }
 
-  descend() {
+  ascend() {
     this.currentLevelIndex -= 1;
     const { startingLocation } = this.currentLevel;
     this.player.setPosition(startingLocation.x, startingLocation.y);

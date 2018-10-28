@@ -188,14 +188,33 @@ export default class DungeonLevel extends Phaser.Scene {
       return;
     }
 
+    this.isActionInProgress = true;
+
     const action = performPlayerCommand(command, this.gameData);
 
     if (!action) {
+      this.isActionInProgress = false;
       return;
     }
 
     if (action.type === 'DOWN_STAIRS') {
-      this.isActionInProgress = true;
+      this.gameData.dungeon.descend();
+
+      this.cameras.main.once(
+        'camerafadeoutcomplete',
+        () => {
+          this.isActionInProgress = false;
+          this.scene.restart(this.gameData.dungeon);
+        },
+        this,
+      );
+
+      this.cameras.main.fadeOut(1000);
+
+      return;
+    }
+
+    if (action.type === 'UP_STAIRS') {
       this.gameData.dungeon.ascend();
 
       this.cameras.main.once(
@@ -208,6 +227,8 @@ export default class DungeonLevel extends Phaser.Scene {
       );
 
       this.cameras.main.fadeOut(1000);
+
+      return;
     }
 
     this.playbackAction(action);

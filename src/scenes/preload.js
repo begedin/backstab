@@ -27,7 +27,7 @@ export default class Preload extends Phaser.Scene {
     // Wait until all sound effects have been decoded into memory.
     if (this.assetsReady) {
       const dungeon = new Dungeon();
-      dungeon.ascend();
+      dungeon.descend();
       this.scene.start('DungeonLevel', dungeon);
     }
   }
