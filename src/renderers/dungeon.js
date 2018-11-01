@@ -1,4 +1,4 @@
-import { Terrain } from 'backstab/enums';
+import { Terrain, Objects } from 'backstab/enums';
 import { pick as randomPick } from 'backstab/Random';
 
 const buildTilemapConfig = (tileSize, mapSize) => ({
@@ -21,8 +21,12 @@ const terrainToTileIndex = terrain => {
 
 const objectToTileIndex = object => {
   switch (object) {
-    case Terrain.DOOR:
+    case Objects.DOOR:
       return randomPick([32, 33]);
+    case Objects.STAIRS_UP:
+      return randomPick([1046, 1047, 1053, 1054]);
+    case Objects.STAIRS_DOWN:
+      return randomPick([1048, 1049, 1055, 1056]);
     default:
       return 0;
   }

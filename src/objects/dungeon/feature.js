@@ -19,6 +19,10 @@ class Feature {
     point.terrain = terrain;
   }
 
+  getObject({ x, y }) {
+    return this.objects.find(({ x: oX, y: oY }) => x === oX && y === oY);
+  }
+
   get length() {
     const { left, right, top, bottom } = this.bounds;
     const width = right - left;

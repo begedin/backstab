@@ -1,4 +1,4 @@
-import { Direction, Terrain } from 'backstab/enums';
+import { Direction, Terrain, Objects } from 'backstab/enums';
 import Feature from 'backstab/objects/dungeon/feature';
 import Anchor from 'backstab/objects/dungeon/anchor';
 import * as Random from 'backstab/Random';
@@ -94,7 +94,7 @@ const generate = (x, y, direction) => {
 
   const feature = new Feature(bounds, points, anchors);
   feature.setPoint({ x, y }, Terrain.DIRT_FLOOR);
-  feature.objects.push({ x, y, type: Terrain.DOOR });
+  feature.objects.push({ x, y, type: Objects.DOOR });
 
   return feature;
 };

@@ -188,16 +188,15 @@ export default class DungeonLevel extends Phaser.Scene {
       return;
     }
 
-    this.isActionInProgress = true;
-
     const action = performPlayerCommand(command, this.gameData);
 
     if (!action) {
-      this.isActionInProgress = false;
       return;
     }
 
-    if (action.type === 'DOWN_STAIRS') {
+    this.isActionInProgress = true;
+
+    if (action.type === 'STAIRS_DOWN') {
       this.gameData.dungeon.descend();
 
       this.cameras.main.once(
@@ -214,7 +213,7 @@ export default class DungeonLevel extends Phaser.Scene {
       return;
     }
 
-    if (action.type === 'UP_STAIRS') {
+    if (action.type === 'STAIRS_UP') {
       this.gameData.dungeon.ascend();
 
       this.cameras.main.once(

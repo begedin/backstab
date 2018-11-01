@@ -32,9 +32,9 @@ const performPlayerCommand = (command, { player, dungeon, enemies }) => {
       );
     case 'WAIT':
       return wait(player);
-    case 'DOWN_STAIRS':
+    case 'STAIRS_DOWN':
       return goDownStairs(player, dungeon);
-    case 'UP_STAIRS':
+    case 'STAIRS_UP':
       return goUpStairs(player, dungeon);
     default:
       return null;

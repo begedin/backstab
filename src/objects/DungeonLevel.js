@@ -10,6 +10,11 @@ class DungeonLevel {
     const feature = this.features.find(f => f.contains({ x, y }));
     return feature ? feature.getPoint({ x, y }) : null;
   }
+
+  objectAt(x, y) {
+    const feature = this.features.find(f => f.contains({ x, y }));
+    return feature ? feature.getObject({ x, y }) : null;
+  }
 }
 
 // used by easystar. Since the algorithm expects coordinates as a [y][x] grid

@@ -1,4 +1,4 @@
-import { Terrain } from 'backstab/enums';
+import { Terrain, Objects } from 'backstab/enums';
 import * as Random from 'backstab/Random';
 import generateRoom from 'backstab/objects/dungeon/generator/room';
 import generateDiamondRoom from 'backstab/objects/dungeon/generator/diamond_room';
@@ -12,8 +12,8 @@ const connectFeatures = (featureA, featureB) => {
   featureB.neighbors.push(featureA);
 };
 
-const addDoor = (feature, { x, y }) => {
-  feature.objects.push({ x, y, type: Terrain.DOOR });
+const addObject = (feature, { x, y }, type) => {
+  feature.objects.push({ x, y, type });
 };
 
 const tryGenerateFeature = existingFeatures => {
@@ -39,7 +39,7 @@ const tryGenerateFeature = existingFeatures => {
   }
 
   feature.setPoint(anchor, Terrain.DIRT_FLOOR);
-  addDoor(feature, anchor);
+  addObject(feature, anchor, Objects.DOOR);
 
   connectFeatures(newFeature, feature);
 
@@ -47,8 +47,8 @@ const tryGenerateFeature = existingFeatures => {
 };
 
 class Generator {
-  constructor(width, height) {
-    const FEATURE_COUNT = 1;
+  constructor(width, height, isTopLevel = false) {
+    const FEATURE_COUNT = 2;
     const MAX_ATTEMPTS = 1000;
 
     // initial room for the map
@@ -67,12 +67,20 @@ class Generator {
       attempts += 1;
     }
 
-    return new DungeonLevel(
-      { x: width / 2, y: height / 2 },
-      features,
-      width,
-      height,
-    );
+    const startingLocation = Random.pick(initialRoom.innerPoints);
+
+    if (!isTopLevel) {
+      addObject(initialRoom, startingLocation, Objects.STAIRS_UP);
+    }
+
+    const downStairsFeature = Random.pick(features);
+    const downStairsPoint = Random.pick(downStairsFeature.innerPoints);
+    addObject(downStairsFeature, downStairsPoint, Objects.STAIRS_DOWN);
+
+    const level = new DungeonLevel(startingLocation, features, width, height);
+    level.stairsDownLocation = { x: downStairsPoint.x, y: downStairsPoint.y };
+
+    return level;
   }
 }
 

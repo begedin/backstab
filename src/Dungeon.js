@@ -4,7 +4,8 @@ import CreatureFactory from 'backstab/CreatureFactory';
 import DungeonGenerator from 'backstab/objects/dungeon/generator';
 import Player from 'backstab/Player';
 
-const spawnLevel = mapSize => new DungeonGenerator(mapSize, mapSize);
+const spawnLevel = (mapSize, isTopLevel) =>
+  new DungeonGenerator(mapSize, mapSize, isTopLevel);
 
 const spawnEnemies = level => {
   const enemies = level.features.map(feature => {
@@ -54,12 +55,12 @@ class Dungeon {
 
   ascend() {
     this.currentLevelIndex -= 1;
-    const { startingLocation } = this.currentLevel;
-    this.player.setPosition(startingLocation.x, startingLocation.y);
+    const { stairsDownLocation } = this.currentLevel;
+    this.player.setPosition(stairsDownLocation.x, stairsDownLocation.y);
   }
 
   spawnLevel() {
-    const level = spawnLevel(this.mapSize);
+    const level = spawnLevel(this.mapSize, this.levels.length === 0);
     level.enemies = spawnEnemies(level);
     this.levels.push(level);
   }

@@ -9,7 +9,12 @@ const Terrain = {
   CORRIDOR: 0,
   DIRT_FLOOR: 1,
   DIRT_WALL: 2,
-  DOOR: 3,
+};
+
+const Objects = {
+  DOOR: 1,
+  STAIRS_UP: 2,
+  STAIRS_DOWN: 3,
 };
 
 const Feature = {
@@ -17,4 +22,4 @@ const Feature = {
   CORRIDOR: 1,
 };
 
-export { Terrain, Direction, Feature };
+export { Terrain, Objects, Direction, Feature };

@@ -37,11 +37,11 @@ class PlayerController extends Phaser.Events.EventEmitter {
     }
 
     if (this.input.keyboard.addKey(190).isDown) {
-      this.emit('command', 'DOWN_STAIRS');
+      this.emit('command', 'STAIRS_DOWN');
     }
 
     if (this.input.keyboard.addKey(188).isDown) {
-      this.emit('command', 'UP_STAIRS');
+      this.emit('command', 'STAIRS_UP');
     }
   }
 }

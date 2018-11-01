@@ -8,9 +8,7 @@
       "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
       "sourceSize": { "w": 16, "h": 16 },
       "pivot": { "x": 0.5, "y": 0.5 }
-    }
-  ],
-  "frames": [
+    },
     {
       "filename": "character-2",
       "frame": { "x": 17, "y": 0, "w": 16, "h": 16 },
