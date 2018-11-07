@@ -1,8 +1,7 @@
 import Boot from 'backstab/scenes/boot';
 import Preload from 'backstab/scenes/preload';
 import DungeonLevel from 'backstab/scenes/DungeonLevel';
-import GameUI from 'backstab/scenes/gameUI';
-import City from 'backstab/scenes/city';
+import GameUI from 'backstab/scenes/GameUI';
 
 export default {
   width: 800,
@@ -10,5 +9,5 @@ export default {
   pixelArt: true,
   roundPixels: false,
   backgroundColor: 'rgb(0, 0, 0)',
-  scene: [Boot, Preload, DungeonLevel, GameUI, City],
+  scene: [Boot, Preload, DungeonLevel, GameUI],
 };

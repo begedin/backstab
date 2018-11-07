@@ -24,17 +24,15 @@ export default class DungeonLevel extends Phaser.Scene {
   create(dungeon) {
     this.scene.launch('GameUI');
 
-    const { player, currentLevel } = dungeon;
+    const { player, currentLevel, mapSize } = dungeon;
     const { enemies } = currentLevel;
-    const grid = getGrid(currentLevel);
 
+    const grid = getGrid(currentLevel);
     const easystar = new EasystarJs();
     easystar.setGrid(grid);
     easystar.setAcceptableTiles([0, 1]);
     easystar.enableSync();
     this.pathfinder = easystar;
-
-    const mapSize = grid[0].length;
 
     this.gameData = { player, dungeon, enemies };
 
@@ -54,10 +52,6 @@ export default class DungeonLevel extends Phaser.Scene {
     this.playerController = playerController;
 
     this.turnQueue = createTurnQueue(enemies.concat(player));
-  }
-
-  get currentTurnSlot() {
-    return this.turnQueue[0];
   }
 
   playbackAction(action) {
@@ -148,25 +142,30 @@ export default class DungeonLevel extends Phaser.Scene {
       },
       this,
     );
-
     timeline.setCallback('onComplete', () => {
       this.isActionInProgress = false;
       this.turnQueue = updateTurnQueue(this.turnQueue);
       this.events.emit('turnChange', this.turnQueue);
     });
-
     timeline.play();
   }
 
   update(delta) {
-    const isPlayersTurn = this.currentTurnSlot.actor === this.gameData.player;
+    if (!this.isActionInProgress) {
+      this.updateActors();
+    }
+    this.cameraController.update(delta);
+    renderUpdated(this, globals.TILE_SIZE);
+  }
+
+  updateActors() {
+    const currentTurnSlot = this.turnQueue[0];
+    const isPlayersTurn = currentTurnSlot.actor === this.gameData.player;
 
     if (isPlayersTurn) {
       this.playerController.update();
-    }
-
-    if (!isPlayersTurn && !this.isActionInProgress) {
-      const { gameData, currentTurnSlot, pathfinder } = this;
+    } else {
+      const { gameData, pathfinder } = this;
 
       if (currentTurnSlot.actor.status !== 'DEAD') {
         const action = decide(currentTurnSlot.actor, gameData, pathfinder);
@@ -177,10 +176,6 @@ export default class DungeonLevel extends Phaser.Scene {
       this.turnQueue = updateTurnQueue(this.turnQueue);
       this.events.emit('turnChange', this.turnQueue);
     }
-
-    this.cameraController.update(delta);
-
-    renderUpdated(this, globals.TILE_SIZE);
   }
 
   handleInput(command) {
