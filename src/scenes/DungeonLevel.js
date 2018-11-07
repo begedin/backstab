@@ -16,6 +16,8 @@ import { renderInitial, renderUpdated } from 'backstab/renderers/entities';
 import { js as EasystarJs } from 'easystarjs';
 import Player from 'backstab/Player';
 
+const findByDataId = (list, id) => list.find(c => c.getData('id') === id);
+
 export default class DungeonLevel extends Phaser.Scene {
   constructor() {
     super('DungeonLevel');
@@ -43,7 +45,8 @@ export default class DungeonLevel extends Phaser.Scene {
     const { TILE_SIZE } = globals;
     setupCamera(camera, TILE_SIZE, mapSize, player);
     this.renderData = renderInitial(this, TILE_SIZE, mapSize);
-    camera.startFollow(this.renderData.playerContainer);
+
+    camera.startFollow(this.playerContainer);
 
     this.cameraController = new CameraController(camera, this.input);
 
@@ -54,22 +57,23 @@ export default class DungeonLevel extends Phaser.Scene {
     this.turnQueue = createTurnQueue(enemies.concat(player));
   }
 
+  get playerContainer() {
+    const { gameData, renderData } = this;
+    return renderData.entities.find(
+      e => e.getData('id') === gameData.player.id,
+    );
+  }
+
   playbackAction(action) {
     const timeline = this.tweens.createTimeline();
     const { type, outcome } = action;
 
     if (type === 'MELEE_ATTACK') {
       const { subject, target: object, value } = outcome;
-      const { playerContainer, enemyContainers } = this.renderData;
-      const allContainers = enemyContainers.concat(playerContainer);
-      const subjectContainer = allContainers.find(
-        c => c.getData('id') === subject.id,
-      );
+      const { entities } = this.renderData;
 
-      const objectContainer = allContainers.find(
-        c => c.getData('id') === object.id,
-      );
-
+      const subjectContainer = findByDataId(entities, subject.id);
+      const objectContainer = findByDataId(entities, object.id);
       const { x, y } = objectContainer;
 
       const text = this.add.text(x, y - globals.TILE_SIZE, value);
@@ -99,11 +103,8 @@ export default class DungeonLevel extends Phaser.Scene {
 
     if (type === 'MOVE') {
       const { subject, target: gridLocation } = outcome;
-      const { playerContainer, enemyContainers } = this.renderData;
-      const allContainers = enemyContainers.concat(playerContainer);
-      const subjectContainer = allContainers.find(
-        c => c.getData('id') === subject.id,
-      );
+      const { entities } = this.renderData;
+      const subjectContainer = findByDataId(entities, subject.id);
 
       const { x, y } = {
         x: gridToWorld(gridLocation.x),
@@ -114,22 +115,20 @@ export default class DungeonLevel extends Phaser.Scene {
     }
 
     if (type === 'BUMP') {
-      const { target: gridLocation } = outcome;
-      const { playerContainer } = this.renderData;
+      const { subject, target: gridLocation } = outcome;
+      const { entities } = this.renderData;
+      const subjectContainer = findByDataId(entities, subject.id);
       const { x, y } = {
         x: gridToWorld(gridLocation.x),
         y: gridToWorld(gridLocation.y),
       };
-      timeline.add(bumpTween(playerContainer, { x, y }));
+      timeline.add(bumpTween(subjectContainer, { x, y }));
     }
 
     if (type === 'WAIT') {
       const { subject } = outcome;
-      const { playerContainer, enemyContainers } = this.renderData;
-      const allContainers = enemyContainers.concat(playerContainer);
-      const subjectContainer = allContainers.find(
-        c => c.getData('id') === subject.id,
-      );
+      const { entities } = this.renderData;
+      const subjectContainer = findByDataId(entities, subject.id);
       const { x, y } = subjectContainer;
 
       timeline.add(bumpTween(subjectContainer, { x, y }));
@@ -226,9 +225,6 @@ export default class DungeonLevel extends Phaser.Scene {
     }
 
     this.playbackAction(action);
-
-    const { playerContainer } = this.renderData;
-
-    this.cameras.main.startFollow(playerContainer);
+    this.cameras.main.startFollow(this.playerContainer);
   }
 }

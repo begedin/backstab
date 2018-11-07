@@ -7,7 +7,8 @@ import { Terrain } from 'backstab/enums';
 const CreatureFactory = {
   createDummy(feature, x, y) {
     const id = Phaser.Utils.String.UUID();
-    const name = 'dummy';
+    const name = 'Dummy';
+    const type = 'dummy';
 
     const attributes = {
       strength: 1,
@@ -17,7 +18,7 @@ const CreatureFactory = {
     };
     const weapon = { damage: 0, accuracy: 1 };
 
-    const creature = new Entity(x, y, id, name, attributes, weapon);
+    const creature = new Entity(x, y, id, name, type, attributes, weapon);
     creature.set('parentFeature', feature);
     creature.set('seenPoints', []);
     creature.set('walkableTerrains', [Terrain.DIRT_FLOOR, Terrain.CORRIDOR]);
@@ -26,7 +27,8 @@ const CreatureFactory = {
 
   createAttacker(feature, x, y) {
     const id = Phaser.Utils.String.UUID();
-    const name = 'attacker';
+    const name = 'Attacker';
+    const type = 'attacker';
     const attributes = {
       strength: 2,
       constitution: 5,
@@ -35,7 +37,7 @@ const CreatureFactory = {
     };
     const weapon = { damage: 2, accuracy: 5 };
 
-    const creature = new Entity(x, y, id, name, attributes, weapon);
+    const creature = new Entity(x, y, id, name, type, attributes, weapon);
     creature.set('parentFeature', feature);
     creature.set('seenPoints', []);
     creature.set('walkableTerrains', [Terrain.DIRT_FLOOR, Terrain.CORRIDOR]);
@@ -44,7 +46,8 @@ const CreatureFactory = {
 
   createPalantir(feature, x, y) {
     const id = Phaser.Utils.String.UUID();
-    const name = 'palantir';
+    const name = 'Palantir';
+    const type = 'palantir';
     const attributes = {
       strength: 1,
       constitution: 5,
@@ -53,7 +56,7 @@ const CreatureFactory = {
     };
     const weapon = { damage: 0, accuracy: 1 };
 
-    const creature = new Entity(x, y, id, name, attributes, weapon);
+    const creature = new Entity(x, y, id, name, type, attributes, weapon);
     creature.set('direction', randomDirection());
     creature.set('range', 4);
     creature.set('parentFeature', feature);

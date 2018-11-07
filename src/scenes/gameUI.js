@@ -35,25 +35,11 @@ const unhighlightContainerSlot = (scene, actorContainer) => {
   return slot && slot.getByName('highlight').setVisible(false);
 };
 
-const setupHoverSpriteHighlightsSlot = (
-  scene,
-  { playerContainer, enemyContainers },
-) => {
-  const playerSprite = playerContainer.getByName('sprite').setInteractive();
-  playerSprite.on('pointerover', () =>
-    highlightContainerSlot(scene, playerContainer),
-  );
-  playerSprite.on('pointerout', () =>
-    unhighlightContainerSlot(scene, playerContainer),
-  );
-  enemyContainers.forEach(enemyContainer => {
-    const enemySprite = enemyContainer.getByName('sprite').setInteractive();
-    enemySprite.on('pointerover', () =>
-      highlightContainerSlot(scene, enemyContainer),
-    );
-    enemySprite.on('pointerout', () =>
-      unhighlightContainerSlot(scene, enemyContainer),
-    );
+const setupHoverSpriteHighlightsSlot = (scene, { entities }) => {
+  entities.forEach(container => {
+    const sprite = container.getByName('sprite').setInteractive();
+    sprite.on('pointerover', () => highlightContainerSlot(scene, container));
+    sprite.on('pointerout', () => unhighlightContainerSlot(scene, container));
   });
 };
 

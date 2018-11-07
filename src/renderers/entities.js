@@ -1,19 +1,19 @@
 import { gridToWorld } from 'backstab/objects/grid/convert';
 import renderDungeon from 'backstab/renderers/dungeon';
 
-const computeLineOfSightGraphic = (graphics, enemy, tileSize) => {
+const computeLineOfSightGraphic = (graphics, entity, tileSize) => {
   graphics.clear();
 
-  if (enemy.isAlerted) {
+  if (entity.isAlerted) {
     graphics.fillStyle(0xff0000, 0.5);
   } else {
     graphics.fillStyle(0xff700b, 0.5);
   }
 
-  const { x: ex, y: ey } = enemy;
+  const { x: ex, y: ey } = entity;
 
   graphics.beginPath();
-  enemy.seenPoints.forEach(({ x: vx, y: vy }) =>
+  entity.seenPoints.forEach(({ x: vx, y: vy }) =>
     graphics.fillRect(
       gridToWorld(vx - ex) - tileSize,
       gridToWorld(vy - ey) - tileSize,
@@ -26,8 +26,8 @@ const computeLineOfSightGraphic = (graphics, enemy, tileSize) => {
   return graphics;
 };
 
-const computeHealthBarGraphic = (graphics, enemy, tileSize) => {
-  const { health, maxHealth } = enemy;
+const computeHealthBarGraphic = (graphics, entity, tileSize) => {
+  const { health, maxHealth } = entity;
 
   graphics.clear();
   const left = 0 - tileSize / 2;
@@ -57,18 +57,9 @@ const frames = {
   player: 'character-22',
 };
 
-const createPlayerContainer = scene => {
-  const { player } = scene.gameData.dungeon;
-  const sprite = scene.add.sprite(0, 0, 'characters', frames.player);
-  sprite.name = 'sprite';
-  return scene.add
-    .container(gridToWorld(player.x), gridToWorld(player.y), [sprite])
-    .setData('id', player.id);
-};
-
-const createEnemyContainers = (scene, tileSize) =>
-  scene.gameData.dungeon.currentLevel.enemies.map(e => {
-    const sprite = scene.add.sprite(0, 0, 'characters', frames[e.name]);
+const createEntities = (scene, entities, tileSize) =>
+  entities.map(e => {
+    const sprite = scene.add.sprite(0, 0, 'characters', frames[e.type]);
     sprite.name = 'sprite';
 
     const lineOfSight = scene.add.graphics();
@@ -86,42 +77,43 @@ const createEnemyContainers = (scene, tileSize) =>
   });
 
 const renderInitial = (scene, tileSize, mapSize) => {
-  const dungeonTileMap = renderDungeon(
-    scene,
-    scene.gameData,
-    tileSize,
-    mapSize,
-  );
-  const playerContainer = createPlayerContainer(scene);
-  const enemyContainers = createEnemyContainers(scene, tileSize);
+  const { gameData } = scene;
+  const dungeonTileMap = renderDungeon(scene, gameData, tileSize, mapSize);
 
-  return { dungeonTileMap, enemyContainers, playerContainer };
+  const { player } = gameData.dungeon;
+  const { enemies } = gameData.dungeon.currentLevel;
+  const entities = createEntities(scene, enemies.concat([player]), tileSize);
+  return { dungeonTileMap, entities };
 };
 
-const updateEnemyStates = (enemyContainers, enemies, tileSize) =>
-  enemies.forEach(enemy => {
-    const index = enemies.indexOf(enemy);
-    const container = enemyContainers[index];
+const updateEntities = (scene, renderedEntities, entities, tileSize) =>
+  entities.forEach(entity => {
+    const container = renderedEntities.find(r => r.getData('id') === entity.id);
 
-    if (enemy.status === 'DEAD') {
+    if (!container) {
+      return;
+    }
+
+    if (entity.status === 'DEAD') {
       return container.destroy();
     }
 
     const lineOfSight = container.getByName('lineOfSight');
-    computeLineOfSightGraphic(lineOfSight, enemy, tileSize);
+    computeLineOfSightGraphic(lineOfSight, entity, tileSize);
 
     const healthBar = container.getByName('healthBar');
-    computeHealthBarGraphic(healthBar, enemy, tileSize);
+    computeHealthBarGraphic(healthBar, entity, tileSize);
 
     return container;
   });
 
 const renderUpdated = (scene, tileSize) => {
-  const { renderData, gameData } = scene;
-  const { enemyContainers } = renderData;
-  const { enemies } = gameData;
+  const { gameData, renderData } = scene;
+  const { entities } = renderData;
+  const { player } = gameData.dungeon;
+  const { enemies } = gameData.dungeon.currentLevel;
 
-  updateEnemyStates(enemyContainers, enemies, tileSize);
+  updateEntities(scene, entities, enemies.concat([player]), tileSize);
 };
 
 export { renderInitial, renderUpdated };

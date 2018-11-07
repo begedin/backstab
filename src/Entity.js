@@ -17,11 +17,12 @@ class Weapon {
 }
 
 class Entity {
-  constructor(x, y, id, name, attributes, weapon) {
+  constructor(x, y, id, name, type, attributes, weapon) {
     this.x = x;
     this.y = y;
     this.id = id;
     this.name = name;
+    this.type = type;
 
     this.attributes = new Attributes(attributes);
     this.weapon = new Weapon(weapon);
