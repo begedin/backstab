@@ -38,8 +38,16 @@ const unhighlightContainerSlot = (scene, actorContainer) => {
 const setupHoverSpriteHighlightsSlot = (scene, { entities }) => {
   entities.forEach(container => {
     const sprite = container.getByName('sprite').setInteractive();
-    sprite.on('pointerover', () => highlightContainerSlot(scene, container));
-    sprite.on('pointerout', () => unhighlightContainerSlot(scene, container));
+    sprite.on(
+      'pointerover',
+      () => highlightContainerSlot(scene, container),
+      this,
+    );
+    sprite.on(
+      'pointerout',
+      () => unhighlightContainerSlot(scene, container),
+      this,
+    );
   });
 };
 
@@ -76,11 +84,15 @@ export default class GameUI extends Phaser.Scene {
       this,
     );
 
-    game.events.on('actorHoverIn', actor =>
-      highlightContainerSlot(this, actor),
+    game.events.on(
+      'actorHoverIn',
+      actor => highlightContainerSlot(this, actor),
+      this,
     );
-    game.events.on('actorHoverOut', actor =>
-      unhighlightContainerSlot(this, actor),
+    game.events.on(
+      'actorHoverOut',
+      actor => unhighlightContainerSlot(this, actor),
+      this,
     );
   }
 }

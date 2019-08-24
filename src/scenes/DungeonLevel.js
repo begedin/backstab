@@ -141,11 +141,15 @@ export default class DungeonLevel extends Phaser.Scene {
       },
       this,
     );
-    timeline.setCallback('onComplete', () => {
-      this.isActionInProgress = false;
-      this.turnQueue = updateTurnQueue(this.turnQueue);
-      this.events.emit('turnChange', this.turnQueue);
-    });
+    timeline.setCallback(
+      'onComplete',
+      () => {
+        this.isActionInProgress = false;
+        this.turnQueue = updateTurnQueue(this.turnQueue);
+        this.events.emit('turnChange', this.turnQueue);
+      },
+      this,
+    );
     timeline.play();
   }
 

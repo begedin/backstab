@@ -4,7 +4,7 @@ const webpack = require('webpack');
 module.exports = env => ({
   resolve: {
     extensions: ['.js'],
-    alias: { backstab: path.join(__dirname, 'src') },
+    alias: { backstab: path.resolve(__dirname, 'src') },
   },
   entry: { main: './src/index.js' },
   output: {
@@ -20,7 +20,7 @@ module.exports = env => ({
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
-          options: { presets: ['env'] },
+          options: { presets: ['@babel/preset-env'] },
         },
       },
       {
