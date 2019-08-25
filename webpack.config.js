@@ -1,20 +1,30 @@
 const path = require('path');
 const webpack = require('webpack');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 module.exports = env => ({
   resolve: {
-    extensions: ['.js'],
-    alias: { backstab: path.resolve(__dirname, 'src') },
+    extensions: ['.ts', '.js'],
+    alias: {
+      backstab: path.resolve(__dirname, 'src'),
+      '@': path.resolve(__dirname, 'src'),
+    },
+    plugins: [new TsconfigPathsPlugin({ configFile: './tsconfig.json' })],
   },
   entry: { main: './src/index.js' },
   output: {
     filename: 'bundle.js',
-    path: path.join(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'dist'),
     publicPath: '/',
   },
   mode: env && env.production ? 'production' : 'development',
   module: {
     rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -29,6 +39,7 @@ module.exports = env => ({
       },
     ],
   },
+  devtool: 'inline-source-map',
   devServer: {
     contentBase: './dist',
   },

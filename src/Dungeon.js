@@ -4,8 +4,7 @@ import CreatureFactory from 'backstab/CreatureFactory';
 import DungeonGenerator from 'backstab/objects/dungeon/generator';
 import Player from 'backstab/Player';
 
-const spawnLevel = (mapSize, isTopLevel) =>
-  new DungeonGenerator(mapSize, mapSize, isTopLevel);
+const spawnLevel = (mapSize, isTopLevel) => new DungeonGenerator(mapSize, mapSize, isTopLevel);
 
 const spawnEnemies = level => {
   const enemies = level.features.map(feature => {

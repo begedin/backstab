@@ -19,9 +19,9 @@ const CreatureFactory = {
     const weapon = { damage: 0, accuracy: 1 };
 
     const creature = new Entity(x, y, id, name, type, attributes, weapon);
-    creature.set('parentFeature', feature);
-    creature.set('seenPoints', []);
-    creature.set('walkableTerrains', [Terrain.DIRT_FLOOR, Terrain.CORRIDOR]);
+    creature.parentFeature = feature;
+    creature.seenPoints = [];
+    creature.walkableTerrains = [Terrain.DIRT_FLOOR, Terrain.CORRIDOR];
     return creature;
   },
 
@@ -38,9 +38,9 @@ const CreatureFactory = {
     const weapon = { damage: 2, accuracy: 5 };
 
     const creature = new Entity(x, y, id, name, type, attributes, weapon);
-    creature.set('parentFeature', feature);
-    creature.set('seenPoints', []);
-    creature.set('walkableTerrains', [Terrain.DIRT_FLOOR, Terrain.CORRIDOR]);
+    creature.parentFeature = feature;
+    creature.seenPoints = [];
+    creature.walkableTerrains = [Terrain.DIRT_FLOOR, Terrain.CORRIDOR];
     return creature;
   },
 
@@ -57,13 +57,13 @@ const CreatureFactory = {
     const weapon = { damage: 0, accuracy: 1 };
 
     const creature = new Entity(x, y, id, name, type, attributes, weapon);
-    creature.set('direction', randomDirection());
-    creature.set('range', 4);
-    creature.set('parentFeature', feature);
-    creature.set('seenPoints', computeSight(creature));
-    creature.set('timeSinceLastRotation', 0);
-    creature.set('timeBetweenRotations', 4);
-    creature.set('walkableTerrains', [Terrain.DIRT_FLOOR, Terrain.CORRIDOR]);
+    creature.direction = randomDirection();
+    creature.range = 4;
+    creature.parentFeature = feature;
+    creature.seenPoints = computeSight(creature);
+    creature.timeSinceLastRotation = 0;
+    creature.timeBetweenRotations = 4;
+    creature.walkableTerrains = [Terrain.DIRT_FLOOR, Terrain.CORRIDOR];
     return creature;
   },
 };

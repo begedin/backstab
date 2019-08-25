@@ -25,8 +25,8 @@ const maybeChangeState = (entity, gameData, pathfinder) => {
   const { player } = gameData.dungeon;
 
   if (detects(entity, player) && entity.state !== STATES.ALERTED) {
-    entity.set('state', STATES.ALERTED);
-    entity.set('isAlerted', true);
+    entity.state = STATES.ALERTED;
+    entity.isAlerted = true;
   }
 
   if (!entity.state || entity.state === STATES.STANDING) {
@@ -34,39 +34,37 @@ const maybeChangeState = (entity, gameData, pathfinder) => {
       const patrolTarget = pick(entity.parentFeature.innerPoints);
       const patrolPath = computePath(entity, patrolTarget, pathfinder);
 
-      entity.set('patrolTarget', patrolTarget);
-      entity.set('patrolPath', patrolPath);
-      entity.set('state', STATES.PATROLING);
+      entity.patrolTarget = patrolTarget;
+      entity.patrolPath = patrolPath;
+      entity.state = STATES.PATROLING;
     }
   }
 
   if (entity.state === STATES.PATROLING) {
     const { patrolTarget, patrolPath } = entity;
     if (entity.x === patrolTarget.x && entity.y === patrolTarget.y) {
-      entity.set('state', STATES.STANDING);
+      entity.state = STATES.STANDING;
     } else {
-      const currentIndex = patrolPath.findIndex(
-        ({ x, y }) => x === entity.x && y === entity.y,
-      );
+      const currentIndex = patrolPath.findIndex(({ x, y }) => x === entity.x && y === entity.y);
       const next = patrolPath[currentIndex + 1];
       if (player.x === next.x && player.y === next.y) {
-        entity.set('lastKnownPlayerPosition', { x: player.x, y: player.y });
-        entity.set('state', STATES.ALERTED);
+        entity.lastKnownPlayerPosition = { x: player.x, y: player.y };
+        entity.state = STATES.ALERTED;
       }
     }
   }
 
   if (entity.state === STATES.ALERTED) {
     if (!detects(entity, player)) {
-      entity.set('state', STATES.SEARCHING);
-      entity.set('isAlerted', false);
+      entity.state = STATES.SEARCHING;
+      entity.isAlerted = false;
     }
   }
 
   if (entity.state === STATES.SEARCHING) {
     const { lastKnownPlayerPosition: target } = entity;
     if (target.x === entity.x && target.y === entity.y) {
-      entity.set('state', STATES.STANDING);
+      entity.state = STATES.STANDING;
     }
   }
 };
@@ -76,16 +74,14 @@ const decide = (entity, gameData, pathfinder) => {
 
   if (entity.state === STATES.PATROLING) {
     const { patrolPath } = entity;
-    const currentIndex = patrolPath.findIndex(
-      ({ x, y }) => x === entity.x && y === entity.y,
-    );
+    const currentIndex = patrolPath.findIndex(({ x, y }) => x === entity.x && y === entity.y);
     const target = patrolPath[currentIndex + 1];
     return { type: 'MOVE', data: { entity, target } };
   }
 
   if (entity.state === STATES.ALERTED) {
     const { player } = gameData.dungeon;
-    entity.set('lastKnownPlayerPosition', { x: player.x, y: player.y });
+    entity.lastKnownPlayerPosition = { x: player.x, y: player.y };
     const [, target] = computePath(entity, player, pathfinder);
 
     if (target.x === player.x && target.y === player.y) {

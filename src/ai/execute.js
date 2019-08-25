@@ -5,9 +5,9 @@ import meleeAttack from 'backstab/actions/meleeAttack';
 import wait from 'backstab/actions/wait';
 
 const rotate = (entity, direction) => {
-  entity.set('direction', direction);
-  entity.set('seenPoints', computeSight(entity));
-  entity.set('timeSinceLastRotation', 0);
+  entity.direction = direction;
+  entity.seenPoints = computeSight(entity);
+  entity.timeSinceLastRotation = 0;
 };
 
 const execute = ({ type, data }) => {

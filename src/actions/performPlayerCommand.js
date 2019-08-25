@@ -24,12 +24,7 @@ const performPlayerCommand = (command, { player, dungeon, enemies }) => {
     case 'DOWN':
     case 'LEFT':
     case 'RIGHT':
-      return enterPosition(
-        player,
-        getCoordinatesFromDirection(player, command),
-        dungeon,
-        enemies,
-      );
+      return enterPosition(player, getCoordinatesFromDirection(player, command), dungeon, enemies);
     case 'WAIT':
       return wait(player);
     case 'STAIRS_DOWN':

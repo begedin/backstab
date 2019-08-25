@@ -1,8 +1,8 @@
-import { Terrain } from 'backstab/enums';
-import Entity from 'backstab/Entity';
+import { Terrain } from '@/enums';
+import Entity from '@/Entity';
 
 class Player extends Entity {
-  constructor(id) {
+  constructor(id: string) {
     super(
       -1,
       -1,
