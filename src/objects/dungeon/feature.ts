@@ -1,5 +1,6 @@
 import { Terrain } from '@/enums';
 import Entity from '@/Entity';
+import Anchor from './anchor';
 
 export type Bounds = { left: integer; right: integer; top: integer; bottom: integer };
 export type DungeonPoint = { x: integer; y: integer };
@@ -9,12 +10,12 @@ export type DungeonObject = DungeonPoint & { type: integer };
 class Feature {
   bounds: Bounds;
   points: DungeonTile[];
-  anchors: DungeonPoint[];
+  anchors: Anchor[];
   neighbors: Feature[];
   enemies: Entity[];
   objects: DungeonObject[];
 
-  constructor(bounds: Bounds, points: DungeonPoint[], anchors: DungeonPoint[]) {
+  constructor(bounds: Bounds, points: DungeonPoint[], anchors: Anchor[]) {
     this.bounds = bounds;
     this.points = points.map(p => ({ ...p, terrain: -1 }));
     this.anchors = anchors;

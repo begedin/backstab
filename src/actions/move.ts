@@ -1,9 +1,9 @@
 import computeSight from '@/behavior/sight';
-import { Location } from '@/actions/Location';
 import Entity from '@/Entity';
 import { ActionOutcome } from '@/actions/ActionOutcome';
+import { DungeonPoint } from '@/objects/dungeon/feature';
 
-const move = (subject: Entity, location: Location): ActionOutcome => {
+const move = (subject: Entity, location: DungeonPoint): ActionOutcome => {
   subject.setPosition(location.x, location.y);
   subject.seenPoints = computeSight(subject);
 

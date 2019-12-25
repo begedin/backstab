@@ -3,12 +3,10 @@ import goDownStairs from '@/actions/goDownStairs';
 import goUpStairs from '@/actions/goUpStairs';
 import wait from '@/actions/wait';
 import { DungeonPoint } from '@/objects/dungeon/feature';
-import Player from '@/Player';
-import Dungeon from '@/Dungeon';
-import Entity from '@/Entity';
 import { ActionOutcome } from './ActionOutcome';
+import { GameData } from '@/types/GameData';
 
-type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
+export type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
 
 const getCoordinatesFromDirection = (
   { x, y }: DungeonPoint,
@@ -28,16 +26,11 @@ const getCoordinatesFromDirection = (
   }
 };
 
-type Command = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT' | 'WAIT' | 'STAIRS_DOWN' | 'STAIRS_UP';
-type CommandData = {
-  player: Player;
-  dungeon: Dungeon;
-  enemies: Entity[];
-};
+export type Command = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT' | 'WAIT' | 'STAIRS_DOWN' | 'STAIRS_UP';
 
 const performPlayerCommand = (
   command: Command,
-  { player, dungeon, enemies }: CommandData,
+  { player, dungeon, enemies }: GameData,
 ): ActionOutcome | null => {
   switch (command) {
     case 'UP':

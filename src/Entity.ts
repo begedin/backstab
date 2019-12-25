@@ -1,5 +1,8 @@
 import { maxHealth, inventoryCapacity } from '@/behavior/attributes';
 import { Location } from '@/actions/Location';
+import { STATES } from './ai/decide';
+import Feature, { DungeonPoint } from './objects/dungeon/feature';
+import { Direction } from './actions/performPlayerCommand';
 
 export type AttributeValues = {
   strength: number;
@@ -48,19 +51,25 @@ class Entity {
   type: EntityType;
   attributes: Attributes;
   weapon: Weapon;
+  state: string;
+  isAlerted: boolean;
+  lastKnownPlayerPosition: DungeonPoint | null = null;
 
   maxHealth: number;
   health: number;
   inventoryCapacity: number;
   status: EntityStatus;
   seenPoints: Location[] | null = null;
-  direction: 0 | 1 | 2 | 3 = 0;
+  direction: Direction = 'UP';
   walkableTerrains: number[] = [];
   range = 1;
-  parentFeature: unknown;
+  parentFeature: Feature | null;
 
   timeSinceLastRotation = 0;
   timeBetweenRotations = 0;
+
+  patrolTarget: DungeonPoint | null = null;
+  patrolPath: DungeonPoint[] | null = null;
 
   constructor(
     x: number,
@@ -70,6 +79,7 @@ class Entity {
     type: EntityType,
     attributes: AttributeValues,
     weapon: WeaponValues,
+    parentFeature: Feature | null = null,
   ) {
     this.x = x;
     this.y = y;
@@ -84,6 +94,9 @@ class Entity {
     this.health = this.maxHealth;
     this.inventoryCapacity = inventoryCapacity(this);
     this.status = 'ALIVE';
+    this.state = STATES.STANDING;
+    this.isAlerted = false;
+    this.parentFeature = parentFeature;
   }
 
   setPosition(x: number, y: number): void {

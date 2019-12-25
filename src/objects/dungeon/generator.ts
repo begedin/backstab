@@ -1,4 +1,4 @@
-import { Terrain, Objects } from '@/enums';
+import { Objects } from '@/enums';
 import * as Random from '@/Random';
 import generateRoom from '@/objects/dungeon/generator/room';
 import generateDiamondRoom from '@/objects/dungeon/generator/diamond_room';
@@ -39,7 +39,7 @@ const tryGenerateFeature = (existingFeatures: Feature[]): Feature | null => {
     return null;
   }
 
-  feature.setPoint(anchor, Terrain.DIRT_FLOOR);
+  feature.setPoint(anchor, 'DIRT_FLOOR');
   addObject(feature, anchor, Objects.DOOR);
 
   connectFeatures(newFeature, feature);
@@ -68,14 +68,14 @@ class Generator {
       attempts += 1;
     }
 
-    const startingLocation = Random.pick(initialRoom.innerPoints);
+    const startingLocation = Random.pick<DungeonPoint>(initialRoom.innerPoints);
 
     if (!isTopLevel) {
       addObject(initialRoom, startingLocation, Objects.STAIRS_UP);
     }
 
-    const downStairsFeature = Random.pick(features);
-    const downStairsPoint = Random.pick(downStairsFeature.innerPoints);
+    const downStairsFeature = Random.pick<Feature>(features);
+    const downStairsPoint = Random.pick<DungeonPoint>(downStairsFeature.innerPoints);
     addObject(downStairsFeature, downStairsPoint, Objects.STAIRS_DOWN);
 
     const level = new DungeonLevel(startingLocation, downStairsPoint, features, width, height);

@@ -19,9 +19,7 @@ const CreatureFactory = {
     };
     const weapon = { damage: 0, accuracy: 1 };
 
-    const creature = new Entity(x, y, id, name, type, attributes, weapon);
-    creature.parentFeature = feature;
-    creature.seenPoints = [];
+    const creature = new Entity(x, y, id, name, type, attributes, weapon, feature);
     creature.walkableTerrains = [Terrain.DIRT_FLOOR, Terrain.CORRIDOR];
     return creature;
   },
@@ -38,7 +36,7 @@ const CreatureFactory = {
     };
     const weapon = { damage: 2, accuracy: 5 };
 
-    const creature = new Entity(x, y, id, name, type, attributes, weapon);
+    const creature = new Entity(x, y, id, name, type, attributes, weapon, feature);
     creature.parentFeature = feature;
     creature.seenPoints = [];
     creature.walkableTerrains = [Terrain.DIRT_FLOOR, Terrain.CORRIDOR];
@@ -57,7 +55,7 @@ const CreatureFactory = {
     };
     const weapon = { damage: 0, accuracy: 1 };
 
-    const creature = new Entity(x, y, id, name, type, attributes, weapon);
+    const creature = new Entity(x, y, id, name, type, attributes, weapon, feature);
     creature.direction = randomDirection();
     creature.range = 4;
     creature.parentFeature = feature;

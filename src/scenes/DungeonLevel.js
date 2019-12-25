@@ -6,11 +6,7 @@ import PlayerController from 'backstab/PlayerController';
 import { gridToWorld } from 'backstab/objects/grid/convert';
 import { decide, execute } from 'backstab/AI';
 import { createTurnQueue, updateTurnQueue } from 'backstab/TurnSystem';
-import {
-  bumpTween,
-  damageEffectTween,
-  moveTween,
-} from 'backstab/objects/actionTweens';
+import { bumpTween, damageEffectTween, moveTween } from 'backstab/objects/actionTweens';
 import performPlayerCommand from 'backstab/actions/performPlayerCommand';
 import { renderInitial, renderUpdated } from 'backstab/renderers/entities';
 import { js as EasystarJs } from 'easystarjs';
@@ -59,9 +55,7 @@ export default class DungeonLevel extends Phaser.Scene {
 
   get playerContainer() {
     const { gameData, renderData } = this;
-    return renderData.entities.find(
-      e => e.getData('id') === gameData.player.id,
-    );
+    return renderData.entities.find(e => e.getData('id') === gameData.player.id);
   }
 
   playbackAction(action) {
