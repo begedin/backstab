@@ -1,11 +1,12 @@
 import Phaser from 'phaser';
-import Entity from 'backstab/Entity';
-import computeSight from 'backstab/behavior/sight';
-import { randomDirection } from 'backstab/behavior/rotation';
-import { Terrain } from 'backstab/enums';
+import Entity from '@/Entity';
+import computeSight from '@/behavior/sight';
+import { randomDirection } from '@/behavior/rotation';
+import { Terrain } from '@/enums';
+import Feature from './objects/dungeon/feature';
 
 const CreatureFactory = {
-  createDummy(feature, x, y) {
+  createDummy(feature: Feature, x: integer, y: integer): Entity {
     const id = Phaser.Utils.String.UUID();
     const name = 'Dummy';
     const type = 'dummy';
@@ -25,7 +26,7 @@ const CreatureFactory = {
     return creature;
   },
 
-  createAttacker(feature, x, y) {
+  createAttacker(feature: Feature, x: integer, y: integer): Entity {
     const id = Phaser.Utils.String.UUID();
     const name = 'Attacker';
     const type = 'attacker';
@@ -44,7 +45,7 @@ const CreatureFactory = {
     return creature;
   },
 
-  createPalantir(feature, x, y) {
+  createPalantir(feature: Feature, x: integer, y: integer): Entity {
     const id = Phaser.Utils.String.UUID();
     const name = 'Palantir';
     const type = 'palantir';

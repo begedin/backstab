@@ -1,13 +1,17 @@
 import Phaser from 'phaser';
-import * as Random from 'backstab/Random';
-import CreatureFactory from 'backstab/CreatureFactory';
-import DungeonGenerator from 'backstab/objects/dungeon/generator';
-import Player from 'backstab/Player';
+import * as Random from '@/Random';
+import CreatureFactory from '@/CreatureFactory';
+import DungeonGenerator from '@/objects/dungeon/generator';
+import Player from '@/Player';
+import DungeonLevel from './objects/DungeonLevel';
+import Entity from './Entity';
 
-const spawnLevel = (mapSize, isTopLevel) => new DungeonGenerator(mapSize, mapSize, isTopLevel);
+const spawnLevel = (mapSize: number, isTopLevel: boolean): DungeonLevel =>
+  DungeonGenerator.createLevel(mapSize, mapSize, isTopLevel);
 
-const spawnEnemies = level => {
-  const enemies = level.features.map(feature => {
+const spawnEnemies = (level: DungeonLevel): Entity[] => {
+  const enemies: Entity[] = [];
+  level.features.forEach(feature => {
     const { x, y } = Random.pick(feature.innerPoints);
 
     let enemy;
@@ -26,14 +30,20 @@ const spawnEnemies = level => {
         break;
     }
 
-    feature.enemies.push(enemy);
-    return enemy;
+    if (enemy) {
+      feature.enemies.push(enemy);
+    }
   });
 
   return enemies;
 };
 
 class Dungeon {
+  currentLevelIndex: number;
+  levels: DungeonLevel[];
+  mapSize: number;
+  player: Player;
+
   constructor() {
     this.currentLevelIndex = -1;
     this.levels = [];
@@ -41,7 +51,7 @@ class Dungeon {
     this.player = new Player(Phaser.Utils.String.UUID());
   }
 
-  descend() {
+  descend(): void {
     const { currentLevelIndex, levels } = this;
     if (!levels[currentLevelIndex + 1]) {
       this.spawnLevel();
@@ -52,19 +62,20 @@ class Dungeon {
     this.player.setPosition(startingLocation.x, startingLocation.y);
   }
 
-  ascend() {
+  ascend(): void {
     this.currentLevelIndex -= 1;
+
     const { stairsDownLocation } = this.currentLevel;
     this.player.setPosition(stairsDownLocation.x, stairsDownLocation.y);
   }
 
-  spawnLevel() {
+  spawnLevel(): void {
     const level = spawnLevel(this.mapSize, this.levels.length === 0);
     level.enemies = spawnEnemies(level);
     this.levels.push(level);
   }
 
-  get currentLevel() {
+  get currentLevel(): DungeonLevel {
     return this.levels[this.currentLevelIndex];
   }
 }

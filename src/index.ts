@@ -1,4 +1,4 @@
 import Phaser from 'phaser';
-import config from 'backstab/config';
+import config from '@/config';
 
 export default new Phaser.Game(config);

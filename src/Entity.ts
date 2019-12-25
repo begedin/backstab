@@ -37,7 +37,7 @@ class Weapon {
   }
 }
 
-type EntityType = 'player' | 'enemy';
+type EntityType = 'player' | 'attacker' | 'palantir' | 'dummy';
 type EntityStatus = 'ALIVE' | 'DEAD';
 
 class Entity {
@@ -58,6 +58,9 @@ class Entity {
   walkableTerrains: number[] = [];
   range = 1;
   parentFeature: unknown;
+
+  timeSinceLastRotation = 0;
+  timeBetweenRotations = 0;
 
   constructor(
     x: number,

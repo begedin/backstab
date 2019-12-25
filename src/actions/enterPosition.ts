@@ -7,7 +7,7 @@ import { ActionOutcome } from './ActionOutcome';
 
 const canMoveTo = (subject: Entity, location: Location, dungeon: Dungeon): boolean => {
   const tile = dungeon.currentLevel.tileAt(location.x, location.y);
-  return tile && subject.walkableTerrains.indexOf(tile.terrain) > -1;
+  return tile ? subject.walkableTerrains.indexOf(tile.terrain) > -1 : false;
 };
 
 const enterPosition = (

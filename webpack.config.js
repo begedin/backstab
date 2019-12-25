@@ -11,7 +11,7 @@ module.exports = env => ({
     },
     plugins: [new TsconfigPathsPlugin({ configFile: './tsconfig.json' })],
   },
-  entry: { main: './src/index.js' },
+  entry: { main: './src/index.ts' },
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
