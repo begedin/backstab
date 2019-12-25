@@ -41,8 +41,8 @@ type EntityType = 'player' | 'attacker' | 'palantir' | 'dummy';
 type EntityStatus = 'ALIVE' | 'DEAD';
 
 class Entity {
-  x: number | null = null;
-  y: number | null = null;
+  x: number;
+  y: number;
   id: string;
   name: string;
   type: EntityType;
