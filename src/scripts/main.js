@@ -1,29 +1,40 @@
-import Analytics from 'utils/Analytics';
+import Phaser from "phaser";
+import Analytics from "./utils/Analytics.js";
 
-import Boot from 'states/Boot';
-import Preload from 'states/Preload';
-import Menu from 'states/Menu';
-import Game from 'states/Game';
+import Boot from "./states/Boot.js";
+import Preload from "./states/Preload.js";
+import Menu from "./states/Menu.js";
+import Game from "./states/Game.js";
 
-var game, App = {};
+let game;
 
-App.start = function() {
-    game = new Phaser.Game(
-        960, 640,
-        Phaser.AUTO,
-        'game-container'
-    );
+const App = {
+    start: () => {
+        const config = {
+            type: Phaser.AUTO,
+            width: 960,
+            height: 640,
+            parent: "game-container",
+            scene: [Boot, Preload, Menu, Game],
+            physics: {
+                default: "arcade",
+                arcade: {
+                    gravity: { y: 300 },
+                    debug: false,
+                },
+            },
+        };
 
-    game.analytics = new Analytics('phaser-game');
+        game = new Phaser.Game(config);
 
-    game.state.add('boot', Boot);
-    game.state.add('preload', Preload);
-    game.state.add('menu', Menu);
-    game.state.add('game', Game);
+        // Add analytics to the game instance
+        game.analytics = new Analytics("phaser-game");
 
-    game.state.start('boot');
-
-    return game;
+        return game;
+    },
 };
+
+// Start the game when the module is loaded
+window.game = App.start();
 
 export default App;

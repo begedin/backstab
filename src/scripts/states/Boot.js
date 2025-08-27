@@ -1,26 +1,43 @@
-class Boot {
+import Phaser from "phaser";
+
+class Boot extends Phaser.Scene {
+    constructor() {
+        super({ key: "Boot" });
+    }
 
     preload() {
-        //load the assets for the preload state here
+        // Load the assets for the preload state here
     }
 
     create() {
-        // max number of fingers to detect
+        // Configure input
         this.input.maxPointers = 1;
 
-        // auto pause if window looses focus
-        this.stage.disableVisibilityChange = true;
+        // Auto pause if window loses focus
+        this.game.scale.pauseOnBlur = true;
+
+        // Configure scaling
+        this.scale.setGameSize(960, 640);
+        this.scale.setZoom(1);
 
         if (this.game.device.desktop) {
-            this.stage.scale.pageAlignHorizontally = true;
+            this.scale.pageAlignHorizontally = true;
         }
 
-        this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        this.game.scale.setScreenSize(true);
+        // Add some visual feedback
+        this.add
+            .text(480, 320, "BOOT SCENE", {
+                fontSize: "32px",
+                fill: "#fff",
+                fontFamily: "Arial",
+            })
+            .setOrigin(0.5);
 
-        this.game.state.start('preload', true, false);
+        // Start the preload scene after a short delay
+        this.time.delayedCall(2000, () => {
+            this.scene.start("Preload");
+        });
     }
-
 }
 
 export default Boot;

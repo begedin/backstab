@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
     <!-- Standardised web app manifest -->
-    <link rel="manifest" href="app.manifest">
+    <link rel="manifest" href="/app.manifest">
 
     <!-- iOS specific -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui">
@@ -35,23 +35,11 @@
 
     <title>backstab</title>
 
-    <!-- build:css assets/css/style.min.css -->
-    <link rel="stylesheet" href="assets/css/style.css">
-    <!-- /build -->
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <section id="game-container"></section>
 
-    <!-- build:js assets/js/game.min.js -->
-    <script src="bower_components/traceur-runtime/traceur-runtime.js"></script>
-    
-    <script src="bower_components/phaser-official/build/custom/phaser-arcade-physics.js"></script>
-    
-    <script src="assets/js/game.js"></script>
-    <!-- /build -->
-
-    <script>
-        window.game = System.get('main')['default'].start();
-    </script>
+    <script type="module" src="/scripts/main.js"></script>
 </body>
 </html>
